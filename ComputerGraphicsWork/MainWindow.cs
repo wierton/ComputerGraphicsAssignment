@@ -249,8 +249,15 @@ namespace ComputerGraphicsWork
                     curUserGraphics = circle;
                     break;
                 case CGGraphicsType.CGTypeEllipse:
-                    wrapDrawEllipse(rawPen, downPos, oldPos);
-                    wrapDrawEllipse(ghsPen, downPos, curPos);
+                    if (canClearGraphics)
+                    {
+                        userCanvas.ClearGraphics(curUserGraphics);
+                    }
+
+                    CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse(downPos, curPos);
+                    userCanvas.SelectGraphics(ellipse);
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                    curUserGraphics = ellipse;
                     break;
             }
 

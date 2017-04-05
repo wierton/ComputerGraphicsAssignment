@@ -28,6 +28,16 @@ namespace ComputerGraphicsWork
         {
             return pointsSet;
         }
+
+        public virtual bool IsCursorNearby(Point cursorPos)
+        {
+            return true;
+        }
+
+        public virtual void CursorOn()
+        {
+            // do nothing
+        }
     }
 
     public class CGUserGraphicsPoint : CGUserGraphics
@@ -180,7 +190,6 @@ namespace ComputerGraphicsWork
     }
     public class CGUserGraphicsCircle : CGUserGraphics
     {
-        private UserLog log;
         Point centerPoint;
         int radius;
 
@@ -233,6 +242,92 @@ namespace ComputerGraphicsWork
                 new Point(centerPoint.X - (int)radius, centerPoint.Y),
                 new Point(centerPoint.X, centerPoint.Y + (int)radius),
                 new Point(centerPoint.X, centerPoint.Y - (int)radius),
+            };
+        }
+    }
+    public class CGUserGraphicsEllipse : CGUserGraphics
+    {
+        Point centerPoint;
+        int xRadius, yRadius;
+        public CGUserGraphicsEllipse(Point center, Point edge)
+        {
+            centerPoint = center;
+            int dx = edge.X - center.X;
+            int dy = edge.Y - center.Y;
+
+            xRadius = Math.Abs(dx);
+            yRadius = Math.Abs(dy);
+
+            int xRadiusSquare = xRadius * xRadius;
+            int yRadiusSquare = yRadius * yRadius;
+
+            int twiceXRadiusSquare = 2 * xRadiusSquare;
+            int twiceYRadiusSquare = 2 * yRadiusSquare;
+
+            int px = 0;
+            int py = twiceXRadiusSquare * yRadius;
+
+            List<Point> baseSet = new List<Point>();
+
+            Point fp = new Point(0, yRadius);
+            int p = yRadiusSquare - xRadiusSquare * yRadius + xRadiusSquare / 4;
+            while (px < py)
+            {
+                if (p < 0)
+                {
+                    fp.X++;
+                    px += twiceYRadiusSquare;
+                    p += yRadiusSquare + px;
+                    baseSet.Add(fp);
+                }
+                else
+                {
+                    fp.X++;
+                    fp.Y--;
+                    px += twiceYRadiusSquare;
+                    py -= twiceXRadiusSquare;
+                    p += yRadiusSquare + px - py;
+                    baseSet.Add(fp);
+                }
+            }
+
+            p = yRadiusSquare * (fp.X * fp.X + fp.X) + xRadiusSquare * (fp.Y - 1) * (fp.Y - 1) - xRadiusSquare * yRadiusSquare;
+            
+            while(fp.Y >= 0)
+            {
+                if (p > 0)
+                {
+                    fp.Y--;
+                    py -= twiceXRadiusSquare;
+                    p += xRadiusSquare - py;
+                    baseSet.Add(fp);
+                }
+                else
+                {
+                    fp.X++;
+                    fp.Y--;
+                    py -= twiceXRadiusSquare;
+                    px += twiceYRadiusSquare;
+                    p += xRadiusSquare + px - py;
+                    baseSet.Add(fp);
+                }
+            }
+
+            for (int i = baseSet.Count - 1; i >= 0; i--)
+                baseSet.Add(new Point(-baseSet[i].X, baseSet[i].Y));
+
+            for (int i = baseSet.Count - 1; i >= 0; i--)
+                baseSet.Add(new Point(baseSet[i].X, -baseSet[i].Y));
+
+            baseSet.ForEach((u) => { pointsSet.Add(new Point(u.X + center.X, u.Y + center.Y)); });
+        }
+        public override List<Point> CornerPoints()
+        {
+            return new List<Point>() {
+                new Point(centerPoint.X + (int)xRadius, centerPoint.Y),
+                new Point(centerPoint.X - (int)xRadius, centerPoint.Y),
+                new Point(centerPoint.X, centerPoint.Y + (int)yRadius),
+                new Point(centerPoint.X, centerPoint.Y - (int)yRadius),
             };
         }
     }
