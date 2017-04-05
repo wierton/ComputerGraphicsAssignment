@@ -181,7 +181,36 @@ namespace ComputerGraphicsWork
     public class CGUserGraphicsCircle : CGUserGraphics
     {
         Point centerPoint;
-        float radius;
+        int radius;
+
+        public CGUserGraphicsCircle(Point center, Point edge)
+        {
+            centerPoint = center;
+            int dx = edge.X - center.X;
+            int dy = edge.Y - center.Y;
+            radius = (int)Math.Sqrt((double)(dx * dx + dy * dy));
+
+            // FIXME:
+            Point fp = new Point(center.X, center.Y + radius);
+            int p = 1 - radius;
+            while (fp.X <= fp.Y)
+            {
+                if (p < 0)
+                {
+                    fp.X++;
+                    p = p + 2 * fp.X + 1;
+                    pointsSet.Add(fp);
+                }
+                else
+                {
+                    fp.X++;
+                    fp.Y++;
+                    p = p + 2 * fp.X - 2 * fp.Y + 1;
+                    pointsSet.Add(fp);
+                }
+            }
+        }
+
         public override List<Point> CornerPoints()
         {
             return new List<Point>() {

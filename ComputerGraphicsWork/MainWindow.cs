@@ -216,9 +216,15 @@ namespace ComputerGraphicsWork
             switch (ghsType)
             {
                 case CGGraphicsType.CGTypePoint:
-                    
-                    // userCanvas.SetPixel(curPos.X, curPos.Y, Color.Black);
-                    // ghs.DrawImage(userCanvas, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
+                    if (canClearGraphics)
+                    {
+                        userCanvas.ClearGraphics(curUserGraphics);
+                    }
+
+                    CGUserGraphicsPoint singlePoint = new CGUserGraphicsPoint(curPos);
+                    userCanvas.SelectGraphics(singlePoint);
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                    curUserGraphics = singlePoint;
                     break;
                 case CGGraphicsType.CGTypeLine:
                     if(canClearGraphics)
@@ -230,12 +236,17 @@ namespace ComputerGraphicsWork
                     userCanvas.SelectGraphics(line);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = line;
-                    // ghs.DrawLine(rawPen, downPos, oldPos);
-                    // ghs.DrawLine(ghsPen, downPos, curPos);
                     break;
                 case CGGraphicsType.CGTypeCircle:
-                    wrapDrawCircle(rawPen, downPos, oldPos);
-                    wrapDrawCircle(ghsPen, downPos, curPos);
+                    if (canClearGraphics)
+                    {
+                        userCanvas.ClearGraphics(curUserGraphics);
+                    }
+
+                    CGUserGraphicsCircle circle = new CGUserGraphicsCircle(downPos, curPos);
+                    userCanvas.SelectGraphics(circle);
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                    curUserGraphics = circle;
                     break;
                 case CGGraphicsType.CGTypeEllipse:
                     wrapDrawEllipse(rawPen, downPos, oldPos);
