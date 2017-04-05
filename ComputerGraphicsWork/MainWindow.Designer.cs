@@ -1,11 +1,14 @@
 ﻿using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 
 
 namespace ComputerGraphicsWork
 {
     public class CGUserGraphics
     {
+        public IList<Point> pointsSet { get; } = new List<Point>();
+
         public void TagPoints()
         {
 
@@ -14,7 +17,15 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphicsPoint : CGUserGraphics
     {
+        public CGUserGraphicsPoint(Point start, Point end)
+        {
+            int dx = end.X - start.X;
+            int dy = end.Y - start.Y;
+            if(dx > dy)
+            {
 
+            }
+        }
     }
     public class CGUserGraphicsLine : CGUserGraphics
     {
@@ -30,6 +41,13 @@ namespace ComputerGraphicsWork
         private int canvasWidth, canvasHeight;
         private Bitmap userCanvas;
         private int[,] refCount;
+        public CGUserCanvas(int width, int height)
+        {
+            canvasWidth = width;
+            canvasHeight = height;
+            userCanvas = new Bitmap(width, height);
+            refCount = new int[width, height];
+        }
 
         private void SetPixel(Point pos)
         {
@@ -53,13 +71,6 @@ namespace ComputerGraphicsWork
             return pos;
         }
 
-        public void Init(int width, int height)
-        {
-            canvasWidth = width;
-            canvasHeight = height;
-            userCanvas = new Bitmap(width, height);
-            refCount = new int[width, height];
-        }
 
         public void SelectGraphics(CGUserGraphics userGraphics)
         {
