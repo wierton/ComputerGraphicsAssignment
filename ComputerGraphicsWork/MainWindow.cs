@@ -228,7 +228,7 @@ namespace ComputerGraphicsWork
 
                     CGUserGraphicsLine line = new CGUserGraphicsLine(downPos, curPos);
                     userCanvas.SelectGraphics(line);
-                    ghs.DrawImage(userCanvas.bmp, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = line;
                     // ghs.DrawLine(rawPen, downPos, oldPos);
                     // ghs.DrawLine(ghsPen, downPos, curPos);

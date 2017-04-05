@@ -22,11 +22,11 @@ namespace ComputerGraphicsWork
     }
     public class CGUserGraphics
     {
-        public IList<Point> pointsSet { get; } = new List<Point>();
+        public List<Point> pointsSet { get; } = new List<Point>();
 
-        public void TagPoints()
+        public virtual List<Point> CornerPoints()
         {
-
+            return pointsSet;
         }
     }
 
@@ -38,6 +38,11 @@ namespace ComputerGraphicsWork
             point = start;
             pointsSet.Add(start);
         }
+
+        public override List<Point> CornerPoints()
+        {
+            return new List<Point>() { point };
+        }
     }
 
     public class CGUserGraphicsLine : CGUserGraphics
@@ -48,6 +53,7 @@ namespace ComputerGraphicsWork
             startPoint = start;
             endPoint = end;
 
+            // swap two points
             if (end.X < start.X)
             {
                 Point temp = start;
@@ -110,10 +116,56 @@ namespace ComputerGraphicsWork
             }
         }
 
+        public override List<Point> CornerPoints()
+        {
+            return new List<Point>() { startPoint, endPoint };
+        }
+
     }
     public class CGUserGraphicsCircle : CGUserGraphics
     {
+        Point centerPoint;
+        float radius;
+        public override List<Point> CornerPoints()
+        {
+            return new List<Point>() {
+                new Point(centerPoint.X + (int)radius, centerPoint.Y),
+                new Point(centerPoint.X - (int)radius, centerPoint.Y),
+                new Point(centerPoint.X, centerPoint.Y + (int)radius),
+                new Point(centerPoint.X, centerPoint.Y - (int)radius),
+            };
+        }
+    }
 
+    public class CGUserGraphicsTinyRectangle : CGUserGraphics
+    {
+        Rectangle rect;
+        const int edge = 3;
+
+        public CGUserGraphicsTinyRectangle(Point center)
+        {
+            for (int i = center.X - edge; i <= center.X + edge; i++)
+                pointsSet.Add(new Point(i, center.Y - edge));
+
+            for (int i = center.X - edge; i <= center.X + edge; i++)
+                pointsSet.Add(new Point(i, center.Y + edge));
+
+            for (int i = center.Y - edge; i <= center.Y + edge; i++)
+                pointsSet.Add(new Point(i, center.X - edge));
+
+            for (int i = center.Y - edge; i <= center.Y + edge; i++)
+                pointsSet.Add(new Point(i, center.X + edge));
+        }
+
+        public override List<Point> CornerPoints()
+        {
+            return new List<Point>() {
+                new Point(rect.X, rect.Y),
+                new Point(rect.X + rect.Width, rect.Y),
+                new Point(rect.X + rect.Width, rect.Y + rect.Width),
+                new Point(rect.X, rect.Y + rect.Width),
+            };
+        }
     }
 
     public class CGUserCanvas
@@ -131,12 +183,18 @@ namespace ComputerGraphicsWork
 
         private void SetPixel(Point pos)
         {
+            if (pos.X < 0 || pos.X >= canvasWidth || pos.Y < 0 || pos.Y >= canvasHeight)
+                return;
+
             bmp.SetPixel(pos.X, pos.Y, Color.Black);
             refCount[pos.X, pos.Y]++;
         }
 
         private void ClearPixel(Point pos)
         {
+            if (pos.X < 0 || pos.X >= canvasWidth || pos.Y < 0 || pos.Y >= canvasHeight)
+                return;
+
             refCount[pos.X, pos.Y]--;
             if(refCount[pos.X, pos.Y] <= 0)
                 bmp.SetPixel(pos.X, pos.Y, Color.White);
