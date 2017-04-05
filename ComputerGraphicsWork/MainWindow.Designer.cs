@@ -31,12 +31,25 @@ namespace ComputerGraphicsWork
 
         public virtual bool IsCursorNearby(Point cursorPos)
         {
-            return true;
+            return false;
         }
 
-        public virtual void CursorOn()
+        public void DrawTagPoints(CGUserCanvas userCanvas)
         {
-            // do nothing
+            foreach(Point p in CornerPoints())
+            {
+                CGUserGraphicsTinyRectangle tinyRect = new CGUserGraphicsTinyRectangle(p);
+                userCanvas.SelectGraphics(tinyRect);
+            }
+        }
+
+        public void ClearTagPoints(CGUserCanvas userCanvas)
+        {
+            foreach (Point p in CornerPoints())
+            {
+                CGUserGraphicsTinyRectangle tinyRect = new CGUserGraphicsTinyRectangle(p);
+                userCanvas.ClearGraphics(tinyRect);
+            }
         }
     }
 
@@ -182,6 +195,22 @@ namespace ComputerGraphicsWork
             }
         }
 
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            int dx = startPoint.X - endPoint.X;
+            int dy = endPoint.Y - startPoint.Y;
+
+            double baseDist = Math.Sqrt(dx * dx + dy * dy);
+            double c = endPoint.X * startPoint.Y - startPoint.X * endPoint.Y;
+
+            double d = Math.Abs(cursorPos.X * dy + cursorPos.Y * dx + c) / baseDist;
+
+            if (d < 4)
+                return true;
+            else
+                return false;
+        }
+
         public override List<Point> CornerPoints()
         {
             return new List<Point>() { startPoint, endPoint };
@@ -234,7 +263,22 @@ namespace ComputerGraphicsWork
             
             baseSet.ForEach((u) => { pointsSet.Add(new Point(u.X + center.X, u.Y + center.Y)); });
         }
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            int dx = cursorPos.X - centerPoint.X;
+            int dy = cursorPos.Y - centerPoint.Y;
 
+            double dist = Math.Sqrt(dx * dx + dy * dy);
+
+            if (Math.Abs(radius - dist) < 4)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public override List<Point> CornerPoints()
         {
             return new List<Point>() {
@@ -321,6 +365,25 @@ namespace ComputerGraphicsWork
 
             baseSet.ForEach((u) => { pointsSet.Add(new Point(u.X + center.X, u.Y + center.Y)); });
         }
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            int dx = cursorPos.X - centerPoint.X;
+            int dy = cursorPos.Y - centerPoint.Y;
+
+            int xRadiusSquare = xRadius * xRadius;
+            int yRadiusSquare = yRadius * yRadius;
+
+            double dist = dx * dx * yRadiusSquare + dy * dy * xRadiusSquare;
+
+            if (dist < xRadiusSquare * yRadiusSquare)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public override List<Point> CornerPoints()
         {
             return new List<Point>() {
@@ -335,7 +398,7 @@ namespace ComputerGraphicsWork
     public class CGUserGraphicsTinyRectangle : CGUserGraphics
     {
         Rectangle rect;
-        const int edge = 3;
+        const int edge = 2;
 
         public CGUserGraphicsTinyRectangle(Point center)
         {
@@ -346,10 +409,10 @@ namespace ComputerGraphicsWork
                 pointsSet.Add(new Point(i, center.Y + edge));
 
             for (int i = center.Y - edge; i <= center.Y + edge; i++)
-                pointsSet.Add(new Point(i, center.X - edge));
+                pointsSet.Add(new Point(center.X - edge, i));
 
             for (int i = center.Y - edge; i <= center.Y + edge; i++)
-                pointsSet.Add(new Point(i, center.X + edge));
+                pointsSet.Add(new Point(center.X + edge, i));
         }
 
         public override List<Point> CornerPoints()
@@ -547,6 +610,7 @@ namespace ComputerGraphicsWork
             this.Text = "MainWindow";
             this.Load += new System.EventHandler(this.MainWindow_OverideLoad);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainWindow_Paint);
+            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseClick);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseUp);
