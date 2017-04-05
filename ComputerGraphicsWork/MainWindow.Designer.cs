@@ -65,54 +65,110 @@ namespace ComputerGraphicsWork
             int dy = end.Y - start.Y;
 
             pointsSet.Add(start);
-            if (Math.Abs(dx) >= Math.Abs(dy))
+            if (dy > 0)
             {
-                int yInc = dy > 0 ? 1 : -1;
-                int p = 2 * dy - dx;
-                for (int i = 0; i < dx; i++)
+                if (Math.Abs(dx) >= Math.Abs(dy))
                 {
-                    if (p > 0)
+                    int p = 2 * dy - dx;
+                    for (int i = 0; i < dx; i++)
                     {
-                        start.X ++;
-                        start.Y += yInc;
-                        pointsSet.Add(start);
-                        int ddx = end.X - start.X;
-                        int ddy = end.Y - start.Y;
-                        p = p + 2 * (ddy - ddx);
+                        if (p > 0)
+                        {
+                            start.X++;
+                            start.Y++;
+                            pointsSet.Add(start);
+                            int ddx = end.X - start.X;
+                            int ddy = end.Y - start.Y;
+                            p = p + 2 * (ddy - ddx);
+                        }
+                        else
+                        {
+                            start.X++;
+                            pointsSet.Add(start);
+                            int ddy = end.Y - start.Y;
+                            p = p + 2 * ddy;
+                        }
                     }
-                    else
+                }
+                else
+                {
+                    int p = 2 * dx - dy;
+                    for (int i = 0; i < Math.Abs(dy); i++)
                     {
-                        start.X ++;
-                        pointsSet.Add(start);
-                        int ddy = end.Y - start.Y;
-                        p = p + 2 * ddy;
+                        if (p > 0)
+                        {
+                            start.Y++;
+                            start.X++;
+                            pointsSet.Add(start);
+                            int ddx = end.X - start.X;
+                            int ddy = end.Y - start.Y;
+                            p = p + 2 * (ddx - ddy);
+                        }
+                        else
+                        {
+                            start.Y++;
+                            pointsSet.Add(start);
+                            int ddx = end.X - start.X;
+                            p = p + 2 * ddx;
+                        }
                     }
                 }
             }
             else
             {
-                int xInc = dx > 0 ? 1 : -1;
-                int p = 2 * dx - dy;
-                for (int i = 0; i < Math.Abs(dy); i++)
+                if (Math.Abs(dx) >= Math.Abs(dy))
                 {
-                    if (p > 0)
+                    int p = 2 * dy + dx;
+                    for (int i = 0; i < dx; i++)
                     {
-                        start.Y++;
-                        start.X += xInc;
-                        pointsSet.Add(start);
-                        int ddx = end.X - start.X;
-                        int ddy = end.Y - start.Y;
-                        p = p + 2 * (ddx - ddy);
-                    }
-                    else
-                    {
-                        start.Y++;
-                        pointsSet.Add(start);
-                        int ddx = end.X - start.X;
-                        p = p + 2 * ddx;
+                        if (p < 0)
+                        {
+                            start.X++;
+                            start.Y--;
+                            pointsSet.Add(start);
+                            int ddx = end.X - start.X;
+                            int ddy = end.Y - start.Y;
+                            p = p + 2 * (ddy + ddx);
+                        }
+                        else
+                        {
+                            start.X++;
+                            pointsSet.Add(start);
+                            int ddy = end.Y - start.Y;
+                            p = p + 2 * ddy;
+                        }
                     }
                 }
+                else
+                {
+                    Point temp = start;
+                    start = end;
+                    end = temp;
 
+                    dx = end.X - start.X;
+                    dy = end.Y - start.Y;
+
+                    int p = 2 * dx + dy;
+                    for (int i = 0; i < dy; i++)
+                    {
+                        if (p < 0)
+                        {
+                            start.Y++;
+                            start.X--;
+                            pointsSet.Add(start);
+                            int ddy = end.Y - start.Y;
+                            int ddx = end.X - start.X;
+                            p = p + 2 * (ddx + ddy);
+                        }
+                        else
+                        {
+                            start.Y++;
+                            pointsSet.Add(start);
+                            int ddx = end.X - start.X;
+                            p = p + 2 * ddx;
+                        }
+                    }
+                }
             }
         }
 
