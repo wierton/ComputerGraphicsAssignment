@@ -39,7 +39,10 @@ namespace ComputerGraphicsWork
         private Pen ghsPen = new Pen(Color.Black, 1);
         private Pen rawPen = new Pen(Color.White, 1);
         private bool canDrawGraphics = false;
-        private Bitmap userCanvas;
+        private bool canClearGraphics = false;
+        private CGUserCanvas userCanvas;
+        private CGUserGraphics curUserGraphics;
+        private IList<CGUserGraphics> userGraphicsSet = new List<CGUserGraphics>();
 
         public MainWindow()
         {
@@ -54,7 +57,7 @@ namespace ComputerGraphicsWork
         private void MainWindow_OverideLoad(object sender, EventArgs e)
         {
             ghs = this.CreateGraphics();
-            userCanvas = new Bitmap(this.ClientRectangle.Width, this.ClientRectangle.Height);
+            userCanvas = new CGUserCanvas(this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
         private void ResumeOldStripButton(CGGraphicsType gt)
@@ -155,16 +158,22 @@ namespace ComputerGraphicsWork
         {
             mouseState = CGMouseState.CGMouseStateUp;
             canDrawGraphics = false;
+            canClearGraphics = false;
         }
 
         private void MainWindow_MouseDown(object sender, MouseEventArgs e)
         {
             mouseState = CGMouseState.CGMouseStateDown;
             canDrawGraphics = true;
+            canClearGraphics = false;
             downPos.X = e.X;
             downPos.Y = e.Y;
         }
 
+        private void MainWindow_Paint(object sender, PaintEventArgs e)
+        {
+            ghs.DrawImage(userCanvas.bmp, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
+        }
 
         private void commandHolder_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -181,6 +190,8 @@ namespace ComputerGraphicsWork
             ghs.DrawEllipse(pen, new RectangleF((float)(cx - r), (float)(cy - r), (float)(2 * r), (float)(2 * r)));
 
         }
+
+
         private void wrapDrawEllipse(Pen pen, Point center, Point edge)
         {
             int dx = Math.Abs(edge.X - center.X);
@@ -205,12 +216,22 @@ namespace ComputerGraphicsWork
             switch (ghsType)
             {
                 case CGGraphicsType.CGTypePoint:
-                    userCanvas.SetPixel(curPos.X, curPos.Y, Color.Black);
-                    ghs.DrawImage(userCanvas, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
+                    
+                    // userCanvas.SetPixel(curPos.X, curPos.Y, Color.Black);
+                    // ghs.DrawImage(userCanvas, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
                     break;
                 case CGGraphicsType.CGTypeLine:
-                    ghs.DrawLine(rawPen, downPos, oldPos);
-                    ghs.DrawLine(ghsPen, downPos, curPos);
+                    if(canClearGraphics)
+                    {
+                        userCanvas.ClearGraphics(curUserGraphics);
+                    }
+
+                    CGUserGraphicsLine line = new CGUserGraphicsLine(downPos, curPos);
+                    userCanvas.SelectGraphics(line);
+                    ghs.DrawImage(userCanvas.bmp, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
+                    curUserGraphics = line;
+                    // ghs.DrawLine(rawPen, downPos, oldPos);
+                    // ghs.DrawLine(ghsPen, downPos, curPos);
                     break;
                 case CGGraphicsType.CGTypeCircle:
                     wrapDrawCircle(rawPen, downPos, oldPos);
@@ -221,6 +242,8 @@ namespace ComputerGraphicsWork
                     wrapDrawEllipse(ghsPen, downPos, curPos);
                     break;
             }
+
+            canClearGraphics = true;
         }
     }
 }

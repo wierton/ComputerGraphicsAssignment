@@ -1,10 +1,25 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.IO;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
 
 namespace ComputerGraphicsWork
 {
+    public class log
+    {
+        public void write(String s)
+        {
+            FileStream fs = new FileStream("log.txt", FileMode.OpenOrCreate | FileMode.Append);
+            StreamWriter sw = new StreamWriter(fs);
+            sw.Write(s);
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+        }
+    }
     public class CGUserGraphics
     {
         public IList<Point> pointsSet { get; } = new List<Point>();
@@ -17,18 +32,83 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphicsPoint : CGUserGraphics
     {
-        public CGUserGraphicsPoint(Point start, Point end)
+        private Point point;
+        public CGUserGraphicsPoint(Point start)
         {
+            point = start;
+            pointsSet.Add(start);
+        }
+    }
+
+    public class CGUserGraphicsLine : CGUserGraphics
+    {
+        private Point startPoint, endPoint;
+        public CGUserGraphicsLine(Point start, Point end)
+        {
+            startPoint = start;
+            endPoint = end;
+
+            if (end.X < start.X)
+            {
+                Point temp = start;
+                start = end;
+                end = temp;
+            }
+
             int dx = end.X - start.X;
             int dy = end.Y - start.Y;
-            if(dx > dy)
+
+            pointsSet.Add(start);
+            if (Math.Abs(dx) >= Math.Abs(dy))
             {
+                int yInc = dy > 0 ? 1 : -1;
+                int p = 2 * dy - dx;
+                for (int i = 0; i < dx; i++)
+                {
+                    if (p > 0)
+                    {
+                        start.X ++;
+                        start.Y += yInc;
+                        pointsSet.Add(start);
+                        int ddx = end.X - start.X;
+                        int ddy = end.Y - start.Y;
+                        p = p + 2 * (ddy - ddx);
+                    }
+                    else
+                    {
+                        start.X ++;
+                        pointsSet.Add(start);
+                        int ddy = end.Y - start.Y;
+                        p = p + 2 * ddy;
+                    }
+                }
+            }
+            else
+            {
+                int xInc = dx > 0 ? 1 : -1;
+                int p = 2 * dx - dy;
+                for (int i = 0; i < Math.Abs(dy); i++)
+                {
+                    if (p > 0)
+                    {
+                        start.Y++;
+                        start.X += xInc;
+                        pointsSet.Add(start);
+                        int ddx = end.X - start.X;
+                        int ddy = end.Y - start.Y;
+                        p = p + 2 * (ddx - ddy);
+                    }
+                    else
+                    {
+                        start.Y++;
+                        pointsSet.Add(start);
+                        int ddx = end.X - start.X;
+                        p = p + 2 * ddx;
+                    }
+                }
 
             }
         }
-    }
-    public class CGUserGraphicsLine : CGUserGraphics
-    {
 
     }
     public class CGUserGraphicsCircle : CGUserGraphics
@@ -39,19 +119,19 @@ namespace ComputerGraphicsWork
     public class CGUserCanvas
     {
         private int canvasWidth, canvasHeight;
-        private Bitmap userCanvas;
+        public Bitmap bmp { get; }
         private int[,] refCount;
         public CGUserCanvas(int width, int height)
         {
             canvasWidth = width;
             canvasHeight = height;
-            userCanvas = new Bitmap(width, height);
+            bmp = new Bitmap(width, height);
             refCount = new int[width, height];
         }
 
         private void SetPixel(Point pos)
         {
-            userCanvas.SetPixel(pos.X, pos.Y, Color.Black);
+            bmp.SetPixel(pos.X, pos.Y, Color.Black);
             refCount[pos.X, pos.Y]++;
         }
 
@@ -59,7 +139,7 @@ namespace ComputerGraphicsWork
         {
             refCount[pos.X, pos.Y]--;
             if(refCount[pos.X, pos.Y] <= 0)
-                userCanvas.SetPixel(pos.X, pos.Y, Color.White);
+                bmp.SetPixel(pos.X, pos.Y, Color.White);
         }
 
         private Point ClipPoint(Point pos)
@@ -74,12 +154,18 @@ namespace ComputerGraphicsWork
 
         public void SelectGraphics(CGUserGraphics userGraphics)
         {
-
+            foreach (Point point in userGraphics.pointsSet)
+            {
+                SetPixel(point);
+            }
         }
 
         public void ClearGraphics(CGUserGraphics userGraphics)
         {
-
+            foreach (Point point in userGraphics.pointsSet)
+            {
+                ClearPixel(point);
+            }
         }
 
         public void FindGraphics(Point pos)
@@ -207,6 +293,7 @@ namespace ComputerGraphicsWork
             this.Name = "MainWindow";
             this.Text = "MainWindow";
             this.Load += new System.EventHandler(this.MainWindow_OverideLoad);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainWindow_Paint);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseUp);
