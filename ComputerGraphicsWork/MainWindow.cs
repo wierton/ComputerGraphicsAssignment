@@ -158,11 +158,10 @@ namespace ComputerGraphicsWork
             {
                 curUserGraphics.ClearTagPoints(userCanvas);
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                userGraphicsSet.Add(curUserGraphics);
             }
             canDrawGraphics = false;
             canClearGraphics = false;
-
-            userGraphicsSet.Add(curUserGraphics);
         }
 
         private void MainWindow_MouseDown(object sender, MouseEventArgs e)
@@ -175,18 +174,23 @@ namespace ComputerGraphicsWork
         }
         private void MainWindow_MouseClick(object sender, MouseEventArgs e)
         {
-            foreach (CGUserGraphics userGraphics in userGraphicsSet)
+            if(userGraphicsSet == null)
             {
-                if (userGraphics.IsCursorNearby(new Point(e.X, e.Y)))
+                return;
+            }
+
+            foreach (CGUserGraphics iterUserGraphics in userGraphicsSet)
+            {
+                if (iterUserGraphics.IsCursorNearby(new Point(e.X, e.Y)))
                 {
                     if (isUserGraphicsSelected)
                     {
                         selectedUserGraphics.ClearTagPoints(userCanvas);
                     }
 
-                    userGraphics.DrawTagPoints(userCanvas);
+                    iterUserGraphics.DrawTagPoints(userCanvas);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    selectedUserGraphics = userGraphics;
+                    selectedUserGraphics = iterUserGraphics;
                     isUserGraphicsSelected = true;
                     return;
                 }
@@ -210,6 +214,7 @@ namespace ComputerGraphicsWork
 
         }
 
+        /*
         private void wrapDrawCircle(Pen pen, Point center, Point edge)
         {
             int dx = edge.X - center.X;
@@ -218,7 +223,6 @@ namespace ComputerGraphicsWork
             double cy = center.Y;
             double r = Math.Sqrt((dx * dx + dy * dy));
             ghs.DrawEllipse(pen, new RectangleF((float)(cx - r), (float)(cy - r), (float)(2 * r), (float)(2 * r)));
-
         }
 
 
@@ -232,6 +236,8 @@ namespace ComputerGraphicsWork
             ghs.DrawEllipse(pen, new RectangleF((float)(cx - dx), (float)(cy - dy), (float)(2 * dx), (float)(2 * dy)));
 
         }
+
+        */
         private void MainWindow_MouseMove(object sender, MouseEventArgs e)
         {
             oldPos = curPos;
@@ -261,6 +267,7 @@ namespace ComputerGraphicsWork
                     userCanvas.SelectGraphics(singlePoint);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = singlePoint;
+                    canClearGraphics = true;
                     break;
                 case CGGraphicsType.CGTypeLine:
                     if(canClearGraphics)
@@ -274,6 +281,7 @@ namespace ComputerGraphicsWork
                     line.DrawTagPoints(userCanvas);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = line;
+                    canClearGraphics = true;
                     break;
                 case CGGraphicsType.CGTypeCircle:
                     if (canClearGraphics)
@@ -287,6 +295,7 @@ namespace ComputerGraphicsWork
                     circle.DrawTagPoints(userCanvas);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = circle;
+                    canClearGraphics = true;
                     break;
                 case CGGraphicsType.CGTypeEllipse:
                     if (canClearGraphics)
@@ -300,10 +309,11 @@ namespace ComputerGraphicsWork
                     ellipse.DrawTagPoints(userCanvas);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = ellipse;
+                    canClearGraphics = true;
                     break;
             }
 
-            canClearGraphics = true;
+            
         }
     }
 }
