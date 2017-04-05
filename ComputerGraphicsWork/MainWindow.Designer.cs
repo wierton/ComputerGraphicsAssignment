@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace ComputerGraphicsWork
 {
-    public class log
+    public class UserLog
     {
         public void write(String s)
         {
@@ -180,6 +180,7 @@ namespace ComputerGraphicsWork
     }
     public class CGUserGraphicsCircle : CGUserGraphics
     {
+        private UserLog log;
         Point centerPoint;
         int radius;
 
@@ -190,8 +191,9 @@ namespace ComputerGraphicsWork
             int dy = edge.Y - center.Y;
             radius = (int)Math.Sqrt((double)(dx * dx + dy * dy));
 
-            // FIXME:
-            Point fp = new Point(center.X, center.Y + radius);
+            List<Point> baseSet = new List<Point>();
+
+            Point fp = new Point(0, radius);
             int p = 1 - radius;
             while (fp.X <= fp.Y)
             {
@@ -199,16 +201,29 @@ namespace ComputerGraphicsWork
                 {
                     fp.X++;
                     p = p + 2 * fp.X + 1;
-                    pointsSet.Add(fp);
+                    baseSet.Add(fp);
                 }
                 else
                 {
                     fp.X++;
-                    fp.Y++;
+                    fp.Y--;
                     p = p + 2 * fp.X - 2 * fp.Y + 1;
-                    pointsSet.Add(fp);
+                    baseSet.Add(fp);
                 }
             }
+
+            for (int i = baseSet.Count - 1; i >= 0; i--)
+            {
+                baseSet.Add(new Point(baseSet[i].Y, baseSet[i].X));
+            }
+
+            for (int i = baseSet.Count - 1; i >= 0; i--)
+                baseSet.Add(new Point(-baseSet[i].X, baseSet[i].Y));
+
+            for (int i = baseSet.Count - 1; i >= 0; i--)
+                baseSet.Add(new Point(baseSet[i].X, -baseSet[i].Y));
+            
+            baseSet.ForEach((u) => { pointsSet.Add(new Point(u.X + center.X, u.Y + center.Y)); });
         }
 
         public override List<Point> CornerPoints()
