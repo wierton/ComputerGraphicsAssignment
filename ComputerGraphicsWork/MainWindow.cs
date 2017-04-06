@@ -181,6 +181,21 @@ namespace ComputerGraphicsWork
             ghs.DrawImage(userCanvas.bmp, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
         }
 
+        private void MainWindow_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            switch (e.KeyChar)
+            {
+                case (char)Keys.Back:
+                    
+                    if (userCanvas.isUserGraphicsSelected)
+                    {
+                        userCanvas.DeleteSelectedGraphics();
+                        ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                    }
+                    break;
+            }
+        }
+
         private void commandHolder_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
 

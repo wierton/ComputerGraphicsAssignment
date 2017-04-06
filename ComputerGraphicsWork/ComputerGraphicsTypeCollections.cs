@@ -20,6 +20,7 @@ namespace ComputerGraphicsWork
             fs.Close();
         }
     }
+
     public class CGUserGraphics
     {
         public List<Point> pointsSet { get; } = new List<Point>();
@@ -457,6 +458,8 @@ namespace ComputerGraphicsWork
 
     public class CGUserCanvas
     {
+        
+
         private int canvasWidth, canvasHeight;
         public Bitmap bmp { get; }
         public bool isUserGraphicsSelected { get; set; }
@@ -584,6 +587,13 @@ namespace ComputerGraphicsWork
             selectedUserGraphics = newGraphics;
         }
 
-    }
+        public void DeleteSelectedGraphics()
+        {
+            if (!isUserGraphicsSelected)
+                return;
 
+            this.ClearGraphicsSelected(selectedUserGraphics);
+            this.ClearGraphics(selectedUserGraphics);
+        }
+    }
 }
