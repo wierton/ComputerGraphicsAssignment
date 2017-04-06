@@ -26,7 +26,7 @@ namespace ComputerGraphicsWork
 
         public virtual List<Point> CornerPoints()
         {
-            return pointsSet;
+            return new List<Point> ();
         }
 
         public virtual bool IsCursorNearby(Point cursorPos)
@@ -65,6 +65,13 @@ namespace ComputerGraphicsWork
         public override List<Point> CornerPoints()
         {
             return new List<Point>() { point };
+        }
+
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            int dx = Math.Abs(point.X - cursorPos.X);
+            int dy = Math.Abs(point.Y - cursorPos.Y);
+            return (dx <= 4 && dy <= 4);
         }
     }
 

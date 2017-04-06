@@ -171,13 +171,6 @@ namespace ComputerGraphicsWork
             canClearGraphics = false;
             downPos.X = e.X;
             downPos.Y = e.Y;
-        }
-        private void MainWindow_MouseClick(object sender, MouseEventArgs e)
-        {
-            if(userGraphicsSet == null)
-            {
-                return;
-            }
 
             foreach (CGUserGraphics iterUserGraphics in userGraphicsSet)
             {
@@ -202,6 +195,10 @@ namespace ComputerGraphicsWork
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 isUserGraphicsSelected = false;
             }
+        }
+        private void MainWindow_MouseClick(object sender, MouseEventArgs e)
+        {
+
         }
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)

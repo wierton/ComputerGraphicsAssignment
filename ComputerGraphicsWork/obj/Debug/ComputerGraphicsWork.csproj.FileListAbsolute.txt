@@ -1,9 +1,9 @@
 C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\bin\Debug\ComputerGraphicsWork.exe.config
 C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\bin\Debug\ComputerGraphicsWork.exe
 C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\bin\Debug\ComputerGraphicsWork.pdb
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.csprojResolveAssemblyReference.cache
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.MainWindow.resources
 C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.Properties.Resources.resources
 C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.csproj.GenerateResource.Cache
 C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.exe
 C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.pdb
-C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.MainWindow.resources
-C:\Users\欧先飞\Desktop\ComputerGraphicsWork\ComputerGraphicsWork\obj\Debug\ComputerGraphicsWork.csprojResolveAssemblyReference.cache
