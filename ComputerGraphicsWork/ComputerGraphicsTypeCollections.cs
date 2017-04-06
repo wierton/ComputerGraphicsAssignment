@@ -34,22 +34,11 @@ namespace ComputerGraphicsWork
             return false;
         }
 
-        public void DrawTagPoints(CGUserCanvas userCanvas)
+        public virtual CGUserGraphics TransformMove(int dx, int dy)
         {
-            foreach (Point p in CornerPoints())
-            {
-                CGUserGraphicsTinyRectangle tinyRect = new CGUserGraphicsTinyRectangle(p);
-                userCanvas.SelectGraphics(tinyRect);
-            }
-        }
-
-        public void ClearTagPoints(CGUserCanvas userCanvas)
-        {
-            foreach (Point p in CornerPoints())
-            {
-                CGUserGraphicsTinyRectangle tinyRect = new CGUserGraphicsTinyRectangle(p);
-                userCanvas.ClearGraphics(tinyRect);
-            }
+            CGUserGraphics newUserGraphics = new CGUserGraphics();
+            pointsSet.ForEach((u) => { newUserGraphics.pointsSet.Add(new Point(u.X + dx, u.Y + dy)); });
+            return newUserGraphics;
         }
     }
 
@@ -72,6 +61,11 @@ namespace ComputerGraphicsWork
             int dx = Math.Abs(point.X - cursorPos.X);
             int dy = Math.Abs(point.Y - cursorPos.Y);
             return (dx <= 4 && dy <= 4);
+        }
+        public override CGUserGraphics TransformMove(int dx, int dy)
+        {
+            CGUserGraphicsPoint newUserGraphics = new CGUserGraphicsPoint(new Point(point.X + dx, point.Y + dy));
+            return newUserGraphics;
         }
     }
 
@@ -232,16 +226,22 @@ namespace ComputerGraphicsWork
         {
             return new List<Point>() { startPoint, endPoint };
         }
-
+        public override CGUserGraphics TransformMove(int dx, int dy)
+        {
+            CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(new Point(startPoint.X + dx, startPoint.Y + dy), new Point(endPoint.X + dx, endPoint.Y + dy));
+            return newUserGraphics;
+        }
     }
     public class CGUserGraphicsCircle : CGUserGraphics
     {
         Point centerPoint;
+        Point edgePoint;
         int radius;
 
         public CGUserGraphicsCircle(Point center, Point edge)
         {
             centerPoint = center;
+            edgePoint = edge;
             int dx = edge.X - center.X;
             int dy = edge.Y - center.Y;
             radius = (int)Math.Sqrt((double)(dx * dx + dy * dy));
@@ -305,14 +305,21 @@ namespace ComputerGraphicsWork
                 new Point(centerPoint.X, centerPoint.Y - (int)radius),
             };
         }
+        public override CGUserGraphics TransformMove(int dx, int dy)
+        {
+            CGUserGraphicsCircle newUserGraphics = new CGUserGraphicsCircle(new Point(centerPoint.X + dx, centerPoint.Y + dy), new Point(edgePoint.X + dx, edgePoint.Y + dy));
+            return newUserGraphics;
+        }
     }
     public class CGUserGraphicsEllipse : CGUserGraphics
     {
         Point centerPoint;
+        Point edgePoint;
         int xRadius, yRadius;
         public CGUserGraphicsEllipse(Point center, Point edge)
         {
             centerPoint = center;
+            edgePoint = edge;
             int dx = edge.X - center.X;
             int dy = edge.Y - center.Y;
 
@@ -410,6 +417,11 @@ namespace ComputerGraphicsWork
                 new Point(centerPoint.X, centerPoint.Y - (int)yRadius),
             };
         }
+        public override CGUserGraphics TransformMove(int dx, int dy)
+        {
+            CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(new Point(centerPoint.X + dx, centerPoint.Y + dy), new Point(edgePoint.X + dx, edgePoint.Y + dy));
+            return newUserGraphics;
+        }
     }
 
     public class CGUserGraphicsTinyRectangle : CGUserGraphics
@@ -447,7 +459,10 @@ namespace ComputerGraphicsWork
     {
         private int canvasWidth, canvasHeight;
         public Bitmap bmp { get; }
+        public bool isUserGraphicsSelected { get; set; }
+        public CGUserGraphics selectedUserGraphics;
         private int[,] refCount;
+        private List<CGUserGraphics> userGraphicsSet = new List<CGUserGraphics>();
         public CGUserCanvas(int width, int height)
         {
             canvasWidth = width;
@@ -484,8 +499,7 @@ namespace ComputerGraphicsWork
             return pos;
         }
 
-
-        public void SelectGraphics(CGUserGraphics userGraphics)
+        private void DrawGraphics(CGUserGraphics userGraphics)
         {
             foreach (Point point in userGraphics.pointsSet)
             {
@@ -493,7 +507,7 @@ namespace ComputerGraphicsWork
             }
         }
 
-        public void ClearGraphics(CGUserGraphics userGraphics)
+        private void UndrawGraphics(CGUserGraphics userGraphics)
         {
             foreach (Point point in userGraphics.pointsSet)
             {
@@ -501,9 +515,73 @@ namespace ComputerGraphicsWork
             }
         }
 
-        public void FindGraphics(Point pos)
+        public void SelectGraphics(CGUserGraphics userGraphics)
         {
+            DrawGraphics(userGraphics);
+            userGraphicsSet.Add(userGraphics);
+        }
 
+        public void ClearGraphics(CGUserGraphics userGraphics)
+        {
+            UndrawGraphics(userGraphics);
+            userGraphicsSet.Remove(userGraphics);
+        }
+
+        public void SetGraphicsSelected(CGUserGraphics userGraphics)
+        {
+            foreach(Point p in userGraphics.CornerPoints())
+            {
+                this.DrawGraphics(new CGUserGraphicsTinyRectangle(p));
+            }
+        }
+
+        public void ClearGraphicsSelected(CGUserGraphics userGraphics)
+        {
+            foreach (Point p in userGraphics.CornerPoints())
+            {
+                this.UndrawGraphics(new CGUserGraphicsTinyRectangle(p));
+            }
+        }
+
+        //return true if select success, return false otherwise
+        public bool SelectGraphicsByCursor(Point cursorPos)
+        {
+            foreach (CGUserGraphics iterUserGraphics in userGraphicsSet)
+            {
+                if (iterUserGraphics.IsCursorNearby(cursorPos))
+                {
+                    if (isUserGraphicsSelected)
+                    {
+                        this.ClearGraphicsSelected(selectedUserGraphics);
+                    }
+
+                    this.SetGraphicsSelected(iterUserGraphics);
+                    selectedUserGraphics = iterUserGraphics;
+                    isUserGraphicsSelected = true;
+                    return true;
+                }
+            }
+
+            // no one graphics selected: clear old selected graphics
+            if (isUserGraphicsSelected)
+            {
+                this.ClearGraphicsSelected(selectedUserGraphics);
+                isUserGraphicsSelected = false;
+            }
+            return false;
+        }
+
+        public void MoveSelectedGraphics(int dx, int dy)
+        {
+            CGUserGraphics newGraphics = selectedUserGraphics.TransformMove(dx, dy);
+
+            this.ClearGraphicsSelected(selectedUserGraphics);
+            this.ClearGraphics(selectedUserGraphics);
+
+            this.SelectGraphics(newGraphics);
+            this.SetGraphicsSelected(newGraphics);
+
+            selectedUserGraphics = newGraphics;
         }
 
     }

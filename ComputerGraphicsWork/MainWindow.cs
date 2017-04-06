@@ -40,11 +40,8 @@ namespace ComputerGraphicsWork
         private Pen rawPen = new Pen(Color.White, 1);
         private bool canDrawGraphics = false;
         private bool canClearGraphics = false;
-        private bool isUserGraphicsSelected = false;
         private CGUserCanvas userCanvas;
         private CGUserGraphics curUserGraphics;
-        private CGUserGraphics selectedUserGraphics;
-        private List<CGUserGraphics> userGraphicsSet = new List<CGUserGraphics>();
 
         public MainWindow()
         {
@@ -156,9 +153,8 @@ namespace ComputerGraphicsWork
             mouseState = CGMouseState.CGMouseStateUp;
             if (canClearGraphics)
             {
-                curUserGraphics.ClearTagPoints(userCanvas);
+                userCanvas.ClearGraphicsSelected(curUserGraphics);
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                userGraphicsSet.Add(curUserGraphics);
             }
             canDrawGraphics = false;
             canClearGraphics = false;
@@ -172,29 +168,8 @@ namespace ComputerGraphicsWork
             downPos.X = e.X;
             downPos.Y = e.Y;
 
-            foreach (CGUserGraphics iterUserGraphics in userGraphicsSet)
-            {
-                if (iterUserGraphics.IsCursorNearby(new Point(e.X, e.Y)))
-                {
-                    if (isUserGraphicsSelected)
-                    {
-                        selectedUserGraphics.ClearTagPoints(userCanvas);
-                    }
-
-                    iterUserGraphics.DrawTagPoints(userCanvas);
-                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    selectedUserGraphics = iterUserGraphics;
-                    isUserGraphicsSelected = true;
-                    return;
-                }
-            }
-
-            if (isUserGraphicsSelected)
-            {
-                selectedUserGraphics.ClearTagPoints(userCanvas);
-                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                isUserGraphicsSelected = false;
-            }
+            userCanvas.SelectGraphicsByCursor(new Point(e.X, e.Y));
+            ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
         }
         private void MainWindow_MouseClick(object sender, MouseEventArgs e)
         {
@@ -247,8 +222,10 @@ namespace ComputerGraphicsWork
             }
 
             // FIXME
-            if (isUserGraphicsSelected)
+            if (userCanvas.isUserGraphicsSelected && mouseState == CGMouseState.CGMouseStateDown)
             {
+                userCanvas.MoveSelectedGraphics(e.X - oldPos.X, e.Y - oldPos.Y);
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 return;
             }
 
@@ -269,13 +246,13 @@ namespace ComputerGraphicsWork
                 case CGGraphicsType.CGTypeLine:
                     if(canClearGraphics)
                     {
+                        userCanvas.ClearGraphicsSelected(curUserGraphics);
                         userCanvas.ClearGraphics(curUserGraphics);
-                        curUserGraphics.ClearTagPoints(userCanvas);
                     }
 
                     CGUserGraphicsLine line = new CGUserGraphicsLine(downPos, curPos);
                     userCanvas.SelectGraphics(line);
-                    line.DrawTagPoints(userCanvas);
+                    userCanvas.SetGraphicsSelected(line);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = line;
                     canClearGraphics = true;
@@ -283,13 +260,13 @@ namespace ComputerGraphicsWork
                 case CGGraphicsType.CGTypeCircle:
                     if (canClearGraphics)
                     {
+                        userCanvas.ClearGraphicsSelected(curUserGraphics);
                         userCanvas.ClearGraphics(curUserGraphics);
-                        curUserGraphics.ClearTagPoints(userCanvas);
                     }
 
                     CGUserGraphicsCircle circle = new CGUserGraphicsCircle(downPos, curPos);
                     userCanvas.SelectGraphics(circle);
-                    circle.DrawTagPoints(userCanvas);
+                    userCanvas.SetGraphicsSelected(circle);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = circle;
                     canClearGraphics = true;
@@ -297,13 +274,13 @@ namespace ComputerGraphicsWork
                 case CGGraphicsType.CGTypeEllipse:
                     if (canClearGraphics)
                     {
+                        userCanvas.ClearGraphicsSelected(curUserGraphics);
                         userCanvas.ClearGraphics(curUserGraphics);
-                        curUserGraphics.ClearTagPoints(userCanvas);
                     }
 
                     CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse(downPos, curPos);
                     userCanvas.SelectGraphics(ellipse);
-                    ellipse.DrawTagPoints(userCanvas);
+                    userCanvas.SetGraphicsSelected(ellipse);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     curUserGraphics = ellipse;
                     canClearGraphics = true;
