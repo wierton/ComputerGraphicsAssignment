@@ -13,13 +13,16 @@ using System.Drawing.Imaging;
 
 namespace ComputerGraphicsWork
 {
-    enum CGGraphicsType
+    enum CGButtonType
     {
-        CGTypeNothing = 0,
-        CGTypePoint = 1,
-        CGTypeLine = 2,
-        CGTypeCircle = 3,
-        CGTypeEllipse = 4,
+        CGTypeNothing,
+        CGTypeSave,
+        CGTypeMove,
+        CGTypeAdjust,
+        CGTypePoint,
+        CGTypeLine,
+        CGTypeCircle,
+        CGTypeEllipse,
     };
 
     enum CGMouseState
@@ -32,7 +35,7 @@ namespace ComputerGraphicsWork
 
     public partial class MainWindow : Form
     {
-        private CGGraphicsType ghsType;
+        private CGButtonType ghsType;
         private CGMouseState mouseState;
         private Graphics ghs;
         private Point oldPos, curPos, downPos;
@@ -54,20 +57,26 @@ namespace ComputerGraphicsWork
             userCanvas = new CGUserCanvas(this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
-        private void ResumeOldStripButton(CGGraphicsType gt)
+        private void ResumeOldStripButton(CGButtonType gt)
         {
             switch (gt)
             {
-                case CGGraphicsType.CGTypePoint:
+                case CGButtonType.CGTypeMove:
+                    this.buttonMoveGraphics.Checked = false;
+                    break;
+                case CGButtonType.CGTypeAdjust:
+                    this.buttonAdjustGraphics.Checked = false;
+                    break;
+                case CGButtonType.CGTypePoint:
                     this.buttonDrawPoint.Checked = false;
                     break;
-                case CGGraphicsType.CGTypeLine:
+                case CGButtonType.CGTypeLine:
                     this.buttonDrawLine.Checked = false;
                     break;
-                case CGGraphicsType.CGTypeCircle:
+                case CGButtonType.CGTypeCircle:
                     this.buttonDrawCircle.Checked = false;
                     break;
-                case CGGraphicsType.CGTypeEllipse:
+                case CGButtonType.CGTypeEllipse:
                     this.buttonDrawEllipse.Checked = false;
                     break;
             }
@@ -75,77 +84,109 @@ namespace ComputerGraphicsWork
 
         private void buttonDrawPoint_Click(object sender, EventArgs e)
         {
-            if (ghsType == CGGraphicsType.CGTypePoint)
+            if (ghsType == CGButtonType.CGTypePoint)
             {
                 this.buttonDrawPoint.Checked = false;
-                ghsType = CGGraphicsType.CGTypeNothing;
+                ghsType = CGButtonType.CGTypeNothing;
             }
             else
             {
                 ResumeOldStripButton(ghsType);
                 this.buttonDrawPoint.Checked = true;
-                ghsType = CGGraphicsType.CGTypePoint;
+                ghsType = CGButtonType.CGTypePoint;
             }
         }
 
         private void buttonDrawLine_Click(object sender, EventArgs e)
         {
-            if(ghsType == CGGraphicsType.CGTypeLine)
+            if(ghsType == CGButtonType.CGTypeLine)
             {
                 this.buttonDrawLine.Checked = false;
-                ghsType = CGGraphicsType.CGTypeNothing;
+                ghsType = CGButtonType.CGTypeNothing;
             }
             else
             {
                 ResumeOldStripButton(ghsType);
                 this.buttonDrawLine.Checked = true;
-                ghsType = CGGraphicsType.CGTypeLine;
+                ghsType = CGButtonType.CGTypeLine;
             }
         }
 
         private void buttonDrawCircle_Click(object sender, EventArgs e)
         {
-            if (ghsType == CGGraphicsType.CGTypeCircle)
+            if (ghsType == CGButtonType.CGTypeCircle)
             {
                 this.buttonDrawCircle.Checked = false;
-                ghsType = CGGraphicsType.CGTypeNothing;
+                ghsType = CGButtonType.CGTypeNothing;
             }
             else
             {
                 ResumeOldStripButton(ghsType);
                 this.buttonDrawCircle.Checked = true;
-                ghsType = CGGraphicsType.CGTypeCircle;
+                ghsType = CGButtonType.CGTypeCircle;
             }
         }
 
         private void buttonDrawEllipse_Click(object sender, EventArgs e)
         {
-            if (ghsType == CGGraphicsType.CGTypeEllipse)
+            if (ghsType == CGButtonType.CGTypeEllipse)
             {
                 this.buttonDrawEllipse.Checked = false;
-                ghsType = CGGraphicsType.CGTypeNothing;
+                ghsType = CGButtonType.CGTypeNothing;
             }
             else
             {
                 ResumeOldStripButton(ghsType);
                 this.buttonDrawEllipse.Checked = true;
-                ghsType = CGGraphicsType.CGTypeEllipse;
+                ghsType = CGButtonType.CGTypeEllipse;
             }
         }
 
-        private void buttonDrawNothing_Click(object sender, EventArgs e)
+        private void buttonMoveGraphics_Click(object sender, EventArgs e)
         {
-            if (ghsType == CGGraphicsType.CGTypeNothing)
+            if (ghsType == CGButtonType.CGTypeMove)
             {
-                this.buttonDrawNothing.Checked = false;
-                ghsType = CGGraphicsType.CGTypeNothing;
+                this.buttonMoveGraphics.Checked = false;
+                ghsType = CGButtonType.CGTypeNothing;
             }
             else
             {
                 ResumeOldStripButton(ghsType);
-                this.buttonDrawNothing.Checked = true;
-                ghsType = CGGraphicsType.CGTypeNothing;
+                this.buttonMoveGraphics.Checked = true;
+                ghsType = CGButtonType.CGTypeMove;
             }
+        }
+
+        private void buttonSaveBitmap_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.InitialDirectory = ".";
+            sfd.Filter = "图片文件(*.bmp;*.png;*.jpg)|*.bmp;*.png;*.jpg";
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                String strFileName = sfd.FileName;
+                userCanvas.bmp.Save(strFileName);
+            }
+        }
+
+        private void buttonAdjustGraphics_Click(object sender, EventArgs e)
+        {
+            if (ghsType == CGButtonType.CGTypeAdjust)
+            {
+                this.buttonAdjustGraphics.Checked = false;
+                ghsType = CGButtonType.CGTypeNothing;
+            }
+            else
+            {
+                ResumeOldStripButton(ghsType);
+                this.buttonAdjustGraphics.Checked = true;
+                ghsType = CGButtonType.CGTypeAdjust;
+            }
+        }
+
+        private void commandHolder_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
         }
 
         private void MainWindow_MouseUp(object sender, MouseEventArgs e)
@@ -171,6 +212,7 @@ namespace ComputerGraphicsWork
             userCanvas.SelectGraphicsByCursor(new Point(e.X, e.Y));
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
         }
+
         private void MainWindow_MouseClick(object sender, MouseEventArgs e)
         {
 
@@ -180,6 +222,7 @@ namespace ComputerGraphicsWork
         {
             ghs.DrawImage(userCanvas.bmp, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
         }
+
 
         private void MainWindow_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -196,35 +239,6 @@ namespace ComputerGraphicsWork
             }
         }
 
-        private void commandHolder_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
-        /*
-        private void wrapDrawCircle(Pen pen, Point center, Point edge)
-        {
-            int dx = edge.X - center.X;
-            int dy = edge.Y - center.Y;
-            double cx = center.X;
-            double cy = center.Y;
-            double r = Math.Sqrt((dx * dx + dy * dy));
-            ghs.DrawEllipse(pen, new RectangleF((float)(cx - r), (float)(cy - r), (float)(2 * r), (float)(2 * r)));
-        }
-
-
-        private void wrapDrawEllipse(Pen pen, Point center, Point edge)
-        {
-            int dx = Math.Abs(edge.X - center.X);
-            int dy = Math.Abs(edge.Y - center.Y);
-            int cx = center.X;
-            int cy = center.Y;
-            double e = Math.Sqrt((dx * dx + dy * dy) / 2);
-            ghs.DrawEllipse(pen, new RectangleF((float)(cx - dx), (float)(cy - dy), (float)(2 * dx), (float)(2 * dy)));
-
-        }
-
-        */
         private void MainWindow_MouseMove(object sender, MouseEventArgs e)
         {
             oldPos = curPos;
@@ -239,14 +253,22 @@ namespace ComputerGraphicsWork
             // FIXME
             if (userCanvas.isUserGraphicsSelected && mouseState == CGMouseState.CGMouseStateDown)
             {
-                userCanvas.MoveSelectedGraphics(e.X - oldPos.X, e.Y - oldPos.Y);
-                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                if (ghsType == CGButtonType.CGTypeAdjust)
+                {
+                    userCanvas.AdjustGraphicsByCursor(oldPos, new Point(e.X, e.Y));
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                }
+                else
+                {
+                    userCanvas.MoveSelectedGraphics(e.X - oldPos.X, e.Y - oldPos.Y);
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                }
                 return;
             }
 
             switch (ghsType)
             {
-                case CGGraphicsType.CGTypePoint:
+                case CGButtonType.CGTypePoint:
                     if (canClearGraphics)
                     {
                         userCanvas.ClearGraphics(curUserGraphics);
@@ -258,7 +280,7 @@ namespace ComputerGraphicsWork
                     curUserGraphics = singlePoint;
                     canClearGraphics = true;
                     break;
-                case CGGraphicsType.CGTypeLine:
+                case CGButtonType.CGTypeLine:
                     if(canClearGraphics)
                     {
                         userCanvas.ClearGraphicsSelected(curUserGraphics);
@@ -272,7 +294,7 @@ namespace ComputerGraphicsWork
                     curUserGraphics = line;
                     canClearGraphics = true;
                     break;
-                case CGGraphicsType.CGTypeCircle:
+                case CGButtonType.CGTypeCircle:
                     if (canClearGraphics)
                     {
                         userCanvas.ClearGraphicsSelected(curUserGraphics);
@@ -286,7 +308,7 @@ namespace ComputerGraphicsWork
                     curUserGraphics = circle;
                     canClearGraphics = true;
                     break;
-                case CGGraphicsType.CGTypeEllipse:
+                case CGButtonType.CGTypeEllipse:
                     if (canClearGraphics)
                     {
                         userCanvas.ClearGraphicsSelected(curUserGraphics);

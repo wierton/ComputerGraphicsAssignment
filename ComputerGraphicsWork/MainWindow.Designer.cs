@@ -38,11 +38,13 @@ namespace ComputerGraphicsWork
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.commandHolder = new System.Windows.Forms.ToolStrip();
+            this.buttonSaveBitmap = new System.Windows.Forms.ToolStripButton();
+            this.buttonMoveGraphics = new System.Windows.Forms.ToolStripButton();
+            this.buttonAdjustGraphics = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPoint = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawLine = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawCircle = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawEllipse = new System.Windows.Forms.ToolStripButton();
-            this.buttonDrawNothing = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,11 +52,13 @@ namespace ComputerGraphicsWork
             // 
             this.commandHolder.Dock = System.Windows.Forms.DockStyle.Left;
             this.commandHolder.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buttonSaveBitmap,
+            this.buttonMoveGraphics,
+            this.buttonAdjustGraphics,
             this.buttonDrawPoint,
             this.buttonDrawLine,
             this.buttonDrawCircle,
-            this.buttonDrawEllipse,
-            this.buttonDrawNothing});
+            this.buttonDrawEllipse});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
             this.commandHolder.Size = new System.Drawing.Size(33, 381);
@@ -62,6 +66,42 @@ namespace ComputerGraphicsWork
             this.commandHolder.TabIndex = 0;
             this.commandHolder.Text = "commandHolder";
             this.commandHolder.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.commandHolder_ItemClicked);
+            // 
+            // buttonSaveBitmap
+            // 
+            this.buttonSaveBitmap.AutoSize = false;
+            this.buttonSaveBitmap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonSaveBitmap.Image = ((System.Drawing.Image)(resources.GetObject("buttonSaveBitmap.Image")));
+            this.buttonSaveBitmap.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonSaveBitmap.Name = "buttonSaveBitmap";
+            this.buttonSaveBitmap.Size = new System.Drawing.Size(32, 32);
+            this.buttonSaveBitmap.Text = "buttonSaveBitmap";
+            this.buttonSaveBitmap.ToolTipText = "save";
+            this.buttonSaveBitmap.Click += new System.EventHandler(this.buttonSaveBitmap_Click);
+            // 
+            // buttonMoveGraphics
+            // 
+            this.buttonMoveGraphics.AutoSize = false;
+            this.buttonMoveGraphics.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonMoveGraphics.Image = ((System.Drawing.Image)(resources.GetObject("buttonMoveGraphics.Image")));
+            this.buttonMoveGraphics.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonMoveGraphics.Name = "buttonMoveGraphics";
+            this.buttonMoveGraphics.Size = new System.Drawing.Size(32, 32);
+            this.buttonMoveGraphics.Text = "buttonMoveGraphics";
+            this.buttonMoveGraphics.ToolTipText = "move";
+            this.buttonMoveGraphics.Click += new System.EventHandler(this.buttonMoveGraphics_Click);
+            // 
+            // buttonAdjustGraphics
+            // 
+            this.buttonAdjustGraphics.AutoSize = false;
+            this.buttonAdjustGraphics.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonAdjustGraphics.Image = ((System.Drawing.Image)(resources.GetObject("buttonAdjustGraphics.Image")));
+            this.buttonAdjustGraphics.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonAdjustGraphics.Name = "buttonAdjustGraphics";
+            this.buttonAdjustGraphics.Size = new System.Drawing.Size(32, 32);
+            this.buttonAdjustGraphics.Text = "buttonAdjustGraphics";
+            this.buttonAdjustGraphics.ToolTipText = "adjust";
+            this.buttonAdjustGraphics.Click += new System.EventHandler(this.buttonAdjustGraphics_Click);
             // 
             // buttonDrawPoint
             // 
@@ -71,6 +111,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawPoint.Name = "buttonDrawPoint";
             this.buttonDrawPoint.Size = new System.Drawing.Size(30, 20);
             this.buttonDrawPoint.Text = "buttonDrawPoint";
+            this.buttonDrawPoint.ToolTipText = "point";
             this.buttonDrawPoint.Click += new System.EventHandler(this.buttonDrawPoint_Click);
             // 
             // buttonDrawLine
@@ -81,7 +122,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawLine.Name = "buttonDrawLine";
             this.buttonDrawLine.Size = new System.Drawing.Size(30, 20);
             this.buttonDrawLine.Text = "buttonDrawLine";
-            this.buttonDrawLine.ToolTipText = "buttonDrawLine";
+            this.buttonDrawLine.ToolTipText = "line";
             this.buttonDrawLine.Click += new System.EventHandler(this.buttonDrawLine_Click);
             // 
             // buttonDrawCircle
@@ -93,6 +134,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawCircle.Name = "buttonDrawCircle";
             this.buttonDrawCircle.Size = new System.Drawing.Size(32, 32);
             this.buttonDrawCircle.Text = "buttonDrawCircle";
+            this.buttonDrawCircle.ToolTipText = "circle";
             this.buttonDrawCircle.Click += new System.EventHandler(this.buttonDrawCircle_Click);
             // 
             // buttonDrawEllipse
@@ -104,19 +146,8 @@ namespace ComputerGraphicsWork
             this.buttonDrawEllipse.Name = "buttonDrawEllipse";
             this.buttonDrawEllipse.Size = new System.Drawing.Size(32, 32);
             this.buttonDrawEllipse.Text = "buttonDrawEllipse";
-            this.buttonDrawEllipse.ToolTipText = "buttonDrawEllipse";
+            this.buttonDrawEllipse.ToolTipText = "ellipse";
             this.buttonDrawEllipse.Click += new System.EventHandler(this.buttonDrawEllipse_Click);
-            // 
-            // buttonDrawNothing
-            // 
-            this.buttonDrawNothing.AutoSize = false;
-            this.buttonDrawNothing.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonDrawNothing.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawNothing.Image")));
-            this.buttonDrawNothing.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonDrawNothing.Name = "buttonDrawNothing";
-            this.buttonDrawNothing.Size = new System.Drawing.Size(32, 32);
-            this.buttonDrawNothing.Text = "buttonDrawNothing";
-            this.buttonDrawNothing.Click += new System.EventHandler(this.buttonDrawNothing_Click);
             // 
             // MainWindow
             // 
@@ -125,6 +156,7 @@ namespace ComputerGraphicsWork
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.ClientSize = new System.Drawing.Size(635, 381);
             this.Controls.Add(this.commandHolder);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.KeyPreview = true;
             this.Name = "MainWindow";
             this.Text = "MainWindow";
@@ -148,7 +180,9 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawLine;
         private System.Windows.Forms.ToolStripButton buttonDrawCircle;
         private System.Windows.Forms.ToolStripButton buttonDrawEllipse;
-        private System.Windows.Forms.ToolStripButton buttonDrawNothing;
+        private System.Windows.Forms.ToolStripButton buttonMoveGraphics;
         private System.Windows.Forms.ToolStripButton buttonDrawPoint;
+        private System.Windows.Forms.ToolStripButton buttonSaveBitmap;
+        private System.Windows.Forms.ToolStripButton buttonAdjustGraphics;
     }
 }

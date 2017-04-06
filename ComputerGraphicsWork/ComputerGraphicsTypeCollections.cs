@@ -41,6 +41,34 @@ namespace ComputerGraphicsWork
             pointsSet.ForEach((u) => { newUserGraphics.pointsSet.Add(new Point(u.X + dx, u.Y + dy)); });
             return newUserGraphics;
         }
+
+        public Point TagPointNearCursor(Point cursorPos)
+        {
+            foreach (Point p in CornerPoints())
+            {
+                int dx = p.X - cursorPos.X;
+                int dy = p.Y - cursorPos.Y;
+
+                if (Math.Sqrt(dx * dx + dy * dy) < 4)
+                {
+                    return p;
+                }
+            }
+
+            return new Point(-1, -1);
+        }
+
+        public virtual CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
+        {
+            // do nothing
+            return TransformMove(newPos.X - oldPos.X, newPos.Y - oldPos.Y);
+        }
+        static public double Dist(Point a, Point b)
+        {
+            int dx = a.X - b.X;
+            int dy = a.Y - b.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
     }
 
     public class CGUserGraphicsPoint : CGUserGraphics
@@ -232,6 +260,23 @@ namespace ComputerGraphicsWork
             CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(new Point(startPoint.X + dx, startPoint.Y + dy), new Point(endPoint.X + dx, endPoint.Y + dy));
             return newUserGraphics;
         }
+        public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
+        {
+            if(Dist(startPoint, oldPos) < 4)
+            {
+                CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, endPoint);
+                return newUserGraphics;
+            }
+            else if(Dist(endPoint, oldPos) < 4)
+            {
+                CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, startPoint);
+                return newUserGraphics;
+            }
+            else
+            {
+                return this;
+            }
+        }
     }
     public class CGUserGraphicsCircle : CGUserGraphics
     {
@@ -310,6 +355,19 @@ namespace ComputerGraphicsWork
         {
             CGUserGraphicsCircle newUserGraphics = new CGUserGraphicsCircle(new Point(centerPoint.X + dx, centerPoint.Y + dy), new Point(edgePoint.X + dx, edgePoint.Y + dy));
             return newUserGraphics;
+        }
+
+        public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
+        {
+            if (Math.Abs(Dist(centerPoint, oldPos) - radius) < 4)
+            {
+                CGUserGraphicsCircle newUserGraphics = new CGUserGraphicsCircle(centerPoint, newPos);
+                return newUserGraphics;
+            }
+            else
+            {
+                return this;
+            }
         }
     }
     public class CGUserGraphicsEllipse : CGUserGraphics
@@ -423,6 +481,25 @@ namespace ComputerGraphicsWork
             CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(new Point(centerPoint.X + dx, centerPoint.Y + dy), new Point(edgePoint.X + dx, edgePoint.Y + dy));
             return newUserGraphics;
         }
+        public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
+        {
+            if (Dist(new Point(centerPoint.X, centerPoint.Y + yRadius), oldPos) < 8
+             || Dist(new Point(centerPoint.X, centerPoint.Y - yRadius), oldPos) < 8)
+            {
+                CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(centerPoint, new Point(edgePoint.X, newPos.Y));
+                return newUserGraphics;
+            }
+            else if (Dist(new Point(centerPoint.X + xRadius, centerPoint.Y), oldPos) < 8
+                  || Dist(new Point(centerPoint.X - xRadius, centerPoint.Y), oldPos) < 8)
+            {
+                CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(centerPoint, new Point(newPos.X, edgePoint.Y));
+                return newUserGraphics;
+            }
+            else
+            {
+                return this;
+            }
+        }
     }
 
     public class CGUserGraphicsTinyRectangle : CGUserGraphics
@@ -458,8 +535,6 @@ namespace ComputerGraphicsWork
 
     public class CGUserCanvas
     {
-        
-
         private int canvasWidth, canvasHeight;
         public Bitmap bmp { get; }
         public bool isUserGraphicsSelected { get; set; }
@@ -472,6 +547,14 @@ namespace ComputerGraphicsWork
             canvasHeight = height;
             bmp = new Bitmap(width, height);
             refCount = new int[width, height];
+
+            for(int i = 0; i < width; i++)
+            {
+                for(int j = 0; j < height; j++)
+                {
+                    bmp.SetPixel(i, j, Color.White);
+                }
+            }
         }
 
         private void SetPixel(Point pos)
@@ -576,6 +659,9 @@ namespace ComputerGraphicsWork
 
         public void MoveSelectedGraphics(int dx, int dy)
         {
+            if (!isUserGraphicsSelected)
+                return;
+
             CGUserGraphics newGraphics = selectedUserGraphics.TransformMove(dx, dy);
 
             this.ClearGraphicsSelected(selectedUserGraphics);
@@ -594,6 +680,22 @@ namespace ComputerGraphicsWork
 
             this.ClearGraphicsSelected(selectedUserGraphics);
             this.ClearGraphics(selectedUserGraphics);
+        }
+
+        public void AdjustGraphicsByCursor(Point oldPos, Point newPos)
+        {
+            if (!isUserGraphicsSelected)
+                return;
+
+            CGUserGraphics newGraphics = selectedUserGraphics.TransformAdjust(oldPos, newPos);
+
+            this.ClearGraphicsSelected(selectedUserGraphics);
+            this.ClearGraphics(selectedUserGraphics);
+
+            this.SelectGraphics(newGraphics);
+            this.SetGraphicsSelected(newGraphics);
+
+            selectedUserGraphics = newGraphics;
         }
     }
 }
