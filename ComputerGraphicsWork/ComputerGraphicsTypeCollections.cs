@@ -541,6 +541,29 @@ namespace ComputerGraphicsWork
         {
             return endPoints;
         }
+
+        public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
+        {
+            for (int i = endPoints.Count - 1; i >= 0; i--)
+            {
+                if (Distance.CalcDistance(oldPos, endPoints[i]) < 3)
+                {
+                    int dx = newPos.X - oldPos.X;
+                    int dy = newPos.Y - oldPos.Y;
+                    Point newPoint = new Point(endPoints[i].X + dx, endPoints[i].Y + dy);
+                    endPoints[i] = newPoint;
+                    int nextI = (i + 1) % endPoints.Count;
+                    int prevI = (i + endPoints.Count - 1) % endPoints.Count;
+                    edgeLines[i] = new CGUserGraphicsLine(endPoints[i], endPoints[nextI]);
+                    edgeLines[prevI] = new CGUserGraphicsLine(endPoints[prevI], endPoints[i]);
+                }
+            }
+
+            pointsSet.RemoveAll((p) => { return true; });
+            edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
+
+            return this;
+        }
     }
 
 
@@ -737,10 +760,13 @@ namespace ComputerGraphicsWork
             if (!isUserGraphicsSelected)
                 return;
 
-            CGUserGraphics newGraphics = selectedUserGraphics.TransformAdjust(oldPos, newPos);
+            CGUserGraphics oldGraphics = selectedUserGraphics;
 
             this.ClearStateOfSelectedGraphics();
-            this.RemoveGraphics(selectedUserGraphics);
+            this.RemoveGraphics(oldGraphics);
+
+
+            CGUserGraphics newGraphics = oldGraphics.TransformAdjust(oldPos, newPos);
 
             this.AddGraphics(newGraphics);
             this.SetGraphicsSelected(newGraphics);

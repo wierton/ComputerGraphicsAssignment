@@ -249,8 +249,6 @@ namespace ComputerGraphicsWork
                     userCanvas.AddGraphics(polygon);
                     userCanvas.SetGraphicsSelected(polygon);
 
-                    MessageBox.Show(String.Format("size of set:{0}", polygonEdgeSet.Count));
-
                     polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
                     polygonEdgeSet.RemoveAll((l) => { return true; });
 
@@ -279,14 +277,11 @@ namespace ComputerGraphicsWork
 
         }
 
-
-
-        private void MainWindow_KeyPress(object sender, KeyPressEventArgs e)
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyChar)
+            switch (e.KeyCode)
             {
-                case (char)Keys.Back:
-                    
+                case Keys.Delete:
                     if (userCanvas.isUserGraphicsSelected)
                     {
                         userCanvas.DeleteSelectedGraphics();
