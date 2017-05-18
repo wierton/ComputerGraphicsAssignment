@@ -5,22 +5,10 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ComputerGraphicsWork
 {
-    public class UserLog
-    {
-        public UserLog(String s)
-        {
-            FileStream fs = new FileStream("log.txt", FileMode.OpenOrCreate | FileMode.Append);
-            StreamWriter sw = new StreamWriter(fs);
-            sw.Write(s + '\n');
-            sw.Flush();
-            sw.Close();
-            fs.Close();
-        }
-    }
-
     public class CGUserGraphics
     {
         public List<Point> pointsSet { get; } = new List<Point>();
@@ -233,7 +221,7 @@ namespace ComputerGraphicsWork
         public override bool IsCursorNearby(Point cursorPos)
         {
             int dx = firstPoint.X - nextPoint.X;
-            int dy = firstPoint.Y - firstPoint.Y;
+            int dy = nextPoint.Y - firstPoint.Y;
 
             int maxX = Math.Max(firstPoint.X, nextPoint.X);
             int minX = Math.Min(firstPoint.X, nextPoint.X);
@@ -456,9 +444,12 @@ namespace ComputerGraphicsWork
         }
         public override bool IsCursorNearby(Point cursorPos)
         {
-            double d = 10000.0;
-            pointsSet.ForEach((u) => { if (Dist(cursorPos, u) < d) { d = Dist(cursorPos, u); } });
-            return d < 4.0;
+            foreach(Point p in pointsSet)
+            {
+                if (Dist(cursorPos, p) < 4.0)
+                    return true;
+            }
+            return false;
         }
         public override List<Point> CornerPoints()
         {
@@ -617,6 +608,7 @@ namespace ComputerGraphicsWork
             return pos;
         }
 
+        // draw graphics but didn't add to graphics set
         private void DrawGraphics(CGUserGraphics userGraphics)
         {
             foreach (Point point in userGraphics.pointsSet)
@@ -625,21 +617,25 @@ namespace ComputerGraphicsWork
             }
         }
 
+        // undraw graphics but didn't remove from graphics set
         private void UndrawGraphics(CGUserGraphics userGraphics)
         {
+            // MessageBox.Show(userGraphics.ToString());
             foreach (Point point in userGraphics.pointsSet)
             {
                 ClearPixel(point);
             }
         }
 
-        public void SelectGraphics(CGUserGraphics userGraphics)
+        // select graphics into set and draw it
+        public void AddGraphics(CGUserGraphics userGraphics)
         {
             DrawGraphics(userGraphics);
             userGraphicsSet.Add(userGraphics);
         }
 
-        public void ClearGraphics(CGUserGraphics userGraphics)
+        // remove graphics from set and undraw it 
+        public void RemoveGraphics(CGUserGraphics userGraphics)
         {
             UndrawGraphics(userGraphics);
             userGraphicsSet.Remove(userGraphics);
@@ -647,7 +643,15 @@ namespace ComputerGraphicsWork
 
         public void SetGraphicsSelected(CGUserGraphics userGraphics)
         {
-            foreach(Point p in userGraphics.CornerPoints())
+            if (isUserGraphicsSelected)
+            {
+                this.ClearGraphicsSelected(selectedUserGraphics);
+            }
+
+            selectedUserGraphics = userGraphics;
+            isUserGraphicsSelected = true;
+
+            foreach (Point p in userGraphics.CornerPoints())
             {
                 this.DrawGraphics(new CGUserGraphicsTinyRectangle(p));
             }
@@ -659,6 +663,8 @@ namespace ComputerGraphicsWork
             {
                 this.UndrawGraphics(new CGUserGraphicsTinyRectangle(p));
             }
+            // selectedUserGraphics = null;
+            isUserGraphicsSelected = false;
         }
 
         //return true if select success, return false otherwise
@@ -668,14 +674,7 @@ namespace ComputerGraphicsWork
             {
                 if (iterUserGraphics.IsCursorNearby(cursorPos))
                 {
-                    if (isUserGraphicsSelected)
-                    {
-                        this.ClearGraphicsSelected(selectedUserGraphics);
-                    }
-
                     this.SetGraphicsSelected(iterUserGraphics);
-                    selectedUserGraphics = iterUserGraphics;
-                    isUserGraphicsSelected = true;
                     return true;
                 }
             }
@@ -684,7 +683,6 @@ namespace ComputerGraphicsWork
             if (isUserGraphicsSelected)
             {
                 this.ClearGraphicsSelected(selectedUserGraphics);
-                isUserGraphicsSelected = false;
             }
             return false;
         }
@@ -697,9 +695,9 @@ namespace ComputerGraphicsWork
             CGUserGraphics newGraphics = selectedUserGraphics.TransformMove(dx, dy);
 
             this.ClearGraphicsSelected(selectedUserGraphics);
-            this.ClearGraphics(selectedUserGraphics);
+            this.RemoveGraphics(selectedUserGraphics);
 
-            this.SelectGraphics(newGraphics);
+            this.AddGraphics(newGraphics);
             this.SetGraphicsSelected(newGraphics);
 
             selectedUserGraphics = newGraphics;
@@ -711,7 +709,7 @@ namespace ComputerGraphicsWork
                 return;
 
             this.ClearGraphicsSelected(selectedUserGraphics);
-            this.ClearGraphics(selectedUserGraphics);
+            this.RemoveGraphics(selectedUserGraphics);
         }
 
         public void AdjustGraphicsByCursor(Point oldPos, Point newPos)
@@ -722,9 +720,9 @@ namespace ComputerGraphicsWork
             CGUserGraphics newGraphics = selectedUserGraphics.TransformAdjust(oldPos, newPos);
 
             this.ClearGraphicsSelected(selectedUserGraphics);
-            this.ClearGraphics(selectedUserGraphics);
+            this.RemoveGraphics(selectedUserGraphics);
 
-            this.SelectGraphics(newGraphics);
+            this.AddGraphics(newGraphics);
             this.SetGraphicsSelected(newGraphics);
 
             selectedUserGraphics = newGraphics;
