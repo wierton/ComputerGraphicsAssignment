@@ -10,11 +10,11 @@ namespace ComputerGraphicsWork
 {
     public class UserLog
     {
-        public void write(String s)
+        public UserLog(String s)
         {
             FileStream fs = new FileStream("log.txt", FileMode.OpenOrCreate | FileMode.Append);
             StreamWriter sw = new StreamWriter(fs);
-            sw.Write(s);
+            sw.Write(s + '\n');
             sw.Flush();
             sw.Close();
             fs.Close();
@@ -29,6 +29,7 @@ namespace ComputerGraphicsWork
         {
             return new List<Point> ();
         }
+
 
         public virtual bool IsCursorNearby(Point cursorPos)
         {
@@ -100,11 +101,15 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphicsLine : CGUserGraphics
     {
-        private Point startPoint, endPoint;
+        public Point firstPoint { get; }
+        public Point nextPoint { get; }
         public CGUserGraphicsLine(Point start, Point end)
         {
-            startPoint = start;
-            endPoint = end;
+            firstPoint = start;
+            nextPoint = end;
+
+            Point startPoint = start;
+            Point endPoint = end;
 
             // swap two points
             if (end.X < start.X)
@@ -227,21 +232,21 @@ namespace ComputerGraphicsWork
 
         public override bool IsCursorNearby(Point cursorPos)
         {
-            int dx = startPoint.X - endPoint.X;
-            int dy = endPoint.Y - startPoint.Y;
+            int dx = firstPoint.X - nextPoint.X;
+            int dy = firstPoint.Y - firstPoint.Y;
 
-            int maxX = Math.Max(startPoint.X, endPoint.X);
-            int minX = Math.Min(startPoint.X, endPoint.X);
+            int maxX = Math.Max(firstPoint.X, nextPoint.X);
+            int minX = Math.Min(firstPoint.X, nextPoint.X);
 
-            int maxY = Math.Max(startPoint.Y, endPoint.Y);
-            int minY = Math.Min(startPoint.Y, endPoint.Y);
+            int maxY = Math.Max(firstPoint.Y, nextPoint.Y);
+            int minY = Math.Min(firstPoint.Y, nextPoint.Y);
 
             bool isInX = minX - 4 <= cursorPos.X && cursorPos.X <= maxX + 4;
             bool isInY = minY - 4 <= cursorPos.Y && cursorPos.Y <= maxY + 4;
 
 
             double baseDist = Math.Sqrt(dx * dx + dy * dy);
-            double c = endPoint.X * startPoint.Y - startPoint.X * endPoint.Y;
+            double c = nextPoint.X * firstPoint.Y - firstPoint.X * nextPoint.Y;
 
             double d = Math.Abs(cursorPos.X * dy + cursorPos.Y * dx + c) / baseDist;
 
@@ -253,23 +258,24 @@ namespace ComputerGraphicsWork
 
         public override List<Point> CornerPoints()
         {
-            return new List<Point>() { startPoint, endPoint };
+            return new List<Point>() { firstPoint, nextPoint };
         }
+
         public override CGUserGraphics TransformMove(int dx, int dy)
         {
-            CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(new Point(startPoint.X + dx, startPoint.Y + dy), new Point(endPoint.X + dx, endPoint.Y + dy));
+            CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(new Point(firstPoint.X + dx, firstPoint.Y + dy), new Point(nextPoint.X + dx, nextPoint.Y + dy));
             return newUserGraphics;
         }
         public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
         {
-            if(Dist(startPoint, oldPos) < 4)
+            if(Dist(firstPoint, oldPos) < 4)
             {
-                CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, endPoint);
+                CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, nextPoint);
                 return newUserGraphics;
             }
-            else if(Dist(endPoint, oldPos) < 4)
+            else if(Dist(nextPoint, oldPos) < 4)
             {
-                CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, startPoint);
+                CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, firstPoint);
                 return newUserGraphics;
             }
             else
@@ -450,22 +456,9 @@ namespace ComputerGraphicsWork
         }
         public override bool IsCursorNearby(Point cursorPos)
         {
-            int dx = cursorPos.X - centerPoint.X;
-            int dy = cursorPos.Y - centerPoint.Y;
-
-            int xRadiusSquare = xRadius * xRadius;
-            int yRadiusSquare = yRadius * yRadius;
-
-            double dist = dx * dx * yRadiusSquare + dy * dy * xRadiusSquare;
-
-            if (dist < xRadiusSquare * yRadiusSquare)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            double d = 10000.0;
+            pointsSet.ForEach((u) => { if (Dist(cursorPos, u) < d) { d = Dist(cursorPos, u); } });
+            return d < 4.0;
         }
         public override List<Point> CornerPoints()
         {
@@ -501,6 +494,45 @@ namespace ComputerGraphicsWork
             }
         }
     }
+
+    public class CGUserGraphicsPolygon : CGUserGraphics
+    {
+        List<Point> endPoints = new List<Point>();
+        public List<CGUserGraphicsLine> edgeLines { get; } = new List<CGUserGraphicsLine>();
+
+        public CGUserGraphicsPolygon(List<Point> inEndPoints)
+        {
+            inEndPoints.ForEach((u) => { endPoints.Add(u); });
+
+            for(int i = 0; i < endPoints.Count - 1; i++)
+            {
+                edgeLines.Add(new CGUserGraphicsLine(endPoints[i], endPoints[i + 1]));
+            }
+            edgeLines.Add(new CGUserGraphicsLine(endPoints[endPoints.Count - 1], endPoints[0]));
+
+            edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
+        }
+
+        public CGUserGraphicsPolygon(List<CGUserGraphicsLine> inEdgeLines)
+        {
+            inEdgeLines.ForEach((l) => { edgeLines.Add(l); });
+            inEdgeLines.ForEach((l) => { endPoints.Add(l.firstPoint); });
+            edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
+        }
+        public override CGUserGraphics TransformMove(int dx, int dy)
+        {
+            List<Point> lps = new List<Point>();
+            endPoints.ForEach((p) => { lps.Add(new Point(p.X + dx, p.Y + dy)); });
+            CGUserGraphicsPolygon newUserGraphics = new CGUserGraphicsPolygon(lps);
+            return newUserGraphics;
+        }
+
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            return base.IsCursorNearby(cursorPos);
+        }
+    }
+
 
     public class CGUserGraphicsTinyRectangle : CGUserGraphics
     {
