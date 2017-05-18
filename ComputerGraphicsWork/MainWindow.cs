@@ -47,12 +47,11 @@ namespace ComputerGraphicsWork
         private CGUserCanvas userCanvas;
         private CGUserGraphics curUserGraphics;
 
-        private bool isPolygonDrawing = false;
-        private bool isPolygonDBClicked = false;
-
+        private bool isRightMouseClicked = false;
         private bool isUpdatingGraphicsWhenMouseUp = false;
 
-        private List<CGUserGraphicsLine> polygonsEdgeSet = new List<CGUserGraphicsLine>();
+        CGUserGraphicsLine oldEdgeLineOfPolygon = null;
+        private List<CGUserGraphicsLine> polygonEdgeSet = new List<CGUserGraphicsLine>();
 
         public MainWindow()
         {
@@ -130,8 +129,6 @@ namespace ComputerGraphicsWork
         private void buttonDrawPolygon_Click(object sender, EventArgs e)
         {
             normalButtonClicked(CGButtonType.CGButtonTypePolygon, this.buttonDrawPolygon);
-            if (this.buttonDrawPolygon.Checked)
-                isUpdatingGraphicsWhenMouseUp = true;
         }
 
         private void buttonMoveGraphics_Click(object sender, EventArgs e)
@@ -165,21 +162,21 @@ namespace ComputerGraphicsWork
         {
             if (btnType == CGButtonType.CGButtonTypePolygon)
             {
-                log.write("mouse set to twice up");
+                log.write("mouse set to up");
                 mouseState = CGMouseState.CGMouseStateUp;
-                isPolygonDrawing = true;
-                downPos.X = e.X; downPos.Y = e.Y;
-                if (isPolygonDBClicked)
+
+                if (isRightMouseClicked)
                 {
-                    isPolygonDrawing = false;
-                    isPolygonDBClicked = false;
+                    isRightMouseClicked = false;
                 }
                 else
-                { 
-                    upPos.X = e.X; upPos.Y = e.Y;
-                    log.write("MainWindow_MouseUp, canUpdateGraphics --> false");
-                    canUpdateGraphics = true;
+                {
+                    isUpdatingGraphicsWhenMouseUp = true;
                 }
+
+                upPos.X = e.X; upPos.Y = e.Y;
+                log.write("MainWindow_MouseUp, canUpdateGraphics --> false");
+                canUpdateGraphics = true;
                 
             }
             else
@@ -200,7 +197,7 @@ namespace ComputerGraphicsWork
             canClearGraphics = false;
         }
 
-        private void MainWindow_MouseDown(object sender, MouseEventArgs e)
+        private void MainWindow_LeftMouseDown(object sender, MouseEventArgs e)
         {
             log.write("mouse state set to down");
             mouseState = CGMouseState.CGMouseStateDown;
@@ -223,41 +220,53 @@ namespace ComputerGraphicsWork
             }
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
         }
-        private void MainWindow_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void MainWindow_RightMouseDown(object sender, MouseEventArgs e)
         {
-            if (btnType == CGButtonType.CGButtonTypePolygon) 
+            // note: the order of each event when double clicked
+            //       down -> up -> down -> dbclick -> up
+            if (btnType == CGButtonType.CGButtonTypePolygon)
             {
                 log.write("mouse double click");
 
-                int dx = e.X - upPos.X;
-                int dy = e.Y - upPos.Y;
+                if (polygonEdgeSet.Count == 0)
+                    return;
 
-                if (dx * dx + dy * dy < 4 * 4)
+                int dx = e.X - polygonEdgeSet[0].firstPoint.X;
+                int dy = e.Y - polygonEdgeSet[0].firstPoint.Y;
+
+                if (dx * dx + dy * dy < 3 * 3)
                 {
                     mouseState = CGMouseState.CGMouseStateUp;
                     log.write("canUpdateGraphics --> false");
                     canUpdateGraphics = false;
-                    isPolygonDBClicked = true;
-                    isPolygonDrawing = false;
+
+                    isRightMouseClicked = true;
+                    isUpdatingGraphicsWhenMouseUp = false;
 
                     userCanvas.ClearStateOfSelectedGraphics();
 
-                    CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(polygonsEdgeSet);
+                    CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(polygonEdgeSet);
                     userCanvas.AddGraphics(polygon);
                     userCanvas.SetGraphicsSelected(polygon);
 
-                    polygonsEdgeSet.ForEach((l)=> { userCanvas.RemoveGraphics(l); });
-                    polygonsEdgeSet.RemoveAll((l)=> { return true; });
+                    MessageBox.Show(String.Format("size of set:{0}", polygonEdgeSet.Count));
+
+                    polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
+                    polygonEdgeSet.RemoveAll((l) => { return true; });
 
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 }
             }
         }
 
-        private void MainWindow_MouseClick(object sender, MouseEventArgs e)
+        private void MainWindow_MouseDown(object sender, MouseEventArgs e)
         {
-
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                MainWindow_LeftMouseDown(sender, e);
+            else
+                MainWindow_RightMouseDown(sender, e);
         }
+
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
         {
@@ -285,6 +294,25 @@ namespace ComputerGraphicsWork
                     }
                     break;
             }
+        }
+
+        // return true if can clear old graphics
+        private bool NormalPartOfUpdateGraphics(CGUserGraphics graphics)
+        {
+            bool ret = false;
+            if (canClearGraphics)
+            {
+                userCanvas.ClearStateOfSelectedGraphics();
+                userCanvas.RemoveGraphics(curUserGraphics);
+                ret = true;
+            }
+
+            userCanvas.AddGraphics(graphics);
+            userCanvas.SetGraphicsSelected(graphics);
+            ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+            curUserGraphics = graphics;
+            canClearGraphics = true;
+            return ret;
         }
 
         private void MainWindow_MouseMove(object sender, MouseEventArgs e)
@@ -326,83 +354,32 @@ namespace ComputerGraphicsWork
                 }
             }
 
-            log.write("try to update graphics");
+            log.write("mouse move");
 
             // update graphics if a graphics is drawing
             switch (btnType)
             {
                 case CGButtonType.CGButtonTypePoint:
-                    if (canClearGraphics)
-                    {
-                        userCanvas.RemoveGraphics(curUserGraphics);
-                    }
-
-                    CGUserGraphicsPoint singlePoint = new CGUserGraphicsPoint(curPos);
-                    userCanvas.AddGraphics(singlePoint);
-                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    curUserGraphics = singlePoint;
-                    canClearGraphics = true;
+                    NormalPartOfUpdateGraphics(new CGUserGraphicsPoint(curPos));
                     break;
                 case CGButtonType.CGButtonTypePolygon:
-                    if (canClearGraphics)
+                    CGUserGraphicsLine pline = new CGUserGraphicsLine(upPos, curPos);
+                    if (NormalPartOfUpdateGraphics(pline))
                     {
-                        userCanvas.ClearStateOfSelectedGraphics();
-                        userCanvas.RemoveGraphics(curUserGraphics);
+                        polygonEdgeSet.Remove(oldEdgeLineOfPolygon);
                     }
 
-                    if (!isPolygonDrawing)
-                        break;
-
-                    CGUserGraphicsLine pline = new CGUserGraphicsLine(upPos, curPos);
-                    userCanvas.AddGraphics(pline);
-                    userCanvas.SetGraphicsSelected(pline);
-                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    curUserGraphics = pline;
-                    canClearGraphics = true;
-                    polygonsEdgeSet.Add(pline);
+                    oldEdgeLineOfPolygon = pline;
+                    polygonEdgeSet.Add(pline);
                     break;
                 case CGButtonType.CGButtonTypeLine:
-                    if(canClearGraphics)
-                    {
-                        userCanvas.ClearStateOfSelectedGraphics();
-                        userCanvas.RemoveGraphics(curUserGraphics);
-                    }
-
-                    log.write(String.Format("downpos:{0}, newpos:{1}", downPos, curPos));
-                    CGUserGraphicsLine line = new CGUserGraphicsLine(downPos, curPos);
-                    userCanvas.AddGraphics(line);
-                    userCanvas.SetGraphicsSelected(line);
-                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    curUserGraphics = line;
-                    canClearGraphics = true;
+                    NormalPartOfUpdateGraphics(new CGUserGraphicsLine(downPos, curPos));
                     break;
                 case CGButtonType.CGButtonTypeCircle:
-                    if (canClearGraphics)
-                    {
-                        userCanvas.ClearStateOfSelectedGraphics();
-                        userCanvas.RemoveGraphics(curUserGraphics);
-                    }
-
-                    CGUserGraphicsCircle circle = new CGUserGraphicsCircle(downPos, curPos);
-                    userCanvas.AddGraphics(circle);
-                    userCanvas.SetGraphicsSelected(circle);
-                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    curUserGraphics = circle;
-                    canClearGraphics = true;
+                    NormalPartOfUpdateGraphics(new CGUserGraphicsCircle(downPos, curPos));
                     break;
                 case CGButtonType.CGButtonTypeEllipse:
-                    if (canClearGraphics)
-                    {
-                        userCanvas.ClearStateOfSelectedGraphics();
-                        userCanvas.RemoveGraphics(curUserGraphics);
-                    }
-
-                    CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse(downPos, curPos);
-                    userCanvas.AddGraphics(ellipse);
-                    userCanvas.SetGraphicsSelected(ellipse);
-                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    curUserGraphics = ellipse;
-                    canClearGraphics = true;
+                    NormalPartOfUpdateGraphics(new CGUserGraphicsEllipse(downPos, curPos));
                     break;
             }
         }

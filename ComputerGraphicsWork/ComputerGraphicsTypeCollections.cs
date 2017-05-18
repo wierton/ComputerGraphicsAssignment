@@ -9,6 +9,15 @@ using System.Windows.Forms;
 
 namespace ComputerGraphicsWork
 {
+    public class Distance
+    {
+        public static double CalcDistance(Point x, Point y)
+        {
+            int dx = x.X - y.X;
+            int dy = x.Y - y.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
+    }
     public class CGUserGraphics
     {
         public List<Point> pointsSet { get; } = new List<Point>();
