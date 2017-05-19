@@ -30,6 +30,11 @@ namespace ComputerGraphicsWork
 
         public virtual bool IsCursorNearby(Point cursorPos)
         {
+            foreach(Point p in pointsSet)
+            {
+                if (Distance.CalcDistance(p, cursorPos) < 4)
+                    return true;
+            }
             return false;
         }
 
@@ -40,32 +45,10 @@ namespace ComputerGraphicsWork
             return newUserGraphics;
         }
 
-        public Point TagPointNearCursor(Point cursorPos)
-        {
-            foreach (Point p in CornerPoints())
-            {
-                int dx = p.X - cursorPos.X;
-                int dy = p.Y - cursorPos.Y;
-
-                if (Math.Sqrt(dx * dx + dy * dy) < 4)
-                {
-                    return p;
-                }
-            }
-
-            return new Point(-1, -1);
-        }
-
         public virtual CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
         {
             // do nothing
-            return TransformMove(newPos.X - oldPos.X, newPos.Y - oldPos.Y);
-        }
-        static public double Dist(Point a, Point b)
-        {
-            int dx = a.X - b.X;
-            int dy = a.Y - b.Y;
-            return Math.Sqrt(dx * dx + dy * dy);
+            return this;
         }
     }
 
@@ -265,12 +248,12 @@ namespace ComputerGraphicsWork
         }
         public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
         {
-            if(Dist(firstPoint, oldPos) < 4)
+            if(Distance.CalcDistance(firstPoint, oldPos) < 4)
             {
                 CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, nextPoint);
                 return newUserGraphics;
             }
-            else if(Dist(nextPoint, oldPos) < 4)
+            else if(Distance.CalcDistance(nextPoint, oldPos) < 4)
             {
                 CGUserGraphicsLine newUserGraphics = new CGUserGraphicsLine(newPos, firstPoint);
                 return newUserGraphics;
@@ -298,6 +281,7 @@ namespace ComputerGraphicsWork
             List<Point> baseSet = new List<Point>();
 
             Point fp = new Point(0, radius);
+            baseSet.Add(fp);
             int p = 1 - radius;
             while (fp.X <= fp.Y)
             {
@@ -362,7 +346,7 @@ namespace ComputerGraphicsWork
 
         public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
         {
-            if (Math.Abs(Dist(centerPoint, oldPos) - radius) < 4)
+            if (Math.Abs(Distance.CalcDistance(centerPoint, oldPos) - radius) < 4)
             {
                 CGUserGraphicsCircle newUserGraphics = new CGUserGraphicsCircle(centerPoint, newPos);
                 return newUserGraphics;
@@ -400,6 +384,7 @@ namespace ComputerGraphicsWork
             List<Point> baseSet = new List<Point>();
 
             Point fp = new Point(0, yRadius);
+            baseSet.Add(fp);
             int p = yRadiusSquare - xRadiusSquare * yRadius + xRadiusSquare / 4;
             while (px < py)
             {
@@ -455,7 +440,7 @@ namespace ComputerGraphicsWork
         {
             foreach(Point p in pointsSet)
             {
-                if (Dist(cursorPos, p) < 4.0)
+                if (Distance.CalcDistance(cursorPos, p) < 4.0)
                     return true;
             }
             return false;
@@ -476,14 +461,14 @@ namespace ComputerGraphicsWork
         }
         public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
         {
-            if (Dist(new Point(centerPoint.X, centerPoint.Y + yRadius), oldPos) < 8
-             || Dist(new Point(centerPoint.X, centerPoint.Y - yRadius), oldPos) < 8)
+            if (Distance.CalcDistance(new Point(centerPoint.X, centerPoint.Y + yRadius), oldPos) < 8
+             || Distance.CalcDistance(new Point(centerPoint.X, centerPoint.Y - yRadius), oldPos) < 8)
             {
                 CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(centerPoint, new Point(edgePoint.X, newPos.Y));
                 return newUserGraphics;
             }
-            else if (Dist(new Point(centerPoint.X + xRadius, centerPoint.Y), oldPos) < 8
-                  || Dist(new Point(centerPoint.X - xRadius, centerPoint.Y), oldPos) < 8)
+            else if (Distance.CalcDistance(new Point(centerPoint.X + xRadius, centerPoint.Y), oldPos) < 8
+                  || Distance.CalcDistance(new Point(centerPoint.X - xRadius, centerPoint.Y), oldPos) < 8)
             {
                 CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(centerPoint, new Point(newPos.X, edgePoint.Y));
                 return newUserGraphics;
@@ -566,6 +551,13 @@ namespace ComputerGraphicsWork
         }
     }
 
+    public class CGUserGraphicsBlock : CGUserGraphics
+    {
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            return base.IsCursorNearby(cursorPos);
+        }
+    }
 
     public class CGUserGraphicsTinyRectangle : CGUserGraphics
     {
@@ -683,6 +675,36 @@ namespace ComputerGraphicsWork
         {
             UndrawGraphics(userGraphics);
             userGraphicsSet.Remove(userGraphics);
+        }
+
+        public void Coloring(Point st)
+        {
+            CGUserGraphicsBlock block = new CGUserGraphicsBlock();
+            Queue<Point> q = new Queue<Point>();
+            q.Enqueue(st);
+            while(q.Count > 0)
+            {
+                Point center = q.Dequeue();
+                block.pointsSet.Add(center);
+                List<Point> neighs = new List<Point>() {
+                    new Point(center.X + 1, center.Y),
+                    new Point(center.X - 1, center.Y),
+                    new Point(center.X, center.Y + 1),
+                    new Point(center.X, center.Y - 1)
+                    };
+
+                neighs.ForEach((u)=> {
+                    if (0 <= u.X && u.X < canvasWidth
+                        && 0 <= u.Y && u.Y < canvasHeight
+                        && refCount[u.X, u.Y] <= 0)
+                    {
+                        q.Enqueue(u);
+                        SetPixel(u);
+                    }
+                });
+            }
+
+            userGraphicsSet.Add(block);
         }
 
         public void SetGraphicsSelected(CGUserGraphics userGraphics)

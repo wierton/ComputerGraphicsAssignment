@@ -47,6 +47,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawCircle = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawEllipse = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
+            this.buttonColoring = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,6 +59,7 @@ namespace ComputerGraphicsWork
             this.buttonMoveGraphics,
             this.buttonDrawRotation,
             this.buttonAdjustGraphics,
+            this.buttonColoring,
             this.buttonDrawPoint,
             this.buttonDrawLine,
             this.buttonDrawCircle,
@@ -177,6 +179,17 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon.ToolTipText = "polygon";
             this.buttonDrawPolygon.Click += new System.EventHandler(this.buttonDrawPolygon_Click);
             // 
+            // buttonColoring
+            // 
+            this.buttonColoring.AutoSize = false;
+            this.buttonColoring.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonColoring.Image = ((System.Drawing.Image)(resources.GetObject("buttonColoring.Image")));
+            this.buttonColoring.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonColoring.Name = "buttonColoring";
+            this.buttonColoring.Size = new System.Drawing.Size(32, 32);
+            this.buttonColoring.Text = "coloring";
+            this.buttonColoring.Click += new System.EventHandler(this.buttonColoring_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -191,6 +204,7 @@ namespace ComputerGraphicsWork
             this.Load += new System.EventHandler(this.MainWindow_OverideLoad);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainWindow_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainWindow_KeyDown);
+            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseClick);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainWindow_MouseUp);
@@ -213,5 +227,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonAdjustGraphics;
         private System.Windows.Forms.ToolStripButton buttonDrawRotation;
         private System.Windows.Forms.ToolStripButton buttonDrawPolygon;
+        private System.Windows.Forms.ToolStripButton buttonColoring;
     }
 }

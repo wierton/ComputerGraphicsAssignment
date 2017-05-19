@@ -19,6 +19,7 @@ namespace ComputerGraphicsWork
         CGButtonTypeSave,
         CGButtonTypeMove,
         CGButtonTypeAdjust,
+        CGButtonTypeColoring,
         CGButtonTypePoint,
         CGButtonTypeLine,
         CGButtonTypeCircle,
@@ -136,6 +137,10 @@ namespace ComputerGraphicsWork
             normalButtonClicked(CGButtonType.CGButtonTypeMove, this.buttonMoveGraphics);
         }
 
+        private void buttonColoring_Click(object sender, EventArgs e)
+        {
+            normalButtonClicked(CGButtonType.CGButtonTypeColoring, this.buttonColoring);
+        }
         private void buttonSaveBitmap_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
@@ -147,6 +152,7 @@ namespace ComputerGraphicsWork
                 userCanvas.bmp.Save(strFileName);
             }
         }
+
 
         private void buttonAdjustGraphics_Click(object sender, EventArgs e)
         {
@@ -268,13 +274,22 @@ namespace ComputerGraphicsWork
 
         private void MainWindow_Paint(object sender, PaintEventArgs e)
         {
-            ghs.DrawImage(userCanvas.bmp, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height));
+            ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
         }
 
 
         private void buttonDrawRotation_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void MainWindow_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (btnType == CGButtonType.CGButtonTypeColoring)
+            {
+                userCanvas.Coloring(new Point(e.X, e.Y));
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+            }
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
