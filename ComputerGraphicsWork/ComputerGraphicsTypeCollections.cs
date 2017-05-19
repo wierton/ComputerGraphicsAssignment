@@ -18,6 +18,27 @@ namespace ComputerGraphicsWork
             return Math.Sqrt(dx * dx + dy * dy);
         }
     }
+
+    public class Theta
+    {
+        public double sinTheta { get; }
+        public double cosTheta { get; }
+        public Theta(Point basePos, Point oldPos, Point newPos)
+        {
+            Point oldVec = new Point(oldPos.X - basePos.X, oldPos.Y - basePos.Y);
+            Point newVec = new Point(newPos.X - basePos.X, newPos.Y - basePos.Y);
+
+            double dotVec = oldVec.X * newVec.X + oldVec.Y * newVec.Y;
+            double oldVecSquareMod = oldVec.X * oldVec.X + oldVec.Y * oldVec.Y;
+            double newVecSquareMod = newVec.X * newVec.X + newVec.Y * newVec.Y;
+            double baseMod = Math.Sqrt(oldVecSquareMod * newVecSquareMod);
+            cosTheta = dotVec / baseMod;
+
+            double timesVec = oldVec.X * newVec.Y - oldVec.Y * newVec.X;
+            sinTheta = timesVec / baseMod;
+        }
+    }
+
     public class CGUserGraphics
     {
         public List<Point> pointsSet { get; } = new List<Point>();
@@ -27,6 +48,15 @@ namespace ComputerGraphicsWork
             return new List<Point> ();
         }
 
+        public Point RotatePoint(Point p, Point basePos, Theta theta)
+        {
+            int dx = p.X - basePos.X;
+            int dy = p.Y - basePos.Y;
+            return new Point(
+                (int)(basePos.X + dx * theta.cosTheta - dy * theta.sinTheta),
+                (int)(basePos.Y + dx * theta.sinTheta + dy * theta.cosTheta)
+            );
+        }
 
         public virtual bool IsCursorNearby(Point cursorPos)
         {
@@ -36,6 +66,11 @@ namespace ComputerGraphicsWork
                     return true;
             }
             return false;
+        }
+
+        public virtual CGUserGraphics TransformRotation(Point basePos, Point oldPos, Point newPos)
+        {
+            return this;
         }
 
         public virtual CGUserGraphics TransformMove(int dx, int dy)
@@ -263,6 +298,14 @@ namespace ComputerGraphicsWork
                 return this;
             }
         }
+
+        public override CGUserGraphics TransformRotation(Point basePos, Point oldPos, Point newPos)
+        {
+            Theta theta = new Theta(basePos, oldPos, newPos);
+            Point a = RotatePoint(firstPoint, basePos, theta);
+            Point b = RotatePoint(nextPoint, basePos, theta);
+            return new CGUserGraphicsLine(a, b);
+        }
     }
     public class CGUserGraphicsCircle : CGUserGraphics
     {
@@ -355,6 +398,13 @@ namespace ComputerGraphicsWork
             {
                 return this;
             }
+        }
+        public override CGUserGraphics TransformRotation(Point basePos, Point oldPos, Point newPos)
+        {
+            Theta theta = new Theta(basePos, oldPos, newPos);
+            Point newCenterPoint = RotatePoint(centerPoint, basePos, theta);
+            Point newEdgePoint = RotatePoint(edgePoint, basePos, theta);
+            return new CGUserGraphicsCircle(newCenterPoint, newEdgePoint);
         }
     }
     public class CGUserGraphicsEllipse : CGUserGraphics
@@ -478,6 +528,14 @@ namespace ComputerGraphicsWork
                 return this;
             }
         }
+
+        public override CGUserGraphics TransformRotation(Point basePos, Point oldPos, Point newPos)
+        {
+            Theta theta = new Theta(basePos, oldPos, newPos);
+            Point newCenterPoint = RotatePoint(centerPoint, basePos, theta);
+            Point newEdgePoint = RotatePoint(edgePoint, basePos, theta);
+            return new CGUserGraphicsEllipse(newCenterPoint, newEdgePoint);
+        }
     }
 
     public class CGUserGraphicsPolygon : CGUserGraphics
@@ -549,6 +607,14 @@ namespace ComputerGraphicsWork
 
             return this;
         }
+
+        public override CGUserGraphics TransformRotation(Point basePos, Point oldPos, Point newPos)
+        {
+            List<Point> newEndPoints = new List<Point>();
+            Theta theta = new Theta(basePos, oldPos, newPos);
+            endPoints.ForEach((p)=> { newEndPoints.Add(RotatePoint(p, basePos, theta)); });
+            return new CGUserGraphicsPolygon(newEndPoints);
+        }
     }
 
     public class CGUserGraphicsBlock : CGUserGraphics
@@ -598,6 +664,7 @@ namespace ComputerGraphicsWork
         public CGUserGraphics selectedUserGraphics;
         private int[,] refCount;
         private List<CGUserGraphics> userGraphicsSet = new List<CGUserGraphics>();
+
         public CGUserCanvas(int width, int height)
         {
             canvasWidth = width;
@@ -750,6 +817,18 @@ namespace ComputerGraphicsWork
             return false;
         }
 
+        private void OperateAtSelectedGraphics(CGUserGraphics newUserGraphics)
+        {
+            CGUserGraphics oldGraphics = selectedUserGraphics;
+            this.ClearStateOfSelectedGraphics();
+            this.RemoveGraphics(oldGraphics);
+
+            this.AddGraphics(newUserGraphics);
+            this.SetGraphicsSelected(newUserGraphics);
+
+            selectedUserGraphics = newUserGraphics;
+        }
+
         public void MoveSelectedGraphics(int dx, int dy)
         {
             if (!isUserGraphicsSelected)
@@ -757,14 +836,17 @@ namespace ComputerGraphicsWork
 
             CGUserGraphics newGraphics = selectedUserGraphics.TransformMove(dx, dy);
 
-            CGUserGraphics oldGraphics = selectedUserGraphics;
-            this.ClearStateOfSelectedGraphics();
-            this.RemoveGraphics(oldGraphics);
+            OperateAtSelectedGraphics(newGraphics);
+        }
 
-            this.AddGraphics(newGraphics);
-            this.SetGraphicsSelected(newGraphics);
+        public void RotateSelectedGraphics(Point basePos, Point oldPos, Point newPos)
+        {
+            if (!isUserGraphicsSelected)
+                return;
 
-            selectedUserGraphics = newGraphics;
+            CGUserGraphics newGraphics = selectedUserGraphics.TransformRotation(basePos, oldPos, newPos);
+
+            OperateAtSelectedGraphics(newGraphics);
         }
 
         public void DeleteSelectedGraphics()

@@ -40,14 +40,14 @@ namespace ComputerGraphicsWork
             this.commandHolder = new System.Windows.Forms.ToolStrip();
             this.buttonSaveBitmap = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveGraphics = new System.Windows.Forms.ToolStripButton();
-            this.buttonDrawRotation = new System.Windows.Forms.ToolStripButton();
+            this.buttonRotation = new System.Windows.Forms.ToolStripButton();
             this.buttonAdjustGraphics = new System.Windows.Forms.ToolStripButton();
+            this.buttonColoring = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPoint = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawLine = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawCircle = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawEllipse = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
-            this.buttonColoring = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,7 +57,7 @@ namespace ComputerGraphicsWork
             this.commandHolder.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonSaveBitmap,
             this.buttonMoveGraphics,
-            this.buttonDrawRotation,
+            this.buttonRotation,
             this.buttonAdjustGraphics,
             this.buttonColoring,
             this.buttonDrawPoint,
@@ -97,17 +97,17 @@ namespace ComputerGraphicsWork
             this.buttonMoveGraphics.ToolTipText = "move";
             this.buttonMoveGraphics.Click += new System.EventHandler(this.buttonMoveGraphics_Click);
             // 
-            // buttonDrawRotation
+            // buttonRotation
             // 
-            this.buttonDrawRotation.AutoSize = false;
-            this.buttonDrawRotation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonDrawRotation.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawRotation.Image")));
-            this.buttonDrawRotation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonDrawRotation.Name = "buttonDrawRotation";
-            this.buttonDrawRotation.Size = new System.Drawing.Size(32, 32);
-            this.buttonDrawRotation.Text = "buttonDrawRotation";
-            this.buttonDrawRotation.ToolTipText = "rotation";
-            this.buttonDrawRotation.Click += new System.EventHandler(this.buttonDrawRotation_Click);
+            this.buttonRotation.AutoSize = false;
+            this.buttonRotation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonRotation.Image = ((System.Drawing.Image)(resources.GetObject("buttonRotation.Image")));
+            this.buttonRotation.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonRotation.Name = "buttonRotation";
+            this.buttonRotation.Size = new System.Drawing.Size(32, 32);
+            this.buttonRotation.Text = "buttonRotation";
+            this.buttonRotation.ToolTipText = "rotation";
+            this.buttonRotation.Click += new System.EventHandler(this.buttonRotation_Click);
             // 
             // buttonAdjustGraphics
             // 
@@ -120,6 +120,17 @@ namespace ComputerGraphicsWork
             this.buttonAdjustGraphics.Text = "buttonAdjustGraphics";
             this.buttonAdjustGraphics.ToolTipText = "adjust";
             this.buttonAdjustGraphics.Click += new System.EventHandler(this.buttonAdjustGraphics_Click);
+            // 
+            // buttonColoring
+            // 
+            this.buttonColoring.AutoSize = false;
+            this.buttonColoring.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonColoring.Image = ((System.Drawing.Image)(resources.GetObject("buttonColoring.Image")));
+            this.buttonColoring.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonColoring.Name = "buttonColoring";
+            this.buttonColoring.Size = new System.Drawing.Size(32, 32);
+            this.buttonColoring.Text = "coloring";
+            this.buttonColoring.Click += new System.EventHandler(this.buttonColoring_Click);
             // 
             // buttonDrawPoint
             // 
@@ -179,17 +190,6 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon.ToolTipText = "polygon";
             this.buttonDrawPolygon.Click += new System.EventHandler(this.buttonDrawPolygon_Click);
             // 
-            // buttonColoring
-            // 
-            this.buttonColoring.AutoSize = false;
-            this.buttonColoring.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonColoring.Image = ((System.Drawing.Image)(resources.GetObject("buttonColoring.Image")));
-            this.buttonColoring.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonColoring.Name = "buttonColoring";
-            this.buttonColoring.Size = new System.Drawing.Size(32, 32);
-            this.buttonColoring.Text = "coloring";
-            this.buttonColoring.Click += new System.EventHandler(this.buttonColoring_Click);
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -225,7 +225,7 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawPoint;
         private System.Windows.Forms.ToolStripButton buttonSaveBitmap;
         private System.Windows.Forms.ToolStripButton buttonAdjustGraphics;
-        private System.Windows.Forms.ToolStripButton buttonDrawRotation;
+        private System.Windows.Forms.ToolStripButton buttonRotation;
         private System.Windows.Forms.ToolStripButton buttonDrawPolygon;
         private System.Windows.Forms.ToolStripButton buttonColoring;
     }

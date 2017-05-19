@@ -24,6 +24,7 @@ namespace ComputerGraphicsWork
         CGButtonTypeLine,
         CGButtonTypeCircle,
         CGButtonTypeEllipse,
+        CGButtonTypeRotation,
         CGButtonTypePolygon,
     };
 
@@ -40,6 +41,7 @@ namespace ComputerGraphicsWork
         private CGButtonType btnType;
         private CGMouseState mouseState;
         private Graphics ghs;
+        private Point rightDownPos = new Point(-1, -1);
         private Point oldPos, curPos, downPos, upPos;
         private Pen ghsPen = new Pen(Color.Black, 1);
         private Pen rawPen = new Pen(Color.White, 1);
@@ -135,6 +137,12 @@ namespace ComputerGraphicsWork
         private void buttonMoveGraphics_Click(object sender, EventArgs e)
         {
             normalButtonClicked(CGButtonType.CGButtonTypeMove, this.buttonMoveGraphics);
+        }
+
+        private void buttonRotation_Click(object sender, EventArgs e)
+        {
+            rightDownPos = new Point(this.ClientRectangle.Width / 2, this.ClientRectangle.Height / 2);
+            normalButtonClicked(CGButtonType.CGButtonTypeRotation, this.buttonRotation);
         }
 
         private void buttonColoring_Click(object sender, EventArgs e)
@@ -261,6 +269,16 @@ namespace ComputerGraphicsWork
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 }
             }
+            else if(btnType == CGButtonType.CGButtonTypeRotation)
+            {
+                // FIXME
+                //rightDownPos = new Point(e.X, e.Y);
+                CGUserGraphicsPoint p = new CGUserGraphicsPoint(rightDownPos);
+                userCanvas.AddGraphics(p);
+                userCanvas.SetGraphicsSelected(p);
+
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+            }
         }
 
         private void MainWindow_MouseDown(object sender, MouseEventArgs e)
@@ -278,11 +296,6 @@ namespace ComputerGraphicsWork
         }
 
 
-        private void buttonDrawRotation_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void MainWindow_MouseClick(object sender, MouseEventArgs e)
         {
             if (btnType == CGButtonType.CGButtonTypeColoring)
@@ -291,6 +304,7 @@ namespace ComputerGraphicsWork
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
             }
         }
+
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -360,6 +374,12 @@ namespace ComputerGraphicsWork
                     userCanvas.MoveSelectedGraphics(e.X - oldPos.X, e.Y - oldPos.Y);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     log.write("return since isUserGraphicsSelected");
+                    return;
+                }
+                else if(btnType == CGButtonType.CGButtonTypeRotation)
+                {
+                    userCanvas.RotateSelectedGraphics(rightDownPos, oldPos, curPos);
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     return;
                 }
             }
