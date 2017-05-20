@@ -38,10 +38,10 @@ namespace ComputerGraphicsWork
     {
         private UserLog log = new UserLog("log.txt");
 
-        private CGButtonType btnType;
+        private ToolStripButton buttonClicked = null;
         private CGMouseState mouseState;
         private Graphics ghs;
-        private Point rightDownPos = new Point(-1, -1);
+
         private Point oldPos, curPos, downPos, upPos;
         private Pen ghsPen = new Pen(Color.Black, 1);
         private Pen rawPen = new Pen(Color.White, 1);
@@ -95,18 +95,19 @@ namespace ComputerGraphicsWork
             }
         }
 
-        private void normalButtonClicked(CGButtonType clickedButtonType, System.Windows.Forms.ToolStripButton clickedButtonObject)
+        private void normalButtonClicked(CGButtonType newClickedButtonType, ToolStripButton newClickedButtonObject)
         {
-            if (btnType == clickedButtonType)
+            if (buttonClicked == newClickedButtonObject)
             {
-                clickedButtonObject.Checked = false;
-                btnType = CGButtonType.CGButtonTypeNothing;
+                buttonClicked.Checked = false;
+                buttonClicked = null;
             }
             else
             {
-                ResumeOldStripButton(btnType);
-                clickedButtonObject.Checked = true;
-                btnType = clickedButtonType;
+                if(buttonClicked != null)
+                    buttonClicked.Checked = false;
+                newClickedButtonObject.Checked = true;
+                buttonClicked = newClickedButtonObject;
             }
         }
 
@@ -141,7 +142,7 @@ namespace ComputerGraphicsWork
 
         private void buttonRotation_Click(object sender, EventArgs e)
         {
-            rightDownPos = new Point(this.ClientRectangle.Width / 2, this.ClientRectangle.Height / 2);
+            userCanvas.SetBasePoint(new Point(this.ClientRectangle.Width / 2, this.ClientRectangle.Height / 2));
             normalButtonClicked(CGButtonType.CGButtonTypeRotation, this.buttonRotation);
         }
 
@@ -174,7 +175,7 @@ namespace ComputerGraphicsWork
 
         private void MainWindow_MouseUp(object sender, MouseEventArgs e)
         {
-            if (btnType == CGButtonType.CGButtonTypePolygon)
+            if (buttonClicked == this.buttonDrawPolygon)
             {
                 log.write("mouse set to up");
                 mouseState = CGMouseState.CGMouseStateUp;
@@ -216,7 +217,7 @@ namespace ComputerGraphicsWork
             log.write("mouse state set to down");
             mouseState = CGMouseState.CGMouseStateDown;
 
-            if (btnType != CGButtonType.CGButtonTypePolygon)
+            if (buttonClicked != this.buttonDrawPolygon)
             {
                 log.write(String.Format("canUpdateGraphics:{0} --> true", canUpdateGraphics));
                 canUpdateGraphics = true;
@@ -227,8 +228,9 @@ namespace ComputerGraphicsWork
             this.downPos.X = e.X;
             this.downPos.Y = e.Y;
 
-            if (btnType == CGButtonType.CGButtonTypeMove
-                || btnType == CGButtonType.CGButtonTypeAdjust)
+            if (buttonClicked == this.buttonMoveGraphics
+                || buttonClicked == this.buttonAdjustGraphics
+                || buttonClicked == this.buttonRotation)
             {
                 userCanvas.SelectGraphicsByCursor(new Point(e.X, e.Y));
             }
@@ -238,7 +240,7 @@ namespace ComputerGraphicsWork
         {
             // note: the order of each event when double clicked
             //       down -> up -> down -> dbclick -> up
-            if (btnType == CGButtonType.CGButtonTypePolygon)
+            if (buttonClicked == this.buttonDrawPolygon)
             {
                 log.write("mouse double click");
 
@@ -269,13 +271,9 @@ namespace ComputerGraphicsWork
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 }
             }
-            else if(btnType == CGButtonType.CGButtonTypeRotation)
+            else if(buttonClicked == this.buttonRotation)
             {
-                // FIXME
-                //rightDownPos = new Point(e.X, e.Y);
-                CGUserGraphicsPoint p = new CGUserGraphicsPoint(rightDownPos);
-                userCanvas.AddGraphics(p);
-                userCanvas.SetGraphicsSelected(p);
+                userCanvas.SetBasePoint(new Point(e.X, e.Y));
 
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
             }
@@ -298,7 +296,7 @@ namespace ComputerGraphicsWork
 
         private void MainWindow_MouseClick(object sender, MouseEventArgs e)
         {
-            if (btnType == CGButtonType.CGButtonTypeColoring)
+            if (buttonClicked == this.buttonColoring)
             {
                 userCanvas.Coloring(new Point(e.X, e.Y));
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
@@ -345,6 +343,9 @@ namespace ComputerGraphicsWork
             curPos.X = e.X;
             curPos.Y = e.Y;
 
+            if (buttonClicked == null)
+                return;
+
             if (!canUpdateGraphics)
             {
                 log.write(String.Format("return from MouseMove handler, canUpdateGraphics={0}", canUpdateGraphics));
@@ -362,23 +363,23 @@ namespace ComputerGraphicsWork
             //       2. mouse is down
             if (userCanvas.isUserGraphicsSelected && mouseState == CGMouseState.CGMouseStateDown)
             {
-                if (btnType == CGButtonType.CGButtonTypeAdjust)
+                if (buttonClicked == this.buttonAdjustGraphics)
                 {
                     userCanvas.AdjustGraphicsByCursor(oldPos, new Point(e.X, e.Y));
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     log.write("return since isUserGraphicsSelected");
                     return;
                 }
-                else if(btnType == CGButtonType.CGButtonTypeMove)
+                else if(buttonClicked == this.buttonMoveGraphics)
                 {
                     userCanvas.MoveSelectedGraphics(e.X - oldPos.X, e.Y - oldPos.Y);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     log.write("return since isUserGraphicsSelected");
                     return;
                 }
-                else if(btnType == CGButtonType.CGButtonTypeRotation)
+                else if(buttonClicked == this.buttonRotation)
                 {
-                    userCanvas.RotateSelectedGraphics(rightDownPos, oldPos, curPos);
+                    userCanvas.RotateSelectedGraphics(oldPos, curPos);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     return;
                 }
@@ -387,12 +388,12 @@ namespace ComputerGraphicsWork
             log.write("mouse move");
 
             // update graphics if a graphics is drawing
-            switch (btnType)
+            switch (buttonClicked.Text)
             {
-                case CGButtonType.CGButtonTypePoint:
+                case "buttonDrawPoint":
                     NormalPartOfUpdateGraphics(new CGUserGraphicsPoint(curPos));
                     break;
-                case CGButtonType.CGButtonTypePolygon:
+                case "buttonDrawPolygon":
                     CGUserGraphicsLine pline = new CGUserGraphicsLine(upPos, curPos);
                     if (NormalPartOfUpdateGraphics(pline))
                     {
@@ -402,13 +403,13 @@ namespace ComputerGraphicsWork
                     oldEdgeLineOfPolygon = pline;
                     polygonEdgeSet.Add(pline);
                     break;
-                case CGButtonType.CGButtonTypeLine:
+                case "buttonDrawLine":
                     NormalPartOfUpdateGraphics(new CGUserGraphicsLine(downPos, curPos));
                     break;
-                case CGButtonType.CGButtonTypeCircle:
+                case "buttonDrawCircle":
                     NormalPartOfUpdateGraphics(new CGUserGraphicsCircle(downPos, curPos));
                     break;
-                case CGButtonType.CGButtonTypeEllipse:
+                case "buttonDrawEllipse":
                     NormalPartOfUpdateGraphics(new CGUserGraphicsEllipse(downPos, curPos));
                     break;
             }

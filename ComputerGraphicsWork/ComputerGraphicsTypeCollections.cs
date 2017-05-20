@@ -21,12 +21,18 @@ namespace ComputerGraphicsWork
 
     public class Theta
     {
+        private bool isThetaValid;
         public double sinTheta { get; }
         public double cosTheta { get; }
         public Theta(Point basePos, Point oldPos, Point newPos)
         {
             Point oldVec = new Point(oldPos.X - basePos.X, oldPos.Y - basePos.Y);
             Point newVec = new Point(newPos.X - basePos.X, newPos.Y - basePos.Y);
+
+            if (oldVec.X == 0 && oldVec.Y == 0 || newVec.X == 0 && newVec.Y == 0)
+                isThetaValid = false;
+            else
+                isThetaValid = true;
 
             double oldVecSquareMod = oldVec.X * oldVec.X + oldVec.Y * oldVec.Y;
             double newVecSquareMod = newVec.X * newVec.X + newVec.Y * newVec.Y;
@@ -37,10 +43,17 @@ namespace ComputerGraphicsWork
 
             double timesVec = oldVec.X * newVec.Y - oldVec.Y * newVec.X;
             sinTheta = timesVec / baseMod;
+
+/*            if (Math.Abs(sinTheta * sinTheta + cosTheta * cosTheta - 1) > 0.0000000001)
+                MessageBox.Show(string.Format("invalid theta: sin={0}, cos={1}, z={2}",
+                    sinTheta, cosTheta, sinTheta * sinTheta + cosTheta * cosTheta));*/
         }
 
         public Point RotatePoint(Point p, Point basePos)
         {
+            if (!isThetaValid)
+                return p;
+
             int dx = p.X - basePos.X;
             int dy = p.Y - basePos.Y;
             return new Point(
@@ -117,6 +130,8 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphicsPoint : CGUserGraphics
     {
+        public int X { get; set; } = 0;
+        public int Y { get; set; } = 0;
         public CGUserGraphicsPoint(Point start)
         {
             keyPoints.Add(start);
@@ -125,6 +140,9 @@ namespace ComputerGraphicsWork
 
         public override void CalculatePointsSet()
         {
+            X = keyPoints[0].X;
+            Y = keyPoints[0].Y;
+
             pointsSet.RemoveAll((p)=> { return true; });
             pointsSet.Add(keyPoints[0]);
         }
@@ -343,6 +361,7 @@ namespace ComputerGraphicsWork
                 new Point(center.X + dy, center.Y - dx),
             };
         }
+
         public override void CalculatePointsSet()
         {
             Point center = keyPoints[0];
@@ -407,12 +426,14 @@ namespace ComputerGraphicsWork
 
         public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
         {
-            Point center = keyPoints[0];
             int dx = newPos.X - oldPos.X;
             int dy = newPos.Y - oldPos.Y;
-            if (Math.Abs(Distance.CalcDistance(center, oldPos) - radius) < 4)
+            if (Math.Abs(Distance.CalcDistance(keyPoints[0], oldPos) - radius) < 4)
             {
-                keyPoints[0] = new Point(center.X + dx, center.Y + dy);
+                int radius = (int)Distance.CalcDistance(keyPoints[0], newPos);
+                keyPoints[1] = new Point(keyPoints[0].X + radius, keyPoints[0].Y);
+
+                pointsSet.RemoveAll((p) => { return true; });
                 CalculatePointsSet();
             }
             return this;
@@ -453,7 +474,7 @@ namespace ComputerGraphicsWork
                 Point fixedUpPoint = new Point(center.X, center.Y + yRadius);
                 Point fixedEdgePoint = new Point(center.X + xRadius, center.Y + yRadius);
 
-                CalculateNormalEllipse(center, keyPoints[1]);
+                CalculateNormalEllipse(center, fixedEdgePoint);
 
                 Theta theta = new Theta(center, fixedUpPoint, upPoint);
 
@@ -588,13 +609,6 @@ namespace ComputerGraphicsWork
         public CGUserGraphicsPolygon(List<Point> inEndPoints)
         {
             inEndPoints.ForEach((u) => { keyPoints.Add(u); });
-
-            for (int i = 0; i < keyPoints.Count - 1; i++)
-            {
-                edgeLines.Add(new CGUserGraphicsLine(keyPoints[i], keyPoints[i + 1]));
-            }
-            edgeLines.Add(new CGUserGraphicsLine(keyPoints[keyPoints.Count - 1], keyPoints[0]));
-
             CalculatePointsSet();
         }
 
@@ -607,6 +621,14 @@ namespace ComputerGraphicsWork
 
         public override void CalculatePointsSet()
         {
+            edgeLines.RemoveAll((l) => { return true; });
+
+            for (int i = 0; i < keyPoints.Count - 1; i++)
+            {
+                edgeLines.Add(new CGUserGraphicsLine(keyPoints[i], keyPoints[i + 1]));
+            }
+            edgeLines.Add(new CGUserGraphicsLine(keyPoints[keyPoints.Count - 1], keyPoints[0]));
+
             edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
         }
 
@@ -654,7 +676,6 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphicsTinyRectangle : CGUserGraphics
     {
-        Rectangle rect;
         const int edge = 2;
 
         public CGUserGraphicsTinyRectangle(Point center)
@@ -683,6 +704,7 @@ namespace ComputerGraphicsWork
         private int[,] refCount;
         private List<CGUserGraphics> userGraphicsSet = new List<CGUserGraphics>();
 
+        public CGUserGraphicsPoint basePoint { get; set; }
         public CGUserCanvas(int width, int height)
         {
             canvasWidth = width;
@@ -697,6 +719,25 @@ namespace ComputerGraphicsWork
                     bmp.SetPixel(i, j, Color.White);
                 }
             }
+
+            basePoint = new CGUserGraphicsPoint(new Point(width / 2, height / 2));
+        }
+
+        public void SetBasePoint(Point p)
+        {
+            if (basePoint != null)
+                UnsetBasePoint();
+
+            basePoint = new CGUserGraphicsPoint(p);
+            this.AddGraphics(basePoint);
+            this.SetGraphicsSelected(basePoint);
+        }
+
+        public void UnsetBasePoint()
+        {
+            this.ClearStateOfSelectedGraphics();
+            this.RemoveGraphics(basePoint);
+            basePoint = null;
         }
 
         private void SetPixel(Point pos)
@@ -855,7 +896,7 @@ namespace ComputerGraphicsWork
 
         public void MoveSelectedGraphics(int dx, int dy)
         {
-            if (!isUserGraphicsSelected)
+            if (!isUserGraphicsSelected || selectedUserGraphics == basePoint)
                 return;
 
             DeleteSelectedGraphics();
@@ -865,14 +906,15 @@ namespace ComputerGraphicsWork
             UpdateSelectedGraphics(newUserGraphics);
         }
 
-        public void RotateSelectedGraphics(Point basePos, Point oldPos, Point newPos)
+        public void RotateSelectedGraphics(Point oldPos, Point newPos)
         {
-            if (!isUserGraphicsSelected)
+            if (!isUserGraphicsSelected || selectedUserGraphics == basePoint
+                || basePoint == null)
                 return;
 
             DeleteSelectedGraphics();
 
-            CGUserGraphics newUserGraphics = GraphicsJustCleared.TransformRotation(basePos, oldPos, newPos);
+            CGUserGraphics newUserGraphics = GraphicsJustCleared.TransformRotation(new Point(basePoint.X, basePoint.Y), oldPos, newPos);
 
             UpdateSelectedGraphics(newUserGraphics);
         }
