@@ -373,14 +373,14 @@ namespace ComputerGraphicsWork
                 }
                 else if(buttonClicked == this.buttonMoveGraphics)
                 {
-                    userCanvas.MoveSelectedGraphics(e.X - oldPos.X, e.Y - oldPos.Y);
+                    userCanvas.MoveSelectedGraphics(new Point(e.X, e.Y));
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     log.write("return since isUserGraphicsSelected");
                     return;
                 }
                 else if(buttonClicked == this.buttonRotation)
                 {
-                    userCanvas.RotateSelectedGraphics(oldPos, curPos);
+                    userCanvas.RotateSelectedGraphics(curPos);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     return;
                 }

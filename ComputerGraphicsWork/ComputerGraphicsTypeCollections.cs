@@ -49,6 +49,30 @@ namespace ComputerGraphicsWork
                     sinTheta, cosTheta, sinTheta * sinTheta + cosTheta * cosTheta));*/
         }
 
+        public Theta(Point start, Point end)
+        {
+            Point vec = new Point(end.X - start.X, end.Y - start.Y);
+            Theta theta = new Theta(vec);
+            sinTheta = theta.sinTheta;
+            cosTheta = theta.cosTheta;
+        }
+
+        public Theta(Point vec)
+        {
+            // old vec = (1, 0), new vec = vector
+
+            if (vec.X == 0 && vec.Y == 0)
+                isThetaValid = false;
+            else
+                isThetaValid = true;
+
+            double vecMod = Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y);
+
+            cosTheta = vec.X / vecMod;
+
+            sinTheta = vec.Y / vecMod;
+        }
+
         public Point RotatePoint(Point p, Point basePos)
         {
             if (!isThetaValid)
@@ -118,6 +142,23 @@ namespace ComputerGraphicsWork
             return this;
         }
 
+        public virtual CGUserGraphics TransformFixRotation(Point basePos, Point oldPos, Point newPos)
+        {
+            Theta theta = new Theta(basePos, oldPos, newPos);
+
+            Point newFixPoint;
+
+            if (keyPoints.Count > 0)
+                newFixPoint = theta.RotatePoint(keyPoints[0], basePos);
+
+            for (int i = keyPoints.Count - 1; i > 0; i--)
+            {
+                Point p = theta.RotatePoint(keyPoints[i], basePos);
+            }
+            UpdatePointsSet();
+            return this;
+        }
+
         public virtual CGUserGraphics TransformMove(int dx, int dy)
         {
             for (int i = keyPoints.Count - 1; i >= 0; i--)
@@ -151,7 +192,7 @@ namespace ComputerGraphicsWork
                     graphics = new CGUserGraphicsLine(this.keyPoints[0], this.keyPoints[1]);
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsCircle":
-                    graphics = new CGUserGraphicsLine(this.keyPoints[0], this.keyPoints[1]);
+                    graphics = new CGUserGraphicsCircle(this.keyPoints[0], this.keyPoints[1]);
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsEllipse":
                     CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse(this.keyPoints[0], this.keyPoints[1]);
@@ -162,6 +203,9 @@ namespace ComputerGraphicsWork
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsPolygon":
                     graphics = new CGUserGraphicsPolygon(this.keyPoints);
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsBlock":
+                    graphics = new CGUserGraphicsBlock(this.keyPoints);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(string.Format("undocumented graphics:{0}", this.GetType().ToString()));
@@ -711,6 +755,15 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphicsBlock : CGUserGraphics
     {
+        public CGUserGraphicsBlock()
+        {
+
+        }
+        public CGUserGraphicsBlock(List<Point> inPointSet)
+        {
+            inPointSet.ForEach((p) => { keyPoints.Add(p); });
+            inPointSet.ForEach((p) => { pointsSet.Add(p); });
+        }
         public override bool IsCursorNearby(Point cursorPos)
         {
             return base.IsCursorNearby(cursorPos);
@@ -748,6 +801,11 @@ namespace ComputerGraphicsWork
         public CGUserGraphics GraphicsJustCleared = null;
         private int[,] refCount;
         private List<CGUserGraphics> userGraphicsSet = new List<CGUserGraphics>();
+
+        // transform
+        Point posOfGraphicsWhenSelected;
+        CGUserGraphics rawSelectedGraphics;
+        CGUserGraphics transfromSelectedGraphics;
 
         public CGUserGraphicsPoint basePoint { get; set; }
         public CGUserCanvas(int width, int height)
@@ -913,7 +971,11 @@ namespace ComputerGraphicsWork
             {
                 if (iterUserGraphics.IsCursorNearby(cursorPos))
                 {
+                    posOfGraphicsWhenSelected = cursorPos;
+                    rawSelectedGraphics = iterUserGraphics;
+
                     this.SetGraphicsSelected(iterUserGraphics);
+                    // this.userGraphicsSet.Remove(iterUserGraphics);
                     return true;
                 }
             }
@@ -929,6 +991,7 @@ namespace ComputerGraphicsWork
                 return;
 
             this.ClearStateOfSelectedGraphics();
+            // comment it when test rotation
             this.RemoveGraphics(GraphicsJustCleared);
         }
 
@@ -940,19 +1003,21 @@ namespace ComputerGraphicsWork
             selectedUserGraphics = newUserGraphics;
         }
 
-        public void MoveSelectedGraphics(int dx, int dy)
+        public void MoveSelectedGraphics(Point newPos)
         {
             if (!isUserGraphicsSelected || selectedUserGraphics == basePoint)
                 return;
 
             DeleteSelectedGraphics();
 
-            CGUserGraphics newUserGraphics = GraphicsJustCleared.TransformMove(dx, dy);
+            transfromSelectedGraphics = rawSelectedGraphics.Copy();
+            transfromSelectedGraphics.TransformMove(newPos.X - posOfGraphicsWhenSelected.X,
+                newPos.Y - posOfGraphicsWhenSelected.Y);
 
-            UpdateSelectedGraphics(newUserGraphics);
+            UpdateSelectedGraphics(transfromSelectedGraphics);
         }
 
-        public void RotateSelectedGraphics(Point oldPos, Point newPos)
+        public void RotateSelectedGraphics(Point newPos)
         {
             if (!isUserGraphicsSelected || selectedUserGraphics == basePoint
                 || basePoint == null)
@@ -960,9 +1025,13 @@ namespace ComputerGraphicsWork
 
             DeleteSelectedGraphics();
 
-            CGUserGraphics newUserGraphics = GraphicsJustCleared.TransformRotation(new Point(basePoint.X, basePoint.Y), oldPos, newPos);
+            transfromSelectedGraphics = rawSelectedGraphics.Copy();
+            transfromSelectedGraphics.TransformRotation(
+                new Point(basePoint.X, basePoint.Y),
+                posOfGraphicsWhenSelected,
+                newPos);
 
-            UpdateSelectedGraphics(newUserGraphics);
+            UpdateSelectedGraphics(transfromSelectedGraphics);
         }
 
 
