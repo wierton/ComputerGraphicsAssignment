@@ -240,6 +240,7 @@ namespace ComputerGraphicsWork
         {
             // note: the order of each event when double clicked
             //       down -> up -> down -> dbclick -> up
+
             if (buttonClicked == this.buttonDrawPolygon)
             {
                 log.write("mouse double click");

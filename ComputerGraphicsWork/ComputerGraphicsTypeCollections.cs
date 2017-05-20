@@ -61,6 +61,17 @@ namespace ComputerGraphicsWork
                 (int)(basePos.Y + dx * sinTheta + dy * cosTheta + 0.5)
             );
         }
+
+        public Point RotateVector(Point p)
+        {
+            if (!isThetaValid)
+                return p;
+
+            return new Point(
+                (int)(p.X * cosTheta - p.Y * sinTheta + 0.5),
+                (int)(p.X * sinTheta + p.Y * cosTheta + 0.5)
+            );
+        }
     }
 
     public class CGUserGraphics
@@ -74,7 +85,7 @@ namespace ComputerGraphicsWork
             // do nothing
         }
 
-        public void UpdatePoinsSet()
+        public void UpdatePointsSet()
         {
             pointsSet.RemoveAll((p) => { return true; });
             CalculatePointsSet();
@@ -98,11 +109,12 @@ namespace ComputerGraphicsWork
         public virtual CGUserGraphics TransformRotation(Point basePos, Point oldPos, Point newPos)
         {
             Theta theta = new Theta(basePos, oldPos, newPos);
+
             for (int i = keyPoints.Count - 1; i >= 0; i--)
             {
                 keyPoints[i] = theta.RotatePoint(keyPoints[i], basePos);
             }
-            UpdatePoinsSet();
+            UpdatePointsSet();
             return this;
         }
 
@@ -112,7 +124,7 @@ namespace ComputerGraphicsWork
             {
                 keyPoints[i] = new Point(keyPoints[i].X + dx, keyPoints[i].Y + dy);
             }
-            UpdatePoinsSet();
+            UpdatePointsSet();
             return this;
         }
 
@@ -125,6 +137,37 @@ namespace ComputerGraphicsWork
         public Point CalculateMiddlePoint(Point a, Point b)
         {
             return new Point((a.X + b.X) / 2, (a.Y + b.Y) / 2);
+        }
+
+        public CGUserGraphics Copy()
+        {
+            CGUserGraphics graphics = null;
+            switch (this.GetType().ToString())
+            {
+                case "ComputerGraphicsWork.CGUserGraphicsPoint":
+                    graphics = new CGUserGraphicsPoint(this.keyPoints[0]);
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsLine":
+                    graphics = new CGUserGraphicsLine(this.keyPoints[0], this.keyPoints[1]);
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsCircle":
+                    graphics = new CGUserGraphicsLine(this.keyPoints[0], this.keyPoints[1]);
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsEllipse":
+                    CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse(this.keyPoints[0], this.keyPoints[1]);
+                    ellipse.keyPoints.RemoveAll((p) => { return true; });
+                    this.keyPoints.ForEach((p) => { ellipse.keyPoints.Add(p); });
+                    ellipse.UpdatePointsSet();
+                    graphics = ellipse;
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsPolygon":
+                    graphics = new CGUserGraphicsPolygon(this.keyPoints);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(string.Format("undocumented graphics:{0}", this.GetType().ToString()));
+                    break;
+            }
+            return graphics;
         }
     }
 
@@ -324,12 +367,12 @@ namespace ComputerGraphicsWork
             if(Distance.CalcDistance(keyPoints[0], oldPos) < 4)
             {
                 keyPoints[0] = newPos;
-                UpdatePoinsSet();
+                UpdatePointsSet();
             }
             else if(Distance.CalcDistance(keyPoints[0], oldPos) < 4)
             {
                 keyPoints[1] = newPos;
-                UpdatePoinsSet();
+                UpdatePointsSet();
             }
 
             return this;
@@ -699,7 +742,9 @@ namespace ComputerGraphicsWork
         private int canvasWidth, canvasHeight;
         public Bitmap bmp { get; }
         public bool isUserGraphicsSelected { get; set; }
+
         public CGUserGraphics selectedUserGraphics;
+
         public CGUserGraphics GraphicsJustCleared = null;
         private int[,] refCount;
         private List<CGUserGraphics> userGraphicsSet = new List<CGUserGraphics>();
@@ -812,6 +857,7 @@ namespace ComputerGraphicsWork
             {
                 Point center = q.Dequeue();
                 block.pointsSet.Add(center);
+                block.keyPoints.Add(center);
                 List<Point> neighs = new List<Point>() {
                     new Point(center.X + 1, center.Y),
                     new Point(center.X - 1, center.Y),
