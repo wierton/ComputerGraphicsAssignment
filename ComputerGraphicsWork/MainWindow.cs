@@ -67,33 +67,6 @@ namespace ComputerGraphicsWork
             userCanvas = new CGUserCanvas(this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
-        private void ResumeOldStripButton(CGButtonType bt)
-        {
-            switch (bt)
-            {
-                case CGButtonType.CGButtonTypeMove:
-                    this.buttonMoveGraphics.Checked = false;
-                    break;
-                case CGButtonType.CGButtonTypeAdjust:
-                    this.buttonAdjustGraphics.Checked = false;
-                    break;
-                case CGButtonType.CGButtonTypePoint:
-                    this.buttonDrawPoint.Checked = false;
-                    break;
-                case CGButtonType.CGButtonTypeLine:
-                    this.buttonDrawLine.Checked = false;
-                    break;
-                case CGButtonType.CGButtonTypeCircle:
-                    this.buttonDrawCircle.Checked = false;
-                    break;
-                case CGButtonType.CGButtonTypeEllipse:
-                    this.buttonDrawEllipse.Checked = false;
-                    break;
-                case CGButtonType.CGButtonTypePolygon:
-                    this.buttonDrawPolygon.Checked = false;
-                    break;
-            }
-        }
 
         private void normalButtonClicked(CGButtonType newClickedButtonType, ToolStripButton newClickedButtonObject)
         {
@@ -140,6 +113,12 @@ namespace ComputerGraphicsWork
             normalButtonClicked(CGButtonType.CGButtonTypeMove, this.buttonMoveGraphics);
         }
 
+        private void buttonZoomGraphics_Click(object sender, EventArgs e)
+        {
+            userCanvas.SetBasePoint(new Point(this.ClientRectangle.Width / 2, this.ClientRectangle.Height / 2));
+            normalButtonClicked(CGButtonType.CGButtonTypeRotation, this.buttonZoomGraphics);
+        }
+
         private void buttonRotation_Click(object sender, EventArgs e)
         {
             userCanvas.SetBasePoint(new Point(this.ClientRectangle.Width / 2, this.ClientRectangle.Height / 2));
@@ -177,7 +156,7 @@ namespace ComputerGraphicsWork
         {
             if (buttonClicked == this.buttonDrawPolygon)
             {
-                log.write("mouse set to up");
+                // log.write("mouse set to up");
                 mouseState = CGMouseState.CGMouseStateUp;
 
                 if (isRightMouseClicked)
@@ -190,13 +169,13 @@ namespace ComputerGraphicsWork
                 }
 
                 upPos.X = e.X; upPos.Y = e.Y;
-                log.write("MainWindow_MouseUp, canUpdateGraphics --> false");
+                // log.write("MainWindow_MouseUp, canUpdateGraphics --> false");
                 canUpdateGraphics = true;
                 
             }
             else
             {
-                log.write("mouse set to up, canUpdateGraphics --> false");
+                // log.write("mouse set to up, canUpdateGraphics --> false");
                 mouseState = CGMouseState.CGMouseStateUp;
                 canUpdateGraphics = false;
             }
@@ -214,12 +193,12 @@ namespace ComputerGraphicsWork
 
         private void MainWindow_LeftMouseDown(object sender, MouseEventArgs e)
         {
-            log.write("mouse state set to down");
+            // log.write("mouse state set to down");
             mouseState = CGMouseState.CGMouseStateDown;
 
             if (buttonClicked != this.buttonDrawPolygon)
             {
-                log.write(String.Format("canUpdateGraphics:{0} --> true", canUpdateGraphics));
+                // log.write(String.Format("canUpdateGraphics:{0} --> true", canUpdateGraphics));
                 canUpdateGraphics = true;
                 canClearGraphics = false;
             }
@@ -230,7 +209,8 @@ namespace ComputerGraphicsWork
 
             if (buttonClicked == this.buttonMoveGraphics
                 || buttonClicked == this.buttonAdjustGraphics
-                || buttonClicked == this.buttonRotation)
+                || buttonClicked == this.buttonRotation
+                || buttonClicked == this.buttonZoomGraphics)
             {
                 userCanvas.SelectGraphicsByCursor(new Point(e.X, e.Y));
             }
@@ -243,7 +223,7 @@ namespace ComputerGraphicsWork
 
             if (buttonClicked == this.buttonDrawPolygon)
             {
-                log.write("mouse double click");
+                // log.write("mouse double click");
 
                 if (polygonEdgeSet.Count == 0)
                     return;
@@ -254,7 +234,7 @@ namespace ComputerGraphicsWork
                 if (dx * dx + dy * dy < 3 * 3)
                 {
                     mouseState = CGMouseState.CGMouseStateUp;
-                    log.write("canUpdateGraphics --> false");
+                    // log.write("canUpdateGraphics --> false");
                     canUpdateGraphics = false;
 
                     isRightMouseClicked = true;
@@ -272,7 +252,8 @@ namespace ComputerGraphicsWork
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 }
             }
-            else if(buttonClicked == this.buttonRotation)
+            else if(buttonClicked == this.buttonRotation
+                || buttonClicked == this.buttonZoomGraphics)
             {
                 userCanvas.SetBasePoint(new Point(e.X, e.Y));
 
@@ -349,13 +330,13 @@ namespace ComputerGraphicsWork
 
             if (!canUpdateGraphics)
             {
-                log.write(String.Format("return from MouseMove handler, canUpdateGraphics={0}", canUpdateGraphics));
+                // log.write(String.Format("return from MouseMove handler, canUpdateGraphics={0}", canUpdateGraphics));
                 return;
             }
 
             if(mouseState == CGMouseState.CGMouseStateUp && !isUpdatingGraphicsWhenMouseUp)
             {
-                log.write(String.Format("return from MouseMove handler, mouseState={0}, pass={1}", mouseState, isUpdatingGraphicsWhenMouseUp));
+                // log.write(String.Format("return from MouseMove handler, mouseState={0}, pass={1}", mouseState, isUpdatingGraphicsWhenMouseUp));
                 return;
             }
 
@@ -368,14 +349,14 @@ namespace ComputerGraphicsWork
                 {
                     userCanvas.AdjustGraphicsByCursor(oldPos, new Point(e.X, e.Y));
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    log.write("return since isUserGraphicsSelected");
+                    // log.write("return since isUserGraphicsSelected");
                     return;
                 }
                 else if(buttonClicked == this.buttonMoveGraphics)
                 {
                     userCanvas.MoveSelectedGraphics(new Point(e.X, e.Y));
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-                    log.write("return since isUserGraphicsSelected");
+                    // log.write("return since isUserGraphicsSelected");
                     return;
                 }
                 else if(buttonClicked == this.buttonRotation)
@@ -384,9 +365,15 @@ namespace ComputerGraphicsWork
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     return;
                 }
+                else if(buttonClicked == buttonZoomGraphics)
+                {
+                    userCanvas.ZoomSelectedGraphics(curPos);
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                    return;
+                }
             }
 
-            log.write("mouse move");
+            // log.write("mouse move");
 
             // update graphics if a graphics is drawing
             switch (buttonClicked.Text)

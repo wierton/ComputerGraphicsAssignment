@@ -48,6 +48,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawCircle = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawEllipse = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
+            this.buttonZoomGraphics = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,6 +59,7 @@ namespace ComputerGraphicsWork
             this.buttonSaveBitmap,
             this.buttonMoveGraphics,
             this.buttonRotation,
+            this.buttonZoomGraphics,
             this.buttonAdjustGraphics,
             this.buttonColoring,
             this.buttonDrawPoint,
@@ -190,6 +192,17 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon.ToolTipText = "polygon";
             this.buttonDrawPolygon.Click += new System.EventHandler(this.buttonDrawPolygon_Click);
             // 
+            // buttonZoomGraphics
+            // 
+            this.buttonZoomGraphics.AutoSize = false;
+            this.buttonZoomGraphics.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonZoomGraphics.Image = ((System.Drawing.Image)(resources.GetObject("buttonZoomGraphics.Image")));
+            this.buttonZoomGraphics.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonZoomGraphics.Name = "buttonZoomGraphics";
+            this.buttonZoomGraphics.Size = new System.Drawing.Size(32, 32);
+            this.buttonZoomGraphics.Text = "zoom";
+            this.buttonZoomGraphics.Click += new System.EventHandler(this.buttonZoomGraphics_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -228,5 +241,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonRotation;
         private System.Windows.Forms.ToolStripButton buttonDrawPolygon;
         private System.Windows.Forms.ToolStripButton buttonColoring;
+        private System.Windows.Forms.ToolStripButton buttonZoomGraphics;
     }
 }

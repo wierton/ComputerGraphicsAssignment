@@ -98,6 +98,38 @@ namespace ComputerGraphicsWork
         }
     }
 
+    public class ZoomFactor
+    {
+        double sx, sy;
+        bool isFactorValid = true;
+
+        public ZoomFactor(Point basePos, Point oldPos, Point newPos)
+        {
+            Point oldVec = new Point(oldPos.X - basePos.X, oldPos.Y - basePos.Y);
+            Point newVec = new Point(newPos.X - basePos.X, newPos.Y - basePos.Y);
+
+            if (oldVec.X == 0 || oldVec.Y == 0)
+            {
+                isFactorValid = false;
+                return;
+            }
+
+            sx = newVec.X / (double)oldVec.X;
+            sy = newVec.Y / (double)oldVec.Y;
+        }
+
+        public Point ZoomPoint(Point p, Point basePos)
+        {
+            if (isFactorValid == false)
+                return p;
+
+            return new Point(
+                (int)(basePos.X + sx * (p.X - basePos.X)),
+                (int)(basePos.Y + sy * (p.Y - basePos.Y))
+                );
+        }
+    }
+
     public class CGUserGraphics
     {
         public List<Point> pointsSet { get; } = new List<Point>();
@@ -142,18 +174,12 @@ namespace ComputerGraphicsWork
             return this;
         }
 
-        public virtual CGUserGraphics TransformFixRotation(Point basePos, Point oldPos, Point newPos)
+        public virtual CGUserGraphics TransformZoom(Point basePos, Point oldPos, Point newPos)
         {
-            Theta theta = new Theta(basePos, oldPos, newPos);
-
-            Point newFixPoint;
-
-            if (keyPoints.Count > 0)
-                newFixPoint = theta.RotatePoint(keyPoints[0], basePos);
-
-            for (int i = keyPoints.Count - 1; i > 0; i--)
+            ZoomFactor zf = new ZoomFactor(basePos, oldPos, newPos);
+            for (int i = keyPoints.Count - 1; i >= 0; i--)
             {
-                Point p = theta.RotatePoint(keyPoints[i], basePos);
+                keyPoints[i] = zf.ZoomPoint(keyPoints[i], basePos);
             }
             UpdatePointsSet();
             return this;
@@ -1013,6 +1039,22 @@ namespace ComputerGraphicsWork
             transfromSelectedGraphics = rawSelectedGraphics.Copy();
             transfromSelectedGraphics.TransformMove(newPos.X - posOfGraphicsWhenSelected.X,
                 newPos.Y - posOfGraphicsWhenSelected.Y);
+
+            UpdateSelectedGraphics(transfromSelectedGraphics);
+        }
+
+        public void ZoomSelectedGraphics(Point newPos)
+        {
+            if (!isUserGraphicsSelected || selectedUserGraphics == basePoint)
+                return;
+
+            DeleteSelectedGraphics();
+
+            transfromSelectedGraphics = rawSelectedGraphics.Copy();
+            transfromSelectedGraphics.TransformZoom(
+                new Point(basePoint.X, basePoint.Y),
+                posOfGraphicsWhenSelected,
+                newPos);
 
             UpdateSelectedGraphics(transfromSelectedGraphics);
         }

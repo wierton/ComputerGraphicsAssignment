@@ -155,6 +155,16 @@
         MRTy2gJORMPhdlzrHTxnS6/OuiXWGmecgxZomn4BEEUJEFEbbIMAAAAASUVORK5CYII=
 </value>
   </data>
+  <data name="buttonZoomGraphics.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADhSURBVFhH7ZeLDYIwFEU7giM4ghvoKG6oG+hGuoG+k1iC
+        /UCpt40aTnLDJw33QAkp7p/ZWk6WSyYHS1MQOFuuQe6Wx2u/O0cL5Uh0F/DlbP3T6Ma4HCIB5msvzMbi
+        CcshEuBlYZAqOwukyiESiE4IyJUDN0wG1AJT5cCUkwGlQFjOdIzfiSQqgdSdczz71VMIpMqhi0CuHJoL
+        TJVDU4G5cmgmUFIOTQRKy0EusKQcpAJLy0EmUFMOEoHacpAIcIGacpBNQS2rwCrwOwI3S+of7tMUCTDA
+        PwV1WP2+LUC/COeePc6px5PRd8cAAAAASUVORK5CYII=
+</value>
+  </data>
   <data name="buttonAdjustGraphics.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -230,6 +240,6 @@
 </value>
   </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>54</value>
+    <value>25</value>
   </metadata>
 </root>
