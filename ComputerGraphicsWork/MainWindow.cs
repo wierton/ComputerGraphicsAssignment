@@ -13,20 +13,6 @@ using System.Drawing.Imaging;
 
 namespace ComputerGraphicsWork
 {
-    enum CGButtonType
-    {
-        CGButtonTypeNothing,
-        CGButtonTypeSave,
-        CGButtonTypeMove,
-        CGButtonTypeAdjust,
-        CGButtonTypeColoring,
-        CGButtonTypePoint,
-        CGButtonTypeLine,
-        CGButtonTypeCircle,
-        CGButtonTypeEllipse,
-        CGButtonTypeRotation,
-        CGButtonTypePolygon,
-    };
 
     enum CGMouseState
     {
@@ -56,6 +42,8 @@ namespace ComputerGraphicsWork
         CGUserGraphicsLine oldEdgeLineOfPolygon = null;
         private List<CGUserGraphicsLine> polygonEdgeSet = new List<CGUserGraphicsLine>();
 
+        private CGUserGraphics oldSelectedCurve = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -68,7 +56,7 @@ namespace ComputerGraphicsWork
         }
 
 
-        private void normalButtonClicked(CGButtonType newClickedButtonType, ToolStripButton newClickedButtonObject)
+        private void normalButtonClicked(ToolStripButton newClickedButtonObject)
         {
             if (buttonClicked == newClickedButtonObject)
             {
@@ -86,48 +74,53 @@ namespace ComputerGraphicsWork
 
         private void buttonDrawPoint_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypePoint, this.buttonDrawPoint);
+            normalButtonClicked(this.buttonDrawPoint);
         }
 
         private void buttonDrawLine_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypeLine, this.buttonDrawLine);
+            normalButtonClicked(this.buttonDrawLine);
         }
 
         private void buttonDrawCircle_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypeCircle, this.buttonDrawCircle);
+            normalButtonClicked(this.buttonDrawCircle);
         }
 
         private void buttonDrawEllipse_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypeEllipse, this.buttonDrawEllipse);
+            normalButtonClicked(this.buttonDrawEllipse);
         }
         private void buttonDrawPolygon_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypePolygon, this.buttonDrawPolygon);
+            normalButtonClicked(this.buttonDrawPolygon);
+        }
+
+        private void buttonDrawBezier_Click(object sender, EventArgs e)
+        {
+            normalButtonClicked(this.buttonDrawBezier);
         }
 
         private void buttonMoveGraphics_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypeMove, this.buttonMoveGraphics);
+            normalButtonClicked(this.buttonMoveGraphics);
         }
 
         private void buttonZoomGraphics_Click(object sender, EventArgs e)
         {
             userCanvas.SetBasePoint(new Point(this.ClientRectangle.Width / 2, this.ClientRectangle.Height / 2));
-            normalButtonClicked(CGButtonType.CGButtonTypeRotation, this.buttonZoomGraphics);
+            normalButtonClicked(this.buttonZoomGraphics);
         }
 
         private void buttonRotation_Click(object sender, EventArgs e)
         {
             userCanvas.SetBasePoint(new Point(this.ClientRectangle.Width / 2, this.ClientRectangle.Height / 2));
-            normalButtonClicked(CGButtonType.CGButtonTypeRotation, this.buttonRotation);
+            normalButtonClicked(this.buttonRotation);
         }
 
         private void buttonColoring_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypeColoring, this.buttonColoring);
+            normalButtonClicked(this.buttonColoring);
         }
         private void buttonSaveBitmap_Click(object sender, EventArgs e)
         {
@@ -144,7 +137,7 @@ namespace ComputerGraphicsWork
 
         private void buttonAdjustGraphics_Click(object sender, EventArgs e)
         {
-            normalButtonClicked(CGButtonType.CGButtonTypeAdjust, this.buttonAdjustGraphics);
+            normalButtonClicked(this.buttonAdjustGraphics);
         }
 
         private void commandHolder_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -154,7 +147,8 @@ namespace ComputerGraphicsWork
 
         private void MainWindow_MouseUp(object sender, MouseEventArgs e)
         {
-            if (buttonClicked == this.buttonDrawPolygon)
+            if (buttonClicked == this.buttonDrawPolygon
+                || buttonClicked == this.buttonDrawBezier)
             {
                 // log.write("mouse set to up");
                 mouseState = CGMouseState.CGMouseStateUp;
@@ -196,7 +190,8 @@ namespace ComputerGraphicsWork
             // log.write("mouse state set to down");
             mouseState = CGMouseState.CGMouseStateDown;
 
-            if (buttonClicked != this.buttonDrawPolygon)
+            if (buttonClicked != this.buttonDrawPolygon
+                && buttonClicked != this.buttonDrawBezier)
             {
                 // log.write(String.Format("canUpdateGraphics:{0} --> true", canUpdateGraphics));
                 canUpdateGraphics = true;
@@ -231,26 +226,82 @@ namespace ComputerGraphicsWork
                 int dx = e.X - polygonEdgeSet[0].firstPoint.X;
                 int dy = e.Y - polygonEdgeSet[0].firstPoint.Y;
 
+                if (dx * dx + dy * dy > 3 * 3)
+                {
+                    CGUserGraphicsLine pline = new CGUserGraphicsLine(new Point(e.X, e.Y), polygonEdgeSet[0].firstPoint);
+                    userCanvas.AddGraphics(pline);
+                    polygonEdgeSet.Add(pline);
+                }
+
+                mouseState = CGMouseState.CGMouseStateUp;
+                // log.write("canUpdateGraphics --> false");
+                canUpdateGraphics = false;
+
+                isRightMouseClicked = true;
+                isUpdatingGraphicsWhenMouseUp = false;
+
+                userCanvas.ClearStateOfSelectedGraphics();
+
+                polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
+
+                CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(polygonEdgeSet);
+                userCanvas.AddGraphics(polygon);
+                userCanvas.SetGraphicsSelected(polygon);
+
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);              
+                polygonEdgeSet.RemoveAll((l) => { return true; });
+
+            }
+            else if(buttonClicked == this.buttonDrawBezier)
+            {
+                if (polygonEdgeSet.Count <= 1)
+                    return;
+
+                if (oldSelectedCurve != null)
+                {
+                    userCanvas.RemoveGraphics(oldSelectedCurve);
+                    oldSelectedCurve = null;
+                }
+
+                int dx = e.X - polygonEdgeSet[0].firstPoint.X;
+                int dy = e.Y - polygonEdgeSet[0].firstPoint.Y;
+
+                List<Point> downPointSet = new List<Point>();
+
+                foreach(CGUserGraphicsLine l in polygonEdgeSet)
+                {
+                    downPointSet.Add(l.firstPoint);
+                }
+
                 if (dx * dx + dy * dy < 3 * 3)
                 {
-                    mouseState = CGMouseState.CGMouseStateUp;
-                    // log.write("canUpdateGraphics --> false");
-                    canUpdateGraphics = false;
-
-                    isRightMouseClicked = true;
-                    isUpdatingGraphicsWhenMouseUp = false;
-
-                    userCanvas.ClearStateOfSelectedGraphics();
-
-                    CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(polygonEdgeSet);
-                    userCanvas.AddGraphics(polygon);
-                    userCanvas.SetGraphicsSelected(polygon);
-
-                    polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
-                    polygonEdgeSet.RemoveAll((l) => { return true; });
-
-                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                    downPointSet.Add(polygonEdgeSet[0].firstPoint);
                 }
+                else
+                {
+                    downPointSet.Add(polygonEdgeSet[polygonEdgeSet.Count - 1].nextPoint);
+                }
+
+                mouseState = CGMouseState.CGMouseStateUp;
+                // log.write("canUpdateGraphics --> false");
+                canUpdateGraphics = false;
+
+                isRightMouseClicked = true;
+                isUpdatingGraphicsWhenMouseUp = false;
+
+                userCanvas.ClearStateOfSelectedGraphics();
+
+                polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
+                polygonEdgeSet.RemoveAll((l) => { return true; });
+
+                CGUserGraphicsBezier curve = new CGUserGraphicsBezier(downPointSet);
+
+                userCanvas.AddGraphics(curve);
+                userCanvas.SetGraphicsSelected(curve);
+
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+
+                downPointSet.RemoveAll((l) => { return true; });
             }
             else if(buttonClicked == this.buttonRotation
                 || buttonClicked == this.buttonZoomGraphics)
@@ -301,7 +352,7 @@ namespace ComputerGraphicsWork
         }
 
         // return true if can clear old graphics
-        private bool NormalPartOfUpdateGraphics(CGUserGraphics graphics)
+        private bool NormalPartOfUpdateTwoPointGraphics(CGUserGraphics graphics)
         {
             bool ret = false;
             if (canClearGraphics)
@@ -317,6 +368,18 @@ namespace ComputerGraphicsWork
             curUserGraphics = graphics;
             canClearGraphics = true;
             return ret;
+        }
+
+        private void NormalPartOfUpdateMultPointGraphics()
+        {
+            CGUserGraphicsLine pline = new CGUserGraphicsLine(upPos, curPos);
+            if (NormalPartOfUpdateTwoPointGraphics(pline))
+            {
+                polygonEdgeSet.Remove(oldEdgeLineOfPolygon);
+            }
+
+            oldEdgeLineOfPolygon = pline;
+            polygonEdgeSet.Add(pline);
         }
 
         private void MainWindow_MouseMove(object sender, MouseEventArgs e)
@@ -379,26 +442,37 @@ namespace ComputerGraphicsWork
             switch (buttonClicked.Text)
             {
                 case "buttonDrawPoint":
-                    NormalPartOfUpdateGraphics(new CGUserGraphicsPoint(curPos));
+                    NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsPoint(curPos));
+                    break;
+                case "buttonDrawBezier":
+                    NormalPartOfUpdateMultPointGraphics();
+
+                    if (polygonEdgeSet.Count >= 2)
+                    {
+                        List<Point> tpl = new List<Point>();
+                        polygonEdgeSet.ForEach((l)=> { tpl.Add(l.firstPoint); });
+                        tpl.Add(polygonEdgeSet[polygonEdgeSet.Count - 1].nextPoint);
+
+                        if (oldSelectedCurve != null)
+                        {
+                            userCanvas.RemoveGraphics(oldSelectedCurve);
+                        }
+                        oldSelectedCurve = new CGUserGraphicsBezier(tpl);
+                        userCanvas.AddGraphics(oldSelectedCurve);
+                    }
+                    
                     break;
                 case "buttonDrawPolygon":
-                    CGUserGraphicsLine pline = new CGUserGraphicsLine(upPos, curPos);
-                    if (NormalPartOfUpdateGraphics(pline))
-                    {
-                        polygonEdgeSet.Remove(oldEdgeLineOfPolygon);
-                    }
-
-                    oldEdgeLineOfPolygon = pline;
-                    polygonEdgeSet.Add(pline);
+                    NormalPartOfUpdateMultPointGraphics();
                     break;
                 case "buttonDrawLine":
-                    NormalPartOfUpdateGraphics(new CGUserGraphicsLine(downPos, curPos));
+                    NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsLine(downPos, curPos));
                     break;
                 case "buttonDrawCircle":
-                    NormalPartOfUpdateGraphics(new CGUserGraphicsCircle(downPos, curPos));
+                    NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsCircle(downPos, curPos));
                     break;
                 case "buttonDrawEllipse":
-                    NormalPartOfUpdateGraphics(new CGUserGraphicsEllipse(downPos, curPos));
+                    NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsEllipse(downPos, curPos));
                     break;
             }
         }

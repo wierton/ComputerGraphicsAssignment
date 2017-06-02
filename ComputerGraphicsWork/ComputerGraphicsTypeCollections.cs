@@ -9,12 +9,67 @@ using System.Windows.Forms;
 
 namespace ComputerGraphicsWork
 {
+    public class Vector
+    {
+        public double X, Y;
+
+        public Vector(Point p) { X = p.X; Y = p.Y; }
+        public Vector(double x, double y) { X = x; Y = y; }
+
+        public static Vector operator +(Vector a, Vector b)
+        {
+            return new Vector(a.X + b.X, a.Y + b.Y);
+        }
+        public static Vector operator -(Vector a, Vector b)
+        {
+            return new Vector(a.X - b.X, a.Y - b.Y);
+        }
+        public static Vector operator +(int off, Vector b)
+        {
+            return new Vector(off + b.X, off + b.Y);
+        }
+        public static Vector operator +(Vector a, int off)
+        {
+            return new Vector(a.X + off, a.Y + off);
+        }
+        public static Vector operator -(int off, Vector b)
+        {
+            return new Vector(off - b.X, off - b.Y);
+        }
+        public static Vector operator -(Vector a, int off)
+        {
+            return new Vector(a.X - off, a.Y - off);
+        }
+        public static Vector operator *(double factor, Vector b)
+        {
+            return new Vector(factor * b.X, factor * b.Y);
+        }
+        public static Vector operator *(Vector a, double factor)
+        {
+            return new Vector(a.X * factor, a.Y * factor);
+        }
+        public static Vector operator /(double factor, Vector b)
+        {
+            return new Vector(factor / b.X, factor / b.Y);
+        }
+        public static Vector operator /(Vector a, double factor)
+        {
+            return new Vector(a.X / factor, a.Y / factor);
+        }
+    }
+
     public class Distance
     {
         public static double CalcDistance(Point x, Point y)
         {
             int dx = x.X - y.X;
             int dy = x.Y - y.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
+        public static double CalcVecDistance(Vector x, Vector y)
+        {
+            double dx = x.X - y.X;
+            double dy = x.Y - y.Y;
             return Math.Sqrt(dx * dx + dy * dy);
         }
     }
@@ -138,7 +193,7 @@ namespace ComputerGraphicsWork
 
         public virtual void CalculatePointsSet()
         {
-            // do nothing
+            keyPoints.ForEach((p) => { pointsSet.Add(p); });
         }
 
         public void UpdatePointsSet()
@@ -229,6 +284,9 @@ namespace ComputerGraphicsWork
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsPolygon":
                     graphics = new CGUserGraphicsPolygon(this.keyPoints);
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsBezier":
+                    graphics = new CGUserGraphicsBezier(this.keyPoints);
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsBlock":
                     graphics = new CGUserGraphicsBlock(this.keyPoints);
@@ -779,6 +837,64 @@ namespace ComputerGraphicsWork
         }
     }
 
+    public class CGUserGraphicsBezier : CGUserGraphics
+    {
+        public Vector[,] pv;
+        public CGUserGraphicsBezier()
+        {
+
+        }
+
+        public CGUserGraphicsBezier(List<Point> inEndPoints)
+        {
+            inEndPoints.ForEach((u) => { keyPoints.Add(u); });
+            CalculatePointsSet();
+        }
+
+        Vector CalculateBezierPointWithFactor(double factor)
+        {
+            for (int i = 1; i < keyPoints.Count; i++)
+            {
+                for (int j = 0; j < keyPoints.Count - i; j++)
+                {
+                    pv[i, j] = (1 - factor) * pv[i - 1, j] + factor * pv[i - 1, j + 1];
+                }
+            }
+            return pv[keyPoints.Count - 1, 0];
+        }
+
+        void CalculateBezierPoint(double stf, Vector st, double edf, Vector ed)
+        {
+
+            double tf = (stf + edf) / 2;
+            Vector v = CalculateBezierPointWithFactor(tf);
+            pointsSet.Add(new Point((int)v.X, (int)v.Y));
+
+            if (Math.Abs((int)st.X - (int)v.X) <= 1
+                && Math.Abs((int)st.Y - (int)v.Y) <= 1
+                && Math.Abs((int)v.X - (int)ed.X) <= 1
+                && Math.Abs((int)v.Y - (int)ed.Y) <= 1)
+                return;
+
+            CalculateBezierPoint(stf, st, tf, v);
+            CalculateBezierPoint(tf, v, edf, ed);
+        }
+
+        public override void CalculatePointsSet()
+        {
+            pv = new Vector[keyPoints.Count, keyPoints.Count];
+
+            for (int i = 0; i < keyPoints.Count; i++)
+            {
+                pv[0, i] = new Vector(keyPoints[i]);
+            }
+
+            pointsSet.Add(new Point((int)pv[0, 0].X, (int)pv[0, 0].Y));
+            pointsSet.Add(new Point((int)pv[0, keyPoints.Count - 1].X, (int)pv[0, keyPoints.Count - 1].Y));
+            CalculateBezierPoint(0, pv[0, 0], 1, pv[0, keyPoints.Count - 1]);
+        }
+    }
+
     public class CGUserGraphicsBlock : CGUserGraphics
     {
         public CGUserGraphicsBlock()
@@ -789,6 +905,11 @@ namespace ComputerGraphicsWork
         {
             inPointSet.ForEach((p) => { keyPoints.Add(p); });
             inPointSet.ForEach((p) => { pointsSet.Add(p); });
+        }
+
+        public override List<Point> CalculateTagPoints()
+        {
+            return new List<Point>();
         }
         public override bool IsCursorNearby(Point cursorPos)
         {

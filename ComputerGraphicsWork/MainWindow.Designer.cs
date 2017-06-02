@@ -41,6 +41,7 @@ namespace ComputerGraphicsWork
             this.buttonSaveBitmap = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveGraphics = new System.Windows.Forms.ToolStripButton();
             this.buttonRotation = new System.Windows.Forms.ToolStripButton();
+            this.buttonZoomGraphics = new System.Windows.Forms.ToolStripButton();
             this.buttonAdjustGraphics = new System.Windows.Forms.ToolStripButton();
             this.buttonColoring = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPoint = new System.Windows.Forms.ToolStripButton();
@@ -48,13 +49,12 @@ namespace ComputerGraphicsWork
             this.buttonDrawCircle = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawEllipse = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
-            this.buttonZoomGraphics = new System.Windows.Forms.ToolStripButton();
+            this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
             // commandHolder
             // 
-            this.commandHolder.Dock = System.Windows.Forms.DockStyle.Left;
             this.commandHolder.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonSaveBitmap,
             this.buttonMoveGraphics,
@@ -66,10 +66,11 @@ namespace ComputerGraphicsWork
             this.buttonDrawLine,
             this.buttonDrawCircle,
             this.buttonDrawEllipse,
-            this.buttonDrawPolygon});
+            this.buttonDrawPolygon,
+            this.buttonDrawBezier});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
-            this.commandHolder.Size = new System.Drawing.Size(33, 381);
+            this.commandHolder.Size = new System.Drawing.Size(635, 35);
             this.commandHolder.Stretch = true;
             this.commandHolder.TabIndex = 0;
             this.commandHolder.Text = "commandHolder";
@@ -111,6 +112,17 @@ namespace ComputerGraphicsWork
             this.buttonRotation.ToolTipText = "rotation";
             this.buttonRotation.Click += new System.EventHandler(this.buttonRotation_Click);
             // 
+            // buttonZoomGraphics
+            // 
+            this.buttonZoomGraphics.AutoSize = false;
+            this.buttonZoomGraphics.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonZoomGraphics.Image = ((System.Drawing.Image)(resources.GetObject("buttonZoomGraphics.Image")));
+            this.buttonZoomGraphics.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonZoomGraphics.Name = "buttonZoomGraphics";
+            this.buttonZoomGraphics.Size = new System.Drawing.Size(32, 32);
+            this.buttonZoomGraphics.Text = "zoom";
+            this.buttonZoomGraphics.Click += new System.EventHandler(this.buttonZoomGraphics_Click);
+            // 
             // buttonAdjustGraphics
             // 
             this.buttonAdjustGraphics.AutoSize = false;
@@ -140,7 +152,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawPoint.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawPoint.Image")));
             this.buttonDrawPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonDrawPoint.Name = "buttonDrawPoint";
-            this.buttonDrawPoint.Size = new System.Drawing.Size(30, 20);
+            this.buttonDrawPoint.Size = new System.Drawing.Size(23, 32);
             this.buttonDrawPoint.Text = "buttonDrawPoint";
             this.buttonDrawPoint.ToolTipText = "point";
             this.buttonDrawPoint.Click += new System.EventHandler(this.buttonDrawPoint_Click);
@@ -151,7 +163,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawLine.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawLine.Image")));
             this.buttonDrawLine.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonDrawLine.Name = "buttonDrawLine";
-            this.buttonDrawLine.Size = new System.Drawing.Size(30, 20);
+            this.buttonDrawLine.Size = new System.Drawing.Size(23, 32);
             this.buttonDrawLine.Text = "buttonDrawLine";
             this.buttonDrawLine.ToolTipText = "line";
             this.buttonDrawLine.Click += new System.EventHandler(this.buttonDrawLine_Click);
@@ -192,16 +204,17 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon.ToolTipText = "polygon";
             this.buttonDrawPolygon.Click += new System.EventHandler(this.buttonDrawPolygon_Click);
             // 
-            // buttonZoomGraphics
+            // buttonDrawBezier
             // 
-            this.buttonZoomGraphics.AutoSize = false;
-            this.buttonZoomGraphics.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonZoomGraphics.Image = ((System.Drawing.Image)(resources.GetObject("buttonZoomGraphics.Image")));
-            this.buttonZoomGraphics.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonZoomGraphics.Name = "buttonZoomGraphics";
-            this.buttonZoomGraphics.Size = new System.Drawing.Size(32, 32);
-            this.buttonZoomGraphics.Text = "zoom";
-            this.buttonZoomGraphics.Click += new System.EventHandler(this.buttonZoomGraphics_Click);
+            this.buttonDrawBezier.AutoSize = false;
+            this.buttonDrawBezier.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDrawBezier.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawBezier.Image")));
+            this.buttonDrawBezier.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDrawBezier.Name = "buttonDrawBezier";
+            this.buttonDrawBezier.Size = new System.Drawing.Size(32, 32);
+            this.buttonDrawBezier.Text = "buttonDrawBezier";
+            this.buttonDrawBezier.ToolTipText = "bezier";
+            this.buttonDrawBezier.Click += new System.EventHandler(this.buttonDrawBezier_Click);
             // 
             // MainWindow
             // 
@@ -242,5 +255,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawPolygon;
         private System.Windows.Forms.ToolStripButton buttonColoring;
         private System.Windows.Forms.ToolStripButton buttonZoomGraphics;
+        private System.Windows.Forms.ToolStripButton buttonDrawBezier;
     }
 }
