@@ -81,6 +81,10 @@ namespace ComputerGraphicsWork
         {
             normalButtonClicked(this.buttonDrawLine);
         }
+        private void buttonDrawRectangle_Click(object sender, EventArgs e)
+        {
+            normalButtonClicked(this.buttonDrawRectangle);
+        }
 
         private void buttonDrawCircle_Click(object sender, EventArgs e)
         {
@@ -122,6 +126,12 @@ namespace ComputerGraphicsWork
         {
             normalButtonClicked(this.buttonColoring);
         }
+
+        private void buttonTrim_Click(object sender, EventArgs e)
+        {
+            normalButtonClicked(this.buttonTrim);
+        }
+
         private void buttonSaveBitmap_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
@@ -169,6 +179,11 @@ namespace ComputerGraphicsWork
             }
             else
             {
+                if (buttonClicked == this.buttonTrim)
+                {
+                    userCanvas.redrawAllGraphics();
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+                }
                 // log.write("mouse set to up, canUpdateGraphics --> false");
                 mouseState = CGMouseState.CGMouseStateUp;
                 canUpdateGraphics = false;
@@ -468,11 +483,18 @@ namespace ComputerGraphicsWork
                 case "buttonDrawLine":
                     NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsLine(downPos, curPos));
                     break;
+                case "buttonDrawRectangle":
+                    NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsRectangle(downPos, curPos));
+                    break;
                 case "buttonDrawCircle":
                     NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsCircle(downPos, curPos));
                     break;
                 case "buttonDrawEllipse":
                     NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsEllipse(downPos, curPos));
+                    break;
+                case "buttonTrim":
+                    userCanvas.trimGraphics(downPos, curPos);
+                    ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     break;
             }
         }

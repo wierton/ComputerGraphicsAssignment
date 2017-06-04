@@ -46,10 +46,12 @@ namespace ComputerGraphicsWork
             this.buttonColoring = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPoint = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawLine = new System.Windows.Forms.ToolStripButton();
+            this.buttonDrawRectangle = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawCircle = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawEllipse = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
+            this.buttonTrim = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,10 +66,12 @@ namespace ComputerGraphicsWork
             this.buttonColoring,
             this.buttonDrawPoint,
             this.buttonDrawLine,
+            this.buttonDrawRectangle,
             this.buttonDrawCircle,
             this.buttonDrawEllipse,
             this.buttonDrawPolygon,
-            this.buttonDrawBezier});
+            this.buttonDrawBezier,
+            this.buttonTrim});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
             this.commandHolder.Size = new System.Drawing.Size(635, 35);
@@ -168,6 +172,17 @@ namespace ComputerGraphicsWork
             this.buttonDrawLine.ToolTipText = "line";
             this.buttonDrawLine.Click += new System.EventHandler(this.buttonDrawLine_Click);
             // 
+            // buttonDrawRectangle
+            // 
+            this.buttonDrawRectangle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDrawRectangle.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawRectangle.Image")));
+            this.buttonDrawRectangle.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDrawRectangle.Name = "buttonDrawRectangle";
+            this.buttonDrawRectangle.Size = new System.Drawing.Size(23, 32);
+            this.buttonDrawRectangle.Text = "buttonDrawRectangle";
+            this.buttonDrawRectangle.ToolTipText = "rectangle";
+            this.buttonDrawRectangle.Click += new System.EventHandler(this.buttonDrawRectangle_Click);
+            // 
             // buttonDrawCircle
             // 
             this.buttonDrawCircle.AutoSize = false;
@@ -216,6 +231,18 @@ namespace ComputerGraphicsWork
             this.buttonDrawBezier.ToolTipText = "bezier";
             this.buttonDrawBezier.Click += new System.EventHandler(this.buttonDrawBezier_Click);
             // 
+            // buttonTrim
+            // 
+            this.buttonTrim.AutoSize = false;
+            this.buttonTrim.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonTrim.Image = ((System.Drawing.Image)(resources.GetObject("buttonTrim.Image")));
+            this.buttonTrim.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTrim.Name = "buttonTrim";
+            this.buttonTrim.Size = new System.Drawing.Size(32, 32);
+            this.buttonTrim.Text = "buttonTrim";
+            this.buttonTrim.ToolTipText = "trim";
+            this.buttonTrim.Click += new System.EventHandler(this.buttonTrim_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -256,5 +283,7 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonColoring;
         private System.Windows.Forms.ToolStripButton buttonZoomGraphics;
         private System.Windows.Forms.ToolStripButton buttonDrawBezier;
+        private System.Windows.Forms.ToolStripButton buttonTrim;
+        private System.Windows.Forms.ToolStripButton buttonDrawRectangle;
     }
 }
