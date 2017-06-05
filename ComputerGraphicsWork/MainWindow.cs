@@ -36,7 +36,6 @@ namespace ComputerGraphicsWork
         private CGUserCanvas userCanvas;
         private CGUserGraphics curUserGraphics;
 
-        private bool isRightMouseClicked = false;
         private bool isUpdatingGraphicsWhenMouseUp = false;
 
         CGUserGraphicsLine oldEdgeLineOfPolygon = null;
@@ -155,7 +154,7 @@ namespace ComputerGraphicsWork
 
         }
 
-        private void MainWindow_MouseUp(object sender, MouseEventArgs e)
+        private void MainWindow_LeftMouseUp(object sender, MouseEventArgs e)
         {
             if (buttonClicked == this.buttonDrawPolygon
                 || buttonClicked == this.buttonDrawBezier)
@@ -163,19 +162,12 @@ namespace ComputerGraphicsWork
                 // log.write("mouse set to up");
                 mouseState = CGMouseState.CGMouseStateUp;
 
-                if (isRightMouseClicked)
-                {
-                    isRightMouseClicked = false;
-                }
-                else
-                {
-                    isUpdatingGraphicsWhenMouseUp = true;
-                }
+                isUpdatingGraphicsWhenMouseUp = true;
 
                 upPos.X = e.X; upPos.Y = e.Y;
                 // log.write("MainWindow_MouseUp, canUpdateGraphics --> false");
                 canUpdateGraphics = true;
-                
+
             }
             else
             {
@@ -196,9 +188,22 @@ namespace ComputerGraphicsWork
                 // flip userCanvas to ghs
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
             }
-            
+
             canClearGraphics = false;
         }
+
+        private void MainWindow_RightMouseUp(object sender, MouseEventArgs e)
+        {
+
+        }
+        private void MainWindow_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                MainWindow_LeftMouseUp(sender, e);
+            else
+                MainWindow_RightMouseUp(sender, e);
+        }
+
 
         private void MainWindow_LeftMouseDown(object sender, MouseEventArgs e)
         {
@@ -252,7 +257,6 @@ namespace ComputerGraphicsWork
                 // log.write("canUpdateGraphics --> false");
                 canUpdateGraphics = false;
 
-                isRightMouseClicked = true;
                 isUpdatingGraphicsWhenMouseUp = false;
 
                 userCanvas.ClearStateOfSelectedGraphics();
@@ -301,7 +305,6 @@ namespace ComputerGraphicsWork
                 // log.write("canUpdateGraphics --> false");
                 canUpdateGraphics = false;
 
-                isRightMouseClicked = true;
                 isUpdatingGraphicsWhenMouseUp = false;
 
                 userCanvas.ClearStateOfSelectedGraphics();

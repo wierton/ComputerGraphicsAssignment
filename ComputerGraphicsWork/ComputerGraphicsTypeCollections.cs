@@ -846,11 +846,10 @@ namespace ComputerGraphicsWork
         {
             edgeLines.RemoveAll((l) => { return true; });
 
-            for (int i = 0; i < keyPoints.Count - 1; i++)
+            for (int i = 0, j = keyPoints.Count - 1; i < keyPoints.Count; j = i++)
             {
-                edgeLines.Add(new CGUserGraphicsLine(keyPoints[i], keyPoints[i + 1]));
+                edgeLines.Add(new CGUserGraphicsLine(keyPoints[j], keyPoints[i]));
             }
-            edgeLines.Add(new CGUserGraphicsLine(keyPoints[keyPoints.Count - 1], keyPoints[0]));
 
             edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
         }
@@ -899,6 +898,15 @@ namespace ComputerGraphicsWork
                     c = !c;
             }
             return c;
+        }
+
+        bool IsAnticlockwise()
+        {
+            foreach(Point p in keyPoints)
+            {
+
+            }
+            return false;
         }
 
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
