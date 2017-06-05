@@ -240,6 +240,11 @@ namespace ComputerGraphicsWork
             return this;
         }
 
+        public virtual List<CGUserGraphics> TransformTrim(Rectangle rect)
+        {
+            return new List<CGUserGraphics>() { this };
+        }
+
         public virtual CGUserGraphics TransformMove(int dx, int dy)
         {
             for (int i = keyPoints.Count - 1; i >= 0; i--)
@@ -268,6 +273,9 @@ namespace ComputerGraphicsWork
             {
                 case "ComputerGraphicsWork.CGUserGraphicsPoint":
                     graphics = new CGUserGraphicsPoint(this.keyPoints[0]);
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsPointset":
+                    graphics = new CGUserGraphicsPointset(this.keyPoints);
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsLine":
                     graphics = new CGUserGraphicsLine(this.keyPoints[0], this.keyPoints[1]);
@@ -299,6 +307,26 @@ namespace ComputerGraphicsWork
                     break;
             }
             return graphics;
+        }
+    }
+
+    public class CGUserGraphicsPointset : CGUserGraphics
+    {
+        public CGUserGraphicsPointset(List<Point> lps)
+        {
+            lps.ForEach((p) => { keyPoints.Add(p); });
+
+            CalculatePointsSet();
+        }
+
+        public override void CalculatePointsSet()
+        {
+            keyPoints.ForEach((p) => { pointsSet.Add(p); });
+        }
+
+        public override List<Point> CalculateTagPoints()
+        {
+            return new List<Point>(){};
         }
     }
 
@@ -507,6 +535,27 @@ namespace ComputerGraphicsWork
             }
 
             return this;
+        }
+
+        public override List<CGUserGraphics> TransformTrim(Rectangle rect)
+        {
+            bool ca = rect.Contains(keyPoints[0]);
+            bool cb = rect.Contains(keyPoints[1]);
+
+            List<Point> lps = new List<Point>();
+
+            foreach(Point p in pointsSet)
+            {
+                if (rect.Contains(p))
+                    lps.Add(p);
+            }
+
+            if (lps.Count == 0)
+                return null;
+            else if (lps.Count == 1)
+                return new List<CGUserGraphics>() { new CGUserGraphicsPoint(lps[0]) };
+            else
+                return new List<CGUserGraphics>() { new CGUserGraphicsLine(lps[0], lps[lps.Count - 1]) };
         }
     }
     public class CGUserGraphicsCircle : CGUserGraphics
@@ -838,6 +887,41 @@ namespace ComputerGraphicsWork
 
             return this;
         }
+
+        public bool Contains(Point p)
+        {
+            int i, j;
+            bool c = false;
+            for (i = 0, j = keyPoints.Count - 1; i < keyPoints.Count; j = i++)
+            {
+                if (((keyPoints[i].Y > p.Y) != (keyPoints[j].Y > p.Y)) &&
+                    (p.X < (keyPoints[j].X - keyPoints[i].X) * (p.Y - keyPoints[i].Y) / (float)(keyPoints[j].Y - keyPoints[i].Y) + keyPoints[i].X))
+                    c = !c;
+            }
+            return c;
+        }
+
+        public override List<CGUserGraphics> TransformTrim(Rectangle rect)
+        {
+            List<Point> lps = new List<Point>();
+
+            foreach(Point p in pointsSet)
+            {
+                if (rect.Contains(p))
+                    lps.Add(p);
+            }
+
+            CGUserGraphicsRectangle cgr = new CGUserGraphicsRectangle(
+                new Point(rect.X, rect.Y), new Point(rect.X + rect.Width - 1, rect.Y + rect.Height - 1));
+
+            foreach (Point p in cgr.pointsSet)
+            {
+                if (this.Contains(p))
+                    lps.Add(p);
+            }
+
+            return new List <CGUserGraphics> (){ new CGUserGraphicsPointset(lps)};
+        }
     }
 
     public class CGUserGraphicsRectangle : CGUserGraphics
@@ -997,7 +1081,6 @@ namespace ComputerGraphicsWork
 
     public class CGUserCanvas
     {
-        private int canvasWidth, canvasHeight;
         public Bitmap bmp { get; }
         public bool isUserGraphicsSelected { get; set; }
 
@@ -1012,16 +1095,15 @@ namespace ComputerGraphicsWork
         CGUserGraphics rawSelectedGraphics;
         CGUserGraphics transfromSelectedGraphics;
 
-        private Rectangle trimArea { get; set; }
+        public Rectangle trimArea { get; set; }
+        private Rectangle clientRect;
         private CGUserGraphicsRectangle trimRectangle;
 
         public CGUserGraphicsPoint basePoint { get; set; }
         public CGUserCanvas(int width, int height)
         {
-            trimArea = new Rectangle(0, 0, width, height);
+            clientRect = new Rectangle(0, 0, width, height);
 
-            canvasWidth = width;
-            canvasHeight = height;
             bmp = new Bitmap(width, height);
             refCount = new int[width, height];
 
@@ -1055,7 +1137,7 @@ namespace ComputerGraphicsWork
 
         private void SetPixel(Point pos)
         {
-            if (!trimArea.Contains(pos))
+            if (!clientRect.Contains(pos))
                 return;
 
             bmp.SetPixel(pos.X, pos.Y, Color.Black);
@@ -1064,7 +1146,7 @@ namespace ComputerGraphicsWork
 
         private void ClearPixel(Point pos)
         {
-            if (!trimArea.Contains(pos))
+            if (!clientRect.Contains(pos))
                 return;
 
             refCount[pos.X, pos.Y]--;
@@ -1125,8 +1207,8 @@ namespace ComputerGraphicsWork
                     };
 
                 neighs.ForEach((u)=> {
-                    if (0 <= u.X && u.X < canvasWidth
-                        && 0 <= u.Y && u.Y < canvasHeight
+                    if (0 <= u.X && u.X < clientRect.Width
+                        && 0 <= u.Y && u.Y < clientRect.Height
                         && refCount[u.X, u.Y] <= 0)
                     {
                         q.Enqueue(u);
@@ -1271,46 +1353,67 @@ namespace ComputerGraphicsWork
             selectedUserGraphics = newGraphics;
         }
 
-        public void untrimGraphics()
+        public void trimAllGraphics(Rectangle rect)
         {
-            trimArea = new Rectangle(0, 0, this.canvasWidth, this.canvasHeight);
             if (trimRectangle != null)
             {
                 this.UndrawGraphics(trimRectangle);
                 trimRectangle = null;
             }
+
+            for(int i = userGraphicsSet.Count - 1; i >= 0; i--)
+            {
+                this.UndrawGraphics(userGraphicsSet[i]);
+                List<CGUserGraphics> lg = userGraphicsSet[i].TransformTrim(rect);
+                if (lg != null && lg.Count > 0)
+                {
+                    if (lg.Count == 1)
+                    {
+                        userGraphicsSet[i] = lg[0];
+                        this.DrawGraphics(lg[0]);
+                    }
+
+                    for (int j = 1; j < lg.Count; j++)
+                    {
+                        userGraphicsSet.Add(lg[j]);
+                        this.DrawGraphics(lg[j]);
+                    }
+                }
+                else
+                {
+                    userGraphicsSet.RemoveAt(i);
+                }
+            }
         }
 
         public void redrawAllGraphics()
         {
-            Rectangle oldRect = trimArea;
-            trimArea = new Rectangle(0, 0, this.canvasWidth, this.canvasHeight);
+            Rectangle oldRect = clientRect;
+            clientRect = new Rectangle(0, 0, clientRect.Width, clientRect.Height);
 
             userGraphicsSet.ForEach((g) => { this.UndrawGraphics(g); });
 
-            trimArea = oldRect;
+            clientRect = oldRect;
             userGraphicsSet.ForEach((g) => { this.DrawGraphics(g); });
 
         }
 
-        public void trimGraphics(Point downPos, Point curPos)
+        public void adjustTrimArea(Point downPos, Point curPos)
         {
             int minX = Math.Max(0, Math.Min(downPos.X, curPos.X));
             int minY = Math.Max(0, Math.Min(downPos.Y, curPos.Y));
-            int maxX = Math.Min(canvasWidth - 1, Math.Max(downPos.X, curPos.X));
-            int maxY = Math.Min(canvasHeight - 1, Math.Max(downPos.Y, curPos.Y));
+            int maxX = Math.Min(clientRect.Width - 1, Math.Max(downPos.X, curPos.X));
+            int maxY = Math.Min(clientRect.Height - 1, Math.Max(downPos.Y, curPos.Y));
 
-            trimArea = new Rectangle(0, 0, this.canvasWidth, this.canvasHeight);
 
             if (trimRectangle != null)
             {
                 this.UndrawGraphics(trimRectangle);
             }
 
+            trimArea = new Rectangle(minX, minY, maxX - minX, maxY - minY);
             trimRectangle = new CGUserGraphicsRectangle(new Point(minX, minY), new Point(maxX, maxY));
             this.DrawGraphics(trimRectangle);
-
-            trimArea = new Rectangle(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }

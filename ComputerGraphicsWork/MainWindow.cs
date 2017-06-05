@@ -181,7 +181,7 @@ namespace ComputerGraphicsWork
             {
                 if (buttonClicked == this.buttonTrim)
                 {
-                    userCanvas.redrawAllGraphics();
+                    userCanvas.trimAllGraphics(userCanvas.trimArea);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 }
                 // log.write("mouse set to up, canUpdateGraphics --> false");
@@ -493,7 +493,7 @@ namespace ComputerGraphicsWork
                     NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsEllipse(downPos, curPos));
                     break;
                 case "buttonTrim":
-                    userCanvas.trimGraphics(downPos, curPos);
+                    userCanvas.adjustTrimArea(downPos, curPos);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                     break;
             }
