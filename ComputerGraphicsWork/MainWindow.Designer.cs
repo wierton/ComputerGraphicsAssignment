@@ -52,6 +52,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
             this.buttonTrim = new System.Windows.Forms.ToolStripButton();
+            this.toolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,7 +72,8 @@ namespace ComputerGraphicsWork
             this.buttonDrawEllipse,
             this.buttonDrawPolygon,
             this.buttonDrawBezier,
-            this.buttonTrim});
+            this.buttonTrim,
+            this.toolStripLabel});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
             this.commandHolder.Size = new System.Drawing.Size(635, 35);
@@ -243,6 +245,12 @@ namespace ComputerGraphicsWork
             this.buttonTrim.ToolTipText = "trim";
             this.buttonTrim.Click += new System.EventHandler(this.buttonTrim_Click);
             // 
+            // toolStripLabel
+            // 
+            this.toolStripLabel.Name = "toolStripLabel";
+            this.toolStripLabel.Size = new System.Drawing.Size(89, 32);
+            this.toolStripLabel.Text = "toolStripLabel";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -285,5 +293,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawBezier;
         private System.Windows.Forms.ToolStripButton buttonTrim;
         private System.Windows.Forms.ToolStripButton buttonDrawRectangle;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel;
     }
 }

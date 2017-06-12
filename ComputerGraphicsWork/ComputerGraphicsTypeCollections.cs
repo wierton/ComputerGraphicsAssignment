@@ -105,9 +105,9 @@ namespace ComputerGraphicsWork
             double timesVec = oldVec.X * newVec.Y - oldVec.Y * newVec.X;
             sinTheta = timesVec / baseMod;
 
-/*            if (Math.Abs(sinTheta * sinTheta + cosTheta * cosTheta - 1) > 0.0000000001)
-                MessageBox.Show(string.Format("invalid theta: sin={0}, cos={1}, z={2}",
-                    sinTheta, cosTheta, sinTheta * sinTheta + cosTheta * cosTheta));*/
+            /*            if (Math.Abs(sinTheta * sinTheta + cosTheta * cosTheta - 1) > 0.0000000001)
+                            MessageBox.Show(string.Format("invalid theta: sin={0}, cos={1}, z={2}",
+                                sinTheta, cosTheta, sinTheta * sinTheta + cosTheta * cosTheta));*/
         }
 
         public Theta(Point start, Point end)
@@ -210,7 +210,7 @@ namespace ComputerGraphicsWork
 
         public virtual bool IsCursorNearby(Point cursorPos)
         {
-            foreach(Point p in pointsSet)
+            foreach (Point p in pointsSet)
             {
                 if (Distance.CalcDistance(p, cursorPos) < 4)
                     return true;
@@ -315,16 +315,92 @@ namespace ComputerGraphicsWork
             return graphics;
         }
 
+        public bool ClipTest(float p, float q, ref float u1, ref float u2)
+        {
+            if(p > 0)
+            {
+                float r = q / p;
+                if (u1 > r)
+                    return false;
+                else if (u2 > r)
+                    u2 = r;
+            }
+            else if(p < 0)
+            {
+                float r = q / p;
+                if (u2 < r)
+                    return false;
+                else if (u1 < r)
+                    u1 = r;
+            }
+            else
+            {
+                if (q < 0)
+                    return false;
+            }
+            return true;
+        }
+
+        public Point[] ClipLine(Point st, Point ed, Rectangle rect)
+        {
+            int x = st.X;
+            int y = st.Y;
+
+            int dx = ed.X - st.X;
+            int dy = ed.Y - st.Y;
+
+            int x_min = rect.X;
+            int x_max = rect.X + rect.Width - 1;
+            int y_min = rect.Y;
+            int y_max = rect.Y + rect.Height - 1;
+
+            int[] p = new int[4];
+            int[] q = new int[4];
+
+            p[0] = -dx; q[0] = x - x_min;
+            p[1] = +dx; q[1] = x_max - x;
+            p[2] = -dy; q[2] = y - y_min;
+            p[3] = +dy; q[3] = y_max - y;
+
+            float u1 = 0, u2 = 1;
+            
+            if (ClipTest(p[0], q[0], ref u1, ref u2)
+                && ClipTest(p[1], q[1], ref u1, ref u2)
+                && ClipTest(p[2], q[2], ref u1, ref u2)
+                && ClipTest(p[3], q[3], ref u1, ref u2))
+            {
+                // MessageBox.Show(String.Format("{0}, {1}", u1, u2));
+                if (u1 > 0.0)
+                {
+                    st.X = (int)(x + dx * u1);
+                    st.Y = (int)(y + dy * u1);
+                }
+
+                if(u2 < 1.0)
+                {
+                    ed.X = (int)(x + dx * u2);
+                    ed.Y = (int)(y + dy * u2);
+                }
+            }
+            else
+            {
+                return new Point[] { };
+            }
+
+            return new Point[2] { st, ed };
+        }
+
         public String Format(List<Point> lps)
         {
             String ret = "";
-            foreach(Point p in lps)
+            foreach (Point p in lps)
             {
                 ret += String.Format("{0},", p);
             }
             return ret;
         }
     }
+
 
     public class CGUserGraphicsPointset : CGUserGraphics
     {
@@ -555,23 +631,14 @@ namespace ComputerGraphicsWork
 
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
         {
-            bool ca = rect.Contains(keyPoints[0]);
-            bool cb = rect.Contains(keyPoints[1]);
+            Point[] ps = ClipLine(keyPoints[0], keyPoints[1], rect);
 
-            List<Point> lps = new List<Point>();
-
-            foreach(Point p in pointsSet)
-            {
-                if (rect.Contains(p))
-                    lps.Add(p);
-            }
-
-            if (lps.Count == 0)
-                return null;
-            else if (lps.Count == 1)
-                return new List<CGUserGraphics>() { new CGUserGraphicsPoint(lps[0]) };
+            if (ps.Count() > 0)
+                return new List<CGUserGraphics>() {
+                    new CGUserGraphicsLine(ps[0], ps[1])
+                };
             else
-                return new List<CGUserGraphics>() { new CGUserGraphicsLine(lps[0], lps[lps.Count - 1]) };
+                return new List<CGUserGraphics>() { };
         }
     }
     public class CGUserGraphicsCircle : CGUserGraphics
@@ -866,20 +933,20 @@ namespace ComputerGraphicsWork
             {
                 edgeLines.Add(new CGUserGraphicsLine(keyPoints[i], keyPoints[i + 1]));
             }
-            edgeLines.Add(new CGUserGraphicsLine(keyPoints[keyPoints.Count - 1], keyPoints[0]));
+            edgeLines.Add(new CGUserGraphicsLine(keyPoints.Last(), keyPoints.First()));
 
             foreach(CGUserGraphicsLine l in edgeLines)
             {
                 if(l.pointsSet[0] == l.firstPoint)
                 {
-                    for (int i = 0; i < l.pointsSet.Count - 1; i++)
+                    for (int i = 0; i < l.pointsSet.Count; i++)
                     {
                         pointsSet.Add(l.pointsSet[i]);
                     }
                 }
                 else
                 {
-                    for(int i = l.pointsSet.Count - 1; i>0; i--)
+                    for (int i = l.pointsSet.Count - 1; i >= 0; i--)
                     {
                         pointsSet.Add(l.pointsSet[i]);
                     }
@@ -969,177 +1036,90 @@ namespace ComputerGraphicsWork
             return s > 0;
         }
 
+        List<Point> SortPointByAnticlockwise(List<Point> lps)
+        {
+            return lps;
+        }
+        enum PointType
+        {
+            Normal,
+            Enter,
+            Leave
+        };
+
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
         {
-            int st = -1;
-            for(int i = 0; i < keyPoints.Count; i++)
+            List<Point> plg = new List<Point>();
+            List<PointType> plgt = new List<PointType>();
+
+            List<Point> rtg = new List<Point>();
+            List<PointType> rtgt = new List<PointType>();
+
+            List<Point> lps = SortPointByAnticlockwise(keyPoints);
+            for(int i = 0, j = lps.Count - 1; i < lps.Count; j = i++)
             {
-                if (!rect.Contains(keyPoints[i]))
+                // line : j --> i
+                plg.Add(lps[j]);
+                plgt.Add(PointType.Normal);
+
+                Point[] ps = ClipLine(lps[j], lps[i], rect);
+
+                if(ps.Count() >= 1 && ps[0] != lps[j])
                 {
-                    st = i;
-                    break;
-                }
-            }
-
-            if (st == -1)
-                return new List<CGUserGraphics>() { this };
-
-            st = pointsSet.IndexOf(keyPoints[st]);
-
-            List<Point> firstPointSet = new List<Point>();
-            List<Point> nextPointSet = new List<Point>();
-
-            Point lastKeyPoint = new Point(-1, -1);
-
-            // traverse point in polygon
-            bool isLastPointInRectangle = false;
-            for(int i = (st + 1) % pointsSet.Count; i != st; i = (i + 1) % pointsSet.Count)
-            {
-                if (rect.Contains(pointsSet[i]))
-                {   // point in trim area
-                    if (isLastPointInRectangle)
+                    plg.Add(ps[0]);
+                    if (rect.Contains(lps[j]))
                     {
-                        if (keyPoints.Contains(pointsSet[i])
-                            && lastKeyPoint != pointsSet[i])
-                        {   // edge point
-                            MessageBox.Show(String.Format("{0}\n{1}", Format(firstPointSet), Format(nextPointSet)));
-                            nextPointSet.Add(pointsSet[i]);
-                            firstPointSet.Add(pointsSet[i]);
-                            MessageBox.Show(String.Format("{0}\n{1}", Format(firstPointSet), Format(nextPointSet)));
-                            lastKeyPoint = pointsSet[i];
-                        }
+                        plgt.Add(PointType.Leave);
                     }
                     else
                     {
-                        // this is first point
-                        firstPointSet.Add(pointsSet[i]);
+                        plgt.Add(PointType.Enter);
                     }
-                    isLastPointInRectangle = true;
                 }
-                else
-                {   // point not in trim area
-                    if (isLastPointInRectangle)
-                    {
-                        // next point
-                        nextPointSet.Add(pointsSet[(i + pointsSet.Count - 1) % pointsSet.Count]);
-                    }
-                    else
-                    {
-                        // do nothing
-                    }
-                    isLastPointInRectangle = false;
-                }
-            }
-
-            if(nextPointSet.Count != firstPointSet.Count)
-            {
-                MessageBox.Show(String.Format("trim error! {0}<>{1}",
-                    firstPointSet.Count,
-                    nextPointSet.Count));
-            }
-
-
-            /// test code
-            /*
-            CGUserGraphicsPolygon tmp = new CGUserGraphicsPolygon(
-                new List<Point>() {
-                    new Point(5, 5),
-                    new Point(5, 10),
-                    new Point(10, 10),
-                    new Point(10, 4),
-                }
-            );
-            MessageBox.Show(String.Format(":{0}, {1}, {2}, {3}",
-                tmp.Contains(new Point(5, 5)),
-                tmp.Contains(new Point(5, 10)),
-                tmp.Contains(new Point(10, 10)),
-                tmp.Contains(new Point(9, 5))
-            ));
-            */
-
-
-            // find a point out of polygon
-            CGUserGraphicsPolygon cgr = new CGUserGraphicsPolygon(
-                new List<Point>() {
-                    new Point(rect.X, rect.Y),
-                    new Point(rect.X + rect.Width, rect.Y),
-                    new Point(rect.X + rect.Width, rect.Y + rect.Height),
-                    new Point(rect.X, rect.Y + rect.Height),
-                }
-            );
-
-            MessageBox.Show(String.Format("{0}\n{1}", Format(firstPointSet), Format(nextPointSet)));
-
-            // find operation
-            st = -1;
-            for (int i = 0; i < cgr.pointsSet.Count; i++)
-            {
-                if (!this.Contains(cgr.pointsSet[i]))
+                if (ps.Count() >= 2 && ps[1] != lps[i])
                 {
-                    st = i;
-                    break;
+                    plg.Add(ps[1]);
+                    plgt.Add(PointType.Leave);
                 }
             }
 
-            if (st == -1)
-                return new List<CGUserGraphics>() { new CGUserGraphicsPoint(new Point(-1, -1)) };
-
-            
-            // traverse point in rectangle/cgr
-            bool isLastPointInPolygon = false;
-            for (int i = (st + 1) % cgr.pointsSet.Count; i != st; i = (i + 1) % cgr.pointsSet.Count)
+            lps = new List<Point>()
             {
-                if (this.Contains(cgr.pointsSet[i]))
-                {   // point in trim area
-                    if (isLastPointInPolygon)
+                new Point(rect.X, rect.Y),
+                new Point(rect.X + rect.Width - 1, rect.Y),
+                new Point(rect.X + rect.Width - 1, rect.Y + rect.Height - 1),
+                new Point(rect.X, rect.Y + rect.Height - 1),
+            };
+
+            for (int i = 0, j = lps.Count - 1; i < lps.Count; j = i++)
+            {
+                // edge : j --> i
+                rtg.Add(lps[j]);
+                rtgt.Add(PointType.Normal);
+
+                if(lps[j].X == lps[i].X)
+                {
+                    List<Point> ps = plg.FindAll((p) => { return p.X == lps[j].X; });
+                    ps.Sort((p, q)=> Math.Abs(p.Y - lps[j].Y) - Math.Abs(q.Y - lps[j].Y));
+
+                    foreach(Point p in ps)
                     {
-                        if (cgr.keyPoints.Contains(cgr.pointsSet[i]))
-                        {
-                            nextPointSet.Add(cgr.pointsSet[i]);
-                            firstPointSet.Add(cgr.pointsSet[i]);
-                        }
+                        rtg.Add(p);
+                        rtgt.Add(plgt[plg.IndexOf(p)]);
                     }
-                    else
-                    {
-                        // this is first point
-                        firstPointSet.Add(cgr.pointsSet[i]);
-                    }
-                    isLastPointInPolygon = true;
                 }
-                else
-                {   // point not in trim area
-                    if (isLastPointInPolygon)
+                else if(lps[j].Y == lps[i].Y)
+                {
+                    List<Point> ps = plg.FindAll((p) => { return p.Y == lps[j].Y; });
+                    ps.Sort((p, q) => Math.Abs(p.X - lps[j].X) - Math.Abs(q.X - lps[j].X));
+
+                    foreach (Point p in ps)
                     {
-                        // next point
-                        nextPointSet.Add(
-                            cgr.pointsSet[(i + cgr.pointsSet.Count - 1) % cgr.pointsSet.Count]);
+                        rtg.Add(p);
+                        rtgt.Add(plgt[plg.IndexOf(p)]);
                     }
-                    else
-                    {
-                        // do nothing
-                    }
-                    isLastPointInPolygon = false;
                 }
             }
-
-            if (nextPointSet.Count != firstPointSet.Count)
-            {
-
-                MessageBox.Show(String.Format("trim error! {0}<>{1}",
-                    firstPointSet.Count,
-                    nextPointSet.Count));
-            }
-
-            // construct child polygon by firstPointSet and nextPointSet
-            while(false)
-            {
-
-            }
-
-            MessageBox.Show(String.Format("{0}\n{1}", 
-                Format(firstPointSet), 
-                Format(nextPointSet)
-                ));
 
             return new List<CGUserGraphics>() { this };
         }
@@ -1637,7 +1617,7 @@ namespace ComputerGraphicsWork
                 this.UndrawGraphics(trimRectangle);
             }
 
-            trimArea = new Rectangle(minX, minY, maxX - minX, maxY - minY);
+            trimArea = new Rectangle(minX, minY, maxX - minX + 1, maxY - minY + 1);
             trimRectangle = new CGUserGraphicsRectangle(new Point(minX, minY), new Point(maxX, maxY));
             this.DrawGraphics(trimRectangle);
         }

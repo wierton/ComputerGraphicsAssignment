@@ -229,6 +229,12 @@ namespace ComputerGraphicsWork
             {
                 userCanvas.SelectGraphicsByCursor(new Point(e.X, e.Y));
             }
+
+            if(buttonClicked == this.buttonTrim)
+            {
+                userCanvas.ClearStateOfSelectedGraphics();
+            }
+
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
         }
         private void MainWindow_RightMouseDown(object sender, MouseEventArgs e)
@@ -406,6 +412,8 @@ namespace ComputerGraphicsWork
             curPos.X = e.X;
             curPos.Y = e.Y;
 
+            this.toolStripLabel.Text = String.Format("({0}, {1})", e.X, e.Y);
+
             if (buttonClicked == null)
                 return;
 
@@ -454,7 +462,6 @@ namespace ComputerGraphicsWork
                 }
             }
 
-            // log.write("mouse move");
 
             // update graphics if a graphics is drawing
             switch (buttonClicked.Text)
@@ -478,7 +485,6 @@ namespace ComputerGraphicsWork
                         oldSelectedCurve = new CGUserGraphicsBezier(tpl);
                         userCanvas.AddGraphics(oldSelectedCurve);
                     }
-                    
                     break;
                 case "buttonDrawPolygon":
                     NormalPartOfUpdateMultPointGraphics();
