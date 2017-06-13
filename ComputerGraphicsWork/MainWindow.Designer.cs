@@ -53,6 +53,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
             this.buttonTrim = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel = new System.Windows.Forms.ToolStripLabel();
+            this.buttonTest = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,7 +74,8 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon,
             this.buttonDrawBezier,
             this.buttonTrim,
-            this.toolStripLabel});
+            this.toolStripLabel,
+            this.buttonTest});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
             this.commandHolder.Size = new System.Drawing.Size(635, 35);
@@ -251,6 +253,16 @@ namespace ComputerGraphicsWork
             this.toolStripLabel.Size = new System.Drawing.Size(89, 32);
             this.toolStripLabel.Text = "toolStripLabel";
             // 
+            // buttonTest
+            // 
+            this.buttonTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonTest.Image = ((System.Drawing.Image)(resources.GetObject("buttonTest.Image")));
+            this.buttonTest.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTest.Name = "buttonTest";
+            this.buttonTest.Size = new System.Drawing.Size(23, 32);
+            this.buttonTest.Text = "buttonTest";
+            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -294,5 +306,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonTrim;
         private System.Windows.Forms.ToolStripButton buttonDrawRectangle;
         private System.Windows.Forms.ToolStripLabel toolStripLabel;
+        private System.Windows.Forms.ToolStripButton buttonTest;
     }
 }

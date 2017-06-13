@@ -375,6 +375,23 @@ namespace ComputerGraphicsWork
             }
         }
 
+        private void buttonTest_Click(object sender, EventArgs e)
+        {
+            CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(
+                new List<Point>() {
+                    new Point(100, 100),
+                    new Point(121, 120),
+                    new Point(110, 131),
+                    new Point(121, 140),
+                    new Point(100, 160),
+                }
+            );
+
+            Rectangle rect = new Rectangle(105, 100, 25, 60);
+            userCanvas.AddGraphics(polygon);
+            userCanvas.trimAllGraphics(rect);
+        }
+
         // return true if can clear old graphics
         private bool NormalPartOfUpdateTwoPointGraphics(CGUserGraphics graphics)
         {

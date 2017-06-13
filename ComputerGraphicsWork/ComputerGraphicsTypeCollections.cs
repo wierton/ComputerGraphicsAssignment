@@ -204,7 +204,7 @@ namespace ComputerGraphicsWork
 
         public void UpdatePointsSet()
         {
-            pointsSet.RemoveAll((p) => { return true; });
+            pointsSet.RemoveAll(p => true);
             CalculatePointsSet();
         }
 
@@ -294,7 +294,7 @@ namespace ComputerGraphicsWork
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsEllipse":
                     CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse(this.keyPoints[0], this.keyPoints[1]);
-                    ellipse.keyPoints.RemoveAll((p) => { return true; });
+                    ellipse.keyPoints.RemoveAll(p => true);
                     this.keyPoints.ForEach((p) => { ellipse.keyPoints.Add(p); });
                     ellipse.UpdatePointsSet();
                     graphics = ellipse;
@@ -372,14 +372,14 @@ namespace ComputerGraphicsWork
                 // MessageBox.Show(String.Format("{0}, {1}", u1, u2));
                 if (u1 > 0.0)
                 {
-                    st.X = (int)(x + dx * u1);
-                    st.Y = (int)(y + dy * u1);
+                    st.X = (int)(x + dx * u1 + 0.5);
+                    st.Y = (int)(y + dy * u1 + 0.5);
                 }
 
                 if(u2 < 1.0)
                 {
-                    ed.X = (int)(x + dx * u2);
-                    ed.Y = (int)(y + dy * u2);
+                    ed.X = (int)(x + dx * u2 + 0.5);
+                    ed.Y = (int)(y + dy * u2 + 0.5);
                 }
             }
             else
@@ -437,7 +437,7 @@ namespace ComputerGraphicsWork
             X = keyPoints[0].X;
             Y = keyPoints[0].Y;
 
-            pointsSet.RemoveAll((p)=> { return true; });
+            pointsSet.RemoveAll(p => true);
             pointsSet.Add(keyPoints[0]);
         }
 
@@ -739,7 +739,7 @@ namespace ComputerGraphicsWork
                 int radius = (int)Distance.CalcDistance(keyPoints[0], newPos);
                 keyPoints[1] = new Point(keyPoints[0].X + radius, keyPoints[0].Y);
 
-                pointsSet.RemoveAll((p) => { return true; });
+                pointsSet.RemoveAll(p => true);
                 CalculatePointsSet();
             }
             return this;
@@ -927,7 +927,7 @@ namespace ComputerGraphicsWork
 
         public override void CalculatePointsSet()
         {
-            edgeLines.RemoveAll((l) => { return true; });
+            edgeLines.RemoveAll(p => true);
 
             for (int i = 0; i < keyPoints.Count - 1; i++)
             {
@@ -991,7 +991,7 @@ namespace ComputerGraphicsWork
                 }
             }
 
-            pointsSet.RemoveAll((p) => { return true; });
+            pointsSet.RemoveAll(p => true);
             edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
 
             return this;
@@ -1047,8 +1047,19 @@ namespace ComputerGraphicsWork
             Leave
         };
 
+        public class Node
+        {
+            Point p;
+            PointType pt;
+            Node next;
+            Node prev;
+            Node cross;
+        }
+
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
         {
+            UserLog log = new UserLog("log2.txt");
+
             List<Point> plg = new List<Point>();
             List<PointType> plgt = new List<PointType>();
 
@@ -1082,6 +1093,14 @@ namespace ComputerGraphicsWork
                     plgt.Add(PointType.Leave);
                 }
             }
+
+            log.write("===============start=================");
+            for(int i = 0; i < plg.Count; i++)
+            {
+                log.write(String.Format("({0}, {1}, {2})", plg[i].X, plg[i].Y, plgt[i]));
+            }
+
+            log.write("\n");
 
             lps = new List<Point>()
             {
@@ -1120,6 +1139,63 @@ namespace ComputerGraphicsWork
                     }
                 }
             }
+
+            for (int i = 0; i < rtg.Count; i++)
+            {
+                log.write(String.Format("({0}, {1}, {2})", rtg[i].X, rtg[i].Y, rtgt[i]));
+            }
+            log.write("===============end=================\n");
+
+
+            List<CGUserGraphicsPolygon> graphics = new List<CGUserGraphicsPolygon>();
+
+            int index = -1;
+            do
+            {
+                try
+                {
+                    index = plgt.FindIndex(t => t == PointType.Enter);
+                }
+                catch
+                {
+                    index = -1;
+                    break;
+                }
+
+                Point st = plg[index];
+                Point tp = plg[(index + 1) % plg.Count];
+
+                List<Point> outPoints = new List<Point>();
+
+                lps = plg;
+                List<PointType> lpt = plgt;
+                outPoints.Add(st);
+                while (tp != st)
+                {
+                    outPoints.Add(tp);
+
+                    int ti = (lps.IndexOf(tp) + 1) % lps.Count;
+                    tp = lps[ti];
+
+                    if (lpt[ti] == PointType.Enter)
+                    {
+                        lps = plg;
+                        lpt = plgt;
+                    }
+                    else if (lpt[ti] == PointType.Leave)
+                    {
+                        lps = rtg;
+                        lpt = rtgt;
+                    }
+                }
+
+                foreach(Point p in outPoints)
+                {
+
+                }
+
+                graphics.Add(new CGUserGraphicsPolygon(outPoints));
+            } while (true);
 
             return new List<CGUserGraphics>() { this };
         }
