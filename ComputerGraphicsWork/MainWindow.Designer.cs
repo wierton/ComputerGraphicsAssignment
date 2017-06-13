@@ -52,8 +52,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
             this.buttonTrim = new System.Windows.Forms.ToolStripButton();
-            this.toolStripLabel = new System.Windows.Forms.ToolStripLabel();
-            this.buttonTest = new System.Windows.Forms.ToolStripButton();
+            this.buttonDrawBStyleCurve = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,9 +72,8 @@ namespace ComputerGraphicsWork
             this.buttonDrawEllipse,
             this.buttonDrawPolygon,
             this.buttonDrawBezier,
-            this.buttonTrim,
-            this.toolStripLabel,
-            this.buttonTest});
+            this.buttonDrawBStyleCurve,
+            this.buttonTrim});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
             this.commandHolder.Size = new System.Drawing.Size(635, 35);
@@ -247,21 +245,17 @@ namespace ComputerGraphicsWork
             this.buttonTrim.ToolTipText = "trim";
             this.buttonTrim.Click += new System.EventHandler(this.buttonTrim_Click);
             // 
-            // toolStripLabel
+            // buttonDrawBStyleCurve
             // 
-            this.toolStripLabel.Name = "toolStripLabel";
-            this.toolStripLabel.Size = new System.Drawing.Size(89, 32);
-            this.toolStripLabel.Text = "toolStripLabel";
-            // 
-            // buttonTest
-            // 
-            this.buttonTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonTest.Image = ((System.Drawing.Image)(resources.GetObject("buttonTest.Image")));
-            this.buttonTest.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonTest.Name = "buttonTest";
-            this.buttonTest.Size = new System.Drawing.Size(23, 32);
-            this.buttonTest.Text = "buttonTest";
-            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
+            this.buttonDrawBStyleCurve.AutoSize = false;
+            this.buttonDrawBStyleCurve.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDrawBStyleCurve.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawBStyleCurve.Image")));
+            this.buttonDrawBStyleCurve.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDrawBStyleCurve.Name = "buttonDrawBStyleCurve";
+            this.buttonDrawBStyleCurve.Size = new System.Drawing.Size(32, 32);
+            this.buttonDrawBStyleCurve.Text = "buttonDrawBStyleCurve";
+            this.buttonDrawBStyleCurve.ToolTipText = "B style curve";
+            this.buttonDrawBStyleCurve.Click += new System.EventHandler(this.buttonDrawBStyleCurve_Click);
             // 
             // MainWindow
             // 
@@ -305,7 +299,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawBezier;
         private System.Windows.Forms.ToolStripButton buttonTrim;
         private System.Windows.Forms.ToolStripButton buttonDrawRectangle;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel;
-        private System.Windows.Forms.ToolStripButton buttonTest;
+        private System.Windows.Forms.ToolStripButton buttonDrawBStyleCurve;
     }
 }

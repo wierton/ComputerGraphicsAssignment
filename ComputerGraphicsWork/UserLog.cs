@@ -34,12 +34,14 @@ namespace ComputerGraphicsWork
 
         public void writeToFile(String s)
         {
+            /*
             FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate | FileMode.Append);
             StreamWriter sw = new StreamWriter(fs);
             sw.Write(String.Format("[{0}]:\t{2}\n", count, getCallerInfo(), s));
             sw.Flush();
             sw.Close();
             fs.Close();
+            */
         }
 
         public void write(String s)

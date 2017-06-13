@@ -1021,44 +1021,96 @@ namespace ComputerGraphicsWork
         }
 
 
-        bool IsAnticlockwise()
+        bool IsAnticlockwise(ref List<Point> lps)
         {
-            if (pointsSet.Count < 3)
+            if (lps.Count < 3)
                 return false;
 
-            int n = pointsSet.Count;
+            int n = lps.Count;
 
-            int s = pointsSet[0].Y * (pointsSet[n - 1].X - pointsSet[1].X);
+            int s = lps[0].Y * (lps[n - 1].X - lps[1].X);
 
             for (int i = 1; i < n; ++i)
-                s += pointsSet[i].Y * (pointsSet[i - 1].X - pointsSet[(i + 1) % n].X);
+                s += lps[i].Y * (lps[i - 1].X - lps[(i + 1) % n].X);
 
             return s > 0;
         }
 
         List<Point> SortPointByAnticlockwise(List<Point> lps)
         {
+            lps = new List<Point>(lps);
+            if (!IsAnticlockwise(ref lps))
+                lps.Reverse();
             return lps;
         }
-        enum PointType
+        public enum PointType
         {
             Normal,
             Enter,
-            Leave
+            Leave,
+            Used,
         };
 
         public class Node
         {
-            Point p;
-            PointType pt;
-            Node next;
-            Node prev;
-            Node cross;
+            public Point p;
+            public PointType pt;
+            public Node next;
+            public Node prev;
+            public Node cross;
+
+            public Node() { }
+            public Node(Point inP, PointType inPt) { p = inP; pt = inPt; }
         }
+
+        public class LinkedList
+        {
+            public Node head, tail;
+            public LinkedList() { }
+            public void Add(Node node)
+            {
+                if (tail != null)
+                {
+                    tail.next = node;
+                    node.prev = tail;
+                    tail = node;
+                }
+                else
+                {
+                    head = tail = node;
+                }
+
+                tail.next = head;
+                head.prev = tail;
+            }
+
+            public void Remove(Node node)
+            {
+                Node prev = node.prev;
+                prev.next = node.next;
+            }
+        }
+
+        UserLog log = new UserLog("log2.txt");
 
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
         {
-            UserLog log = new UserLog("log2.txt");
+            if (keyPoints.Count == 0)
+            {
+                return new List<CGUserGraphics>();
+            }
+            else if (keyPoints.Count == 1)
+            {
+                if (rect.Contains(keyPoints[0]))
+                    return new List<CGUserGraphics>() { new CGUserGraphicsPoint(keyPoints[0]) };
+                else
+                    return new List<CGUserGraphics>();
+            }
+            else if (keyPoints.Count == 2)
+            {
+                Point[] ps = ClipLine(keyPoints[0], keyPoints[1], rect);
+                return new List<CGUserGraphics>() { new CGUserGraphicsLine(ps[0], ps[1]) };
+            }
 
             List<Point> plg = new List<Point>();
             List<PointType> plgt = new List<PointType>();
@@ -1144,10 +1196,10 @@ namespace ComputerGraphicsWork
             {
                 log.write(String.Format("({0}, {1}, {2})", rtg[i].X, rtg[i].Y, rtgt[i]));
             }
-            log.write("===============end=================\n");
+            log.write("===============mid=================\n");
 
 
-            List<CGUserGraphicsPolygon> graphics = new List<CGUserGraphicsPolygon>();
+            List<CGUserGraphics> graphics = new List<CGUserGraphics>();
 
             int index = -1;
             do
@@ -1159,45 +1211,75 @@ namespace ComputerGraphicsWork
                 catch
                 {
                     index = -1;
-                    break;
                 }
 
-                Point st = plg[index];
-                Point tp = plg[(index + 1) % plg.Count];
+                if (index == -1)
+                    break;
+
 
                 List<Point> outPoints = new List<Point>();
-
+                // points in stack
+                Point st = plg[index];
+                Point tp = st;
+                // pointer
                 lps = plg;
                 List<PointType> lpt = plgt;
+                // init
                 outPoints.Add(st);
-                while (tp != st)
+                log.write(String.Format("({0}, {1})", st.X, st.Y));
+                do
                 {
                     outPoints.Add(tp);
+                    log.write(String.Format("({0}, {1})", tp.X, tp.Y));
 
-                    int ti = (lps.IndexOf(tp) + 1) % lps.Count;
+                    int ti = lps.IndexOf(tp);
+                    ti = (ti + 1) % lps.Count;
                     tp = lps[ti];
+
+                    if(outPoints.Contains(tp))
+                        break;
 
                     if (lpt[ti] == PointType.Enter)
                     {
+                        log.write(String.Format("switch to polygon at ({0}, {1})", lps[ti].X, lps[ti].Y));
                         lps = plg;
                         lpt = plgt;
                     }
                     else if (lpt[ti] == PointType.Leave)
                     {
+                        log.write(String.Format("switch to clip edge at ({0}, {1})", lps[ti].X, lps[ti].Y));
                         lps = rtg;
                         lpt = rtgt;
                     }
-                }
+                    else
+                    {
+                        log.write(String.Format("keep at {2}:({0}, {1})", lps[ti].X, lps[ti].Y, lpt[ti]));
+                    }
+                } while (tp != st) ;
 
-                foreach(Point p in outPoints)
+                foreach (Point p in outPoints)
                 {
+                    int ti = plg.IndexOf(p);
+                    if (ti > 0)
+                    {
+                        plgt[ti] = PointType.Used;
+                    }
 
+                    ti = rtg.IndexOf(p);
+                    if (ti > 0)
+                    {
+                        rtgt[ti] = PointType.Used;
+                    }
                 }
 
+                log.write(String.Format("add polygon:{0}", Format(outPoints)));
                 graphics.Add(new CGUserGraphicsPolygon(outPoints));
+                log.write("===============next=================\n");
             } while (true);
 
-            return new List<CGUserGraphics>() { this };
+            log.write("===============end=================\n");
+
+            return graphics;
         }
     }
 
@@ -1254,6 +1336,7 @@ namespace ComputerGraphicsWork
                 tp
             };
         }
+
     }
 
     public class CGUserGraphicsBezier : CGUserGraphics
@@ -1635,7 +1718,7 @@ namespace ComputerGraphicsWork
             selectedUserGraphics = newGraphics;
         }
 
-        public void trimAllGraphics(Rectangle rect)
+        public void trimSelectedGraphics(Rectangle rect)
         {
             if (trimRectangle != null)
             {
@@ -1643,27 +1726,18 @@ namespace ComputerGraphicsWork
                 trimRectangle = null;
             }
 
-            for(int i = userGraphicsSet.Count - 1; i >= 0; i--)
-            {
-                this.UndrawGraphics(userGraphicsSet[i]);
-                List<CGUserGraphics> lg = userGraphicsSet[i].TransformTrim(rect);
-                if (lg != null && lg.Count > 0)
-                {
-                    if (lg.Count == 1)
-                    {
-                        userGraphicsSet[i] = lg[0];
-                        this.DrawGraphics(lg[0]);
-                    }
+            if (!isUserGraphicsSelected)
+                return;
 
-                    for (int j = 1; j < lg.Count; j++)
-                    {
-                        userGraphicsSet.Add(lg[j]);
-                        this.DrawGraphics(lg[j]);
-                    }
-                }
-                else
+            CGUserGraphics oldGraphics = selectedUserGraphics;
+            this.ClearStateOfSelectedGraphics();
+            this.RemoveGraphics(oldGraphics);
+            List<CGUserGraphics> lg = oldGraphics.TransformTrim(rect);
+            if (lg != null && lg.Count > 0)
+            {
+                for (int j = 0; j < lg.Count; j++)
                 {
-                    userGraphicsSet.RemoveAt(i);
+                    this.AddGraphics(lg[j]);
                 }
             }
         }

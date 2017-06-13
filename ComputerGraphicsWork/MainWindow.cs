@@ -173,7 +173,7 @@ namespace ComputerGraphicsWork
             {
                 if (buttonClicked == this.buttonTrim)
                 {
-                    userCanvas.trimAllGraphics(userCanvas.trimArea);
+                    userCanvas.trimSelectedGraphics(userCanvas.trimArea);
                     ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
                 }
                 // log.write("mouse set to up, canUpdateGraphics --> false");
@@ -228,11 +228,6 @@ namespace ComputerGraphicsWork
                 || buttonClicked == this.buttonZoomGraphics)
             {
                 userCanvas.SelectGraphicsByCursor(new Point(e.X, e.Y));
-            }
-
-            if(buttonClicked == this.buttonTrim)
-            {
-                userCanvas.ClearStateOfSelectedGraphics();
             }
 
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
@@ -380,16 +375,23 @@ namespace ComputerGraphicsWork
             CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(
                 new List<Point>() {
                     new Point(100, 100),
-                    new Point(121, 120),
-                    new Point(110, 131),
-                    new Point(121, 140),
-                    new Point(100, 160),
+                    new Point(200, 100),
+                    new Point(200, 400),
+                    new Point(100, 400),
                 }
             );
 
-            Rectangle rect = new Rectangle(105, 100, 25, 60);
+            Rectangle rect = new Rectangle(0, 200, 300, 100);
             userCanvas.AddGraphics(polygon);
-            userCanvas.trimAllGraphics(rect);
+            userCanvas.SetGraphicsSelected(polygon);
+            userCanvas.trimSelectedGraphics(rect);
+            //userCanvas.AddGraphics(new CGUserGraphicsRectangle(new Point(105, 100),  new Point(130, 160)));
+            ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+        }
+
+        private void buttonDrawBStyleCurve_Click(object sender, EventArgs e)
+        {
+
         }
 
         // return true if can clear old graphics
@@ -429,7 +431,7 @@ namespace ComputerGraphicsWork
             curPos.X = e.X;
             curPos.Y = e.Y;
 
-            this.toolStripLabel.Text = String.Format("({0}, {1})", e.X, e.Y);
+            //this.toolStripLabel.Text = String.Format("({0}, {1})", e.X, e.Y);
 
             if (buttonClicked == null)
                 return;
