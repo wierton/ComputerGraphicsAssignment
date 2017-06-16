@@ -51,8 +51,9 @@ namespace ComputerGraphicsWork
             this.buttonDrawEllipse = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPolygon = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
-            this.buttonTrim = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawBStyleCurve = new System.Windows.Forms.ToolStripButton();
+            this.buttonTrim = new System.Windows.Forms.ToolStripButton();
+            this.buttonInternalColoring = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -65,6 +66,7 @@ namespace ComputerGraphicsWork
             this.buttonZoomGraphics,
             this.buttonAdjustGraphics,
             this.buttonColoring,
+            this.buttonInternalColoring,
             this.buttonDrawPoint,
             this.buttonDrawLine,
             this.buttonDrawRectangle,
@@ -233,6 +235,18 @@ namespace ComputerGraphicsWork
             this.buttonDrawBezier.ToolTipText = "bezier";
             this.buttonDrawBezier.Click += new System.EventHandler(this.buttonDrawBezier_Click);
             // 
+            // buttonDrawBStyleCurve
+            // 
+            this.buttonDrawBStyleCurve.AutoSize = false;
+            this.buttonDrawBStyleCurve.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDrawBStyleCurve.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawBStyleCurve.Image")));
+            this.buttonDrawBStyleCurve.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDrawBStyleCurve.Name = "buttonDrawBStyleCurve";
+            this.buttonDrawBStyleCurve.Size = new System.Drawing.Size(32, 32);
+            this.buttonDrawBStyleCurve.Text = "buttonDrawBStyleCurve";
+            this.buttonDrawBStyleCurve.ToolTipText = "B style curve";
+            this.buttonDrawBStyleCurve.Click += new System.EventHandler(this.buttonDrawBStyleCurve_Click);
+            // 
             // buttonTrim
             // 
             this.buttonTrim.AutoSize = false;
@@ -245,17 +259,16 @@ namespace ComputerGraphicsWork
             this.buttonTrim.ToolTipText = "trim";
             this.buttonTrim.Click += new System.EventHandler(this.buttonTrim_Click);
             // 
-            // buttonDrawBStyleCurve
+            // buttonInternalColoring
             // 
-            this.buttonDrawBStyleCurve.AutoSize = false;
-            this.buttonDrawBStyleCurve.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonDrawBStyleCurve.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawBStyleCurve.Image")));
-            this.buttonDrawBStyleCurve.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonDrawBStyleCurve.Name = "buttonDrawBStyleCurve";
-            this.buttonDrawBStyleCurve.Size = new System.Drawing.Size(32, 32);
-            this.buttonDrawBStyleCurve.Text = "buttonDrawBStyleCurve";
-            this.buttonDrawBStyleCurve.ToolTipText = "B style curve";
-            this.buttonDrawBStyleCurve.Click += new System.EventHandler(this.buttonDrawBStyleCurve_Click);
+            this.buttonInternalColoring.AutoSize = false;
+            this.buttonInternalColoring.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonInternalColoring.Image = ((System.Drawing.Image)(resources.GetObject("buttonInternalColoring.Image")));
+            this.buttonInternalColoring.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonInternalColoring.Name = "buttonInternalColoring";
+            this.buttonInternalColoring.Size = new System.Drawing.Size(32, 32);
+            this.buttonInternalColoring.Text = "internal coloring";
+            this.buttonInternalColoring.Click += new System.EventHandler(this.buttonInternalColoring_Click);
             // 
             // MainWindow
             // 
@@ -300,5 +313,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonTrim;
         private System.Windows.Forms.ToolStripButton buttonDrawRectangle;
         private System.Windows.Forms.ToolStripButton buttonDrawBStyleCurve;
+        private System.Windows.Forms.ToolStripButton buttonInternalColoring;
     }
 }

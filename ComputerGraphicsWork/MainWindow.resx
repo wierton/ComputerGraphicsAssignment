@@ -185,6 +185,16 @@
         TkSuQmCC
 </value>
   </data>
+  <data name="buttonInternalColoring.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADRSURBVFhH7dVBEcIwFATQSEACEioBCUhAAhIqAQdIQAIS
+        wEElgAPYvW9o/ub3wEx25t36dzpNk5SRkX/JAV7wMT3BzgyqtNUb9hDODu6gSiOOEM4EC6jCiAuEcwZV
+        FhVed37yK6iyKGvd+caqzGGtuypyWOvOqDKHteUYVeZ4gBVV5rKWQRX14PEdiirpwbuDW7s5qqQXj/Lm
+        qIIMPFmbooaz8G5ZjRrMwott9X9Qg5lu8DNqKNsJqlED2bg1q/+DGthC9ahWD2/FvjFHRpJTyhet58vr
+        rgrBNwAAAABJRU5ErkJggg==
+</value>
+  </data>
   <data name="buttonDrawPoint.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -260,13 +270,13 @@
   <data name="buttonDrawBStyleCurve.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFiSURBVFhH7VfbcYMwEKQEd8A3jw93gEtwCe7A6cDuwOkg
-        dBA6SEpwB6ED04G9q1k8vJzARBw/7MwO1nG625PkAwILxHH8nqbpvUvYD3LxjzAMN0iSifckSSrwu8GK
-        drn/D6hki2AnBP0EbwzcJZPK3YFj2jWcDlaIIEfwp5kIYq6wFeC5pncBCuwqxZVLm4M73e5hsgBWh0ou
-        cPiqiQlc3mfFuJZjD5H8KbgZzxUglzYQePDUkpjIis9yHQX45y9iDcfBjd7ywLb7dZJPrAKQpGAysG4k
-        GWxHSwFvEtAjm47c5gMElKA77U1aJa871/xL3YXa6w0s+VtmOyCx2/uxHc47WDlYLVI9D5j2PpfJFkjs
-        Dl8URXuZbAEBrvkssvwE9x4sNbSH9r/10mAGLvuiApDY7kk3hEUFvHr9gpgPucwLJZvvo+EvSIDfj4Yp
-        WAVIwPiPBt/gs5/JuoQIg79kEDwAQtH7R6+zkSEAAAAASUVORK5CYII=
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFuSURBVFhH7ZfdcYMwEIQpIR3wzM+DO7BLSAnuwOkg7sDp
+        IHRgd5CUkA7iDkwHybfM4SGgODARx4t3Zgd0HNqVdAhIPJDn+UtZll99Et9aSnykafqAyNoosRq+d1gr
+        bun/A52t6Oy5KIoj5xd13KdELb2B2opbczo0QgR38LMrlGXZB7ET3LeMbkCdtiPlWNOu4MYuDzDZgEZH
+        woGEt5YIHOF1xBzP5IwqIuWTK8PX/qwdNsDFYNWKXNOI95Y6CuRXob5+7QeRwfSQvLl5U0zcDSBykhhs
+        N5I1sZ2ngSczMCCzs7K0+YABPWJNtXfpJd7sXDpayA+2AV0QP+vcwn5AuFl7TMz3mrwFjVxrv8joVWC2
+        9pWFfKGikwFep48W8gUGms1nkekXtPaqAWv6w6r/x0eDGzTtixpg6v3edCEsaoBpD35+YebVUuaFxPQE
+        aP07jPfT8BfMQNyfhim4GzAD438aYgOxrcT69Hkkk+Qb+7/6zwlsBo4AAAAASUVORK5CYII=
 </value>
   </data>
   <data name="buttonTrim.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

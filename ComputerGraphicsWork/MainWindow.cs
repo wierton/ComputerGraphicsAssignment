@@ -130,6 +130,12 @@ namespace ComputerGraphicsWork
             normalButtonClicked(this.buttonColoring);
         }
 
+        private void buttonInternalColoring_Click(object sender, EventArgs e)
+        {
+            userCanvas.InternalColoring();
+            ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+        }
+
         private void buttonTrim_Click(object sender, EventArgs e)
         {
             normalButtonClicked(this.buttonTrim);
@@ -164,15 +170,13 @@ namespace ComputerGraphicsWork
                 || buttonClicked == this.buttonDrawBezier
                 || buttonClicked == this.buttonDrawBStyleCurve)
             {
-                // log.write("mouse set to up");
                 mouseState = CGMouseState.CGMouseStateUp;
 
                 isUpdatingGraphicsWhenMouseUp = true;
 
                 upPos.X = e.X; upPos.Y = e.Y;
-                // log.write("MainWindow_MouseUp, canUpdateGraphics --> false");
-                canUpdateGraphics = true;
 
+                canUpdateGraphics = true;
             }
             else
             {
@@ -445,8 +449,6 @@ namespace ComputerGraphicsWork
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
         }
 
-
-
         // return true if can clear old graphics
         private bool NormalPartOfUpdateTwoPointGraphics(CGUserGraphics graphics)
         {
@@ -548,7 +550,7 @@ namespace ComputerGraphicsWork
                     {
                         List<Point> tpl = new List<Point>();
                         polygonEdgeSet.ForEach((l)=> { tpl.Add(l.firstPoint); });
-                        tpl.Add(polygonEdgeSet[polygonEdgeSet.Count - 1].nextPoint);
+                        tpl.Add(polygonEdgeSet.Last().nextPoint);
 
                         if (oldSelectedCurve != null)
                         {
@@ -565,7 +567,7 @@ namespace ComputerGraphicsWork
                     {
                         List<Point> tpl = new List<Point>();
                         polygonEdgeSet.ForEach((l) => { tpl.Add(l.firstPoint); });
-                        tpl.Add(polygonEdgeSet[polygonEdgeSet.Count - 1].nextPoint);
+                        tpl.Add(polygonEdgeSet.Last().nextPoint);
 
                         if (oldSelectedCurve != null)
                         {

@@ -9,12 +9,6 @@ using System.Windows.Forms;
 
 namespace ComputerGraphicsWork
 {
-    public class Line
-    {
-        Point a, b;
-
-        public Line(Point x, Point y) { a = x; b = y; }
-    }
     public class Vector
     {
         public double X, Y;
@@ -69,22 +63,6 @@ namespace ComputerGraphicsWork
         }
     }
 
-    public class Distance
-    {
-        public static double CalcDistance(Point x, Point y)
-        {
-            int dx = x.X - y.X;
-            int dy = x.Y - y.Y;
-            return Math.Sqrt(dx * dx + dy * dy);
-        }
-        public static double CalcVecDistance(Vector x, Vector y)
-        {
-            double dx = x.X - y.X;
-            double dy = x.Y - y.Y;
-            return Math.Sqrt(dx * dx + dy * dy);
-        }
-    }
-
     public class Theta
     {
         private bool isThetaValid;
@@ -111,7 +89,7 @@ namespace ComputerGraphicsWork
             sinTheta = timesVec / baseMod;
 
             /*            if (Math.Abs(sinTheta * sinTheta + cosTheta * cosTheta - 1) > 0.0000000001)
-                            MessageBox.Show(string.Format("invalid theta: sin={0}, cos={1}, z={2}",
+                            MessageBox.Show(string.FormatPointListToString("invalid theta: sin={0}, cos={1}, z={2}",
                                 sinTheta, cosTheta, sinTheta * sinTheta + cosTheta * cosTheta));*/
         }
 
@@ -198,6 +176,7 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphics
     {
+        public bool isColored = false;
         public List<Point> pointsSet { get; } = new List<Point>();
 
         public List<Point> keyPoints = new List<Point>();
@@ -217,9 +196,10 @@ namespace ComputerGraphicsWork
         {
             foreach (Point p in pointsSet)
             {
-                if (Distance.CalcDistance(p, cursorPos) < 4)
+                if (GetDistance(p, cursorPos) < 4)
                     return true;
             }
+
             return false;
         }
 
@@ -228,26 +208,57 @@ namespace ComputerGraphicsWork
             return keyPoints;
         }
 
+        public delegate Point TransformOperation(Point p);
+        public CGUserGraphics BasicTransformFrame(TransformOperation btf)
+        {
+            for (int i = keyPoints.Count - 1; i >= 0; i--)
+            {
+                keyPoints[i] = btf(keyPoints[i]);
+            }
+            UpdatePointsSet();
+
+            if (isColored)
+            {
+                List<Point> lps = this.InternalPoints();
+                lps.ForEach(p => { pointsSet.Add(p); });
+            }
+
+            return this;
+        }
+
         public virtual CGUserGraphics TransformRotation(Point basePos, Point oldPos, Point newPos)
         {
             Theta theta = new Theta(basePos, oldPos, newPos);
-
-            for (int i = keyPoints.Count - 1; i >= 0; i--)
-            {
-                keyPoints[i] = theta.RotatePoint(keyPoints[i], basePos);
-            }
-            UpdatePointsSet();
-            return this;
+            return BasicTransformFrame((p) => theta.RotatePoint(p, basePos));
         }
 
         public virtual CGUserGraphics TransformZoom(Point basePos, Point oldPos, Point newPos)
         {
             ZoomFactor zf = new ZoomFactor(basePos, oldPos, newPos);
+            return BasicTransformFrame((p) => zf.ZoomPoint(p, basePos));
+        }
+
+        public virtual CGUserGraphics TransformMove(int dx, int dy)
+        {
+            return BasicTransformFrame((p) => new Point(p.X + dx, p.Y + dy));
+        }
+
+        public virtual CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
+        {
             for (int i = keyPoints.Count - 1; i >= 0; i--)
             {
-                keyPoints[i] = zf.ZoomPoint(keyPoints[i], basePos);
+                if (GetDistance(oldPos, keyPoints[i]) < 3)
+                {
+                    int dx = newPos.X - oldPos.X;
+                    int dy = newPos.Y - oldPos.Y;
+                    Point newPoint = new Point(keyPoints[i].X + dx, keyPoints[i].Y + dy);
+                    keyPoints[i] = newPoint;
+                    break;
+                }
             }
+
             UpdatePointsSet();
+
             return this;
         }
 
@@ -255,72 +266,35 @@ namespace ComputerGraphicsWork
         {
             return new List<CGUserGraphics>() { this };
         }
+        
 
-        public virtual CGUserGraphics TransformMove(int dx, int dy)
+        public virtual List<Point> InternalPoints()
         {
-            for (int i = keyPoints.Count - 1; i >= 0; i--)
+            return new List<Point>() { };
+        }
+
+        public CGUserGraphics InternalColoring()
+        {
+            isColored = true;
+            List<Point> lps = InternalPoints();
+            foreach(Point p in lps)
             {
-                keyPoints[i] = new Point(keyPoints[i].X + dx, keyPoints[i].Y + dy);
+                pointsSet.Add(p);
             }
-            UpdatePointsSet();
             return this;
-        }
-
-        public virtual CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
-        {
-            // do nothing
-            return this;
-        }
-
-        public Point CalculateMiddlePoint(Point a, Point b)
-        {
-            return new Point((a.X + b.X) / 2, (a.Y + b.Y) / 2);
         }
 
         public CGUserGraphics Copy()
         {
-            CGUserGraphics graphics = null;
-            switch (this.GetType().ToString())
-            {
-                case "ComputerGraphicsWork.CGUserGraphicsPoint":
-                    graphics = new CGUserGraphicsPoint(this.keyPoints[0]);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsPointset":
-                    graphics = new CGUserGraphicsPointset(this.keyPoints);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsLine":
-                    graphics = new CGUserGraphicsLine(this.keyPoints[0], this.keyPoints[1]);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsRectangle":
-                    graphics = new CGUserGraphicsRectangle(this.keyPoints);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsCircle":
-                    graphics = new CGUserGraphicsCircle(this.keyPoints[0], this.keyPoints[1]);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsEllipse":
-                    CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse(this.keyPoints[0], this.keyPoints[1]);
-                    ellipse.keyPoints.RemoveAll(p => true);
-                    this.keyPoints.ForEach((p) => { ellipse.keyPoints.Add(p); });
-                    ellipse.UpdatePointsSet();
-                    graphics = ellipse;
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsPolygon":
-                    graphics = new CGUserGraphicsPolygon(this.keyPoints);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsBezier":
-                    graphics = new CGUserGraphicsBezier(this.keyPoints);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsBStyleCurve":
-                    graphics = new CGUserGraphicsBStyleCurve(this.keyPoints);
-                    break;
-                case "ComputerGraphicsWork.CGUserGraphicsBlock":
-                    graphics = new CGUserGraphicsBlock(this.keyPoints);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(string.Format("undocumented graphics:{0}", this.GetType().ToString()));
-                    break;
-            }
-            return graphics;
+            Type t = this.GetType();
+            CGUserGraphics g = (CGUserGraphics)Activator.CreateInstance(t);
+
+            this.keyPoints.ForEach(p => { g.keyPoints.Add(p); });
+            //this.pointsSet.ForEach(p => { g.pointsSet.Add(p); });
+            this.CalculatePointsSet();
+            g.isColored = this.isColored;
+
+            return g;
         }
 
         public bool ClipTest(float p, float q, ref float u1, ref float u2)
@@ -347,6 +321,19 @@ namespace ComputerGraphicsWork
                     return false;
             }
             return true;
+        }
+
+        // other functions
+        public Point GetMiddlePoint(Point a, Point b)
+        {
+            return new Point((a.X + b.X) / 2, (a.Y + b.Y) / 2);
+        }
+
+        public double GetDistance(Point a, Point b)
+        {
+            int dx = a.X - b.X;
+            int dy = a.Y - b.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
         }
 
         public Point[] ClipLine(Point st, Point ed, Rectangle rect)
@@ -377,7 +364,7 @@ namespace ComputerGraphicsWork
                 && ClipTest(p[2], q[2], ref u1, ref u2)
                 && ClipTest(p[3], q[3], ref u1, ref u2))
             {
-                // MessageBox.Show(String.Format("{0}, {1}", u1, u2));
+                // MessageBox.Show(String.FormatPointListToString("{0}, {1}", u1, u2));
                 if (u1 > 0.0)
                 {
                     st.X = (int)(x + dx * u1 + 0.5);
@@ -398,7 +385,32 @@ namespace ComputerGraphicsWork
             return new Point[2] { st, ed };
         }
 
-        public String Format(List<Point> lps)
+
+        private double determinant(double v1, double v2, double v3, double v4)
+        {
+            return v1 * v3 - v2 * v4;
+        }
+        public bool IsLineCross(Point st1, Point ed1, Point st2, Point ed2)
+        {
+            double delta = determinant(ed1.X - st1.X, st2.X - ed2.X, ed1.Y - st1.Y, st2.Y - ed2.Y);
+            if (delta <= 1e-6 && delta >= -1e-6)  
+            {
+                return false;
+            }
+            double lambda = determinant(st2.X - st1.X, st2.X - ed2.X, st2.Y - st1.Y, st2.Y - ed2.Y) / delta;
+            if (lambda > 1 || lambda < 0)
+            {
+                return false;
+            }
+            double mu = determinant(ed1.X - st1.X, st2.X - st1.X, ed1.Y - st1.Y, st2.Y - st1.Y) / delta;
+            if (mu > 1 || mu < 0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public String FormatPointListToString(List<Point> lps)
         {
             String ret = "";
             foreach (Point p in lps)
@@ -410,30 +422,12 @@ namespace ComputerGraphicsWork
     }
 
 
-    public class CGUserGraphicsPointset : CGUserGraphics
-    {
-        public CGUserGraphicsPointset(List<Point> lps)
-        {
-            lps.ForEach((p) => { keyPoints.Add(p); });
-
-            CalculatePointsSet();
-        }
-
-        public override void CalculatePointsSet()
-        {
-            keyPoints.ForEach((p) => { pointsSet.Add(p); });
-        }
-
-        public override List<Point> CalculateTagPoints()
-        {
-            return new List<Point>(){};
-        }
-    }
-
     public class CGUserGraphicsPoint : CGUserGraphics
     {
         public int X { get; set; } = 0;
         public int Y { get; set; } = 0;
+
+        public CGUserGraphicsPoint() { }
         public CGUserGraphicsPoint(Point start)
         {
             keyPoints.Add(start);
@@ -444,8 +438,6 @@ namespace ComputerGraphicsWork
         {
             X = keyPoints[0].X;
             Y = keyPoints[0].Y;
-
-            pointsSet.RemoveAll(p => true);
             pointsSet.Add(keyPoints[0]);
         }
 
@@ -462,6 +454,7 @@ namespace ComputerGraphicsWork
     {
         public Point firstPoint { get; set; }
         public Point nextPoint { get; set; }
+        public CGUserGraphicsLine() { }
         public CGUserGraphicsLine(Point start, Point end)
         {
             keyPoints.Add(start);
@@ -621,22 +614,6 @@ namespace ComputerGraphicsWork
                 return false;
         }
 
-        public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
-        {
-            if(Distance.CalcDistance(keyPoints[0], oldPos) < 4)
-            {
-                keyPoints[0] = newPos;
-                UpdatePointsSet();
-            }
-            else if(Distance.CalcDistance(keyPoints[0], oldPos) < 4)
-            {
-                keyPoints[1] = newPos;
-                UpdatePointsSet();
-            }
-
-            return this;
-        }
-
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
         {
             Point[] ps = ClipLine(keyPoints[0], keyPoints[1], rect);
@@ -652,6 +629,8 @@ namespace ComputerGraphicsWork
     public class CGUserGraphicsCircle : CGUserGraphics
     {
         int radius { get; set; }
+
+        public CGUserGraphicsCircle() { }
         // keyPoints[0]: centerPoint, keyPoints[1]: edgePoint
         public CGUserGraphicsCircle(Point center, Point edge)
         {
@@ -720,31 +699,14 @@ namespace ComputerGraphicsWork
 
             baseSet.ForEach((u) => { pointsSet.Add(new Point(u.X + center.X, u.Y + center.Y)); });
         }
-        public override bool IsCursorNearby(Point cursorPos)
-        {
-            Point center = keyPoints[0];
-            int dx = cursorPos.X - center.X;
-            int dy = cursorPos.Y - center.Y;
-
-            double dist = Math.Sqrt(dx * dx + dy * dy);
-
-            if (Math.Abs(radius - dist) < 4)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
         {
             int dx = newPos.X - oldPos.X;
             int dy = newPos.Y - oldPos.Y;
-            if (Math.Abs(Distance.CalcDistance(keyPoints[0], oldPos) - radius) < 4)
+            if (Math.Abs(GetDistance(keyPoints[0], oldPos) - radius) < 4)
             {
-                int radius = (int)Distance.CalcDistance(keyPoints[0], newPos);
+                int radius = (int)GetDistance(keyPoints[0], newPos);
                 keyPoints[1] = new Point(keyPoints[0].X + radius, keyPoints[0].Y);
 
                 pointsSet.RemoveAll(p => true);
@@ -752,16 +714,41 @@ namespace ComputerGraphicsWork
             }
             return this;
         }
+
+        public override List<Point> InternalPoints()
+        {
+            Point center = keyPoints[0];
+            Point edge = keyPoints[1];
+
+            int dx = edge.X - center.X;
+            int dy = edge.Y - center.Y;
+            int squareRadius = dx * dx + dy * dy;
+            radius = (int)Math.Sqrt((double)(squareRadius));
+
+            List<Point> lps = new List<Point>();
+
+            for(int i = center.X - radius; i <= center.X + radius; i++)
+            {
+                for(int j = center.Y - radius; j <= center.Y + radius; j++)
+                {
+                    int squareDist = (i - center.X) * (i - center.X) + (j - center.Y) * (j - center.Y);
+                    if (squareDist < squareRadius)
+                        lps.Add(new Point(i, j));
+                }
+            }
+
+            return lps;
+        }
     }
     public class CGUserGraphicsEllipse : CGUserGraphics
     {
+        public CGUserGraphicsEllipse() { }
         /* p[0]          O           p[2]
          * 
          * O             O            O
          * 
          *               O           p[1]
          * */
-        int xRadius, yRadius;
         public CGUserGraphicsEllipse(Point p0, Point p1)
         {
             keyPoints.Add(p0);
@@ -770,20 +757,78 @@ namespace ComputerGraphicsWork
             CalculatePointsSet();
         }
 
+        public List<Point> CalculateNormalInternalPoints(Point center, Point edge)
+        {
+            int dx = edge.X - center.X;
+            int dy = edge.Y - center.Y;
+
+            int xRadius = Math.Abs(dx);
+            int yRadius = Math.Abs(dy);
+
+            int xRadiusSquare = xRadius * xRadius;
+            int yRadiusSquare = yRadius * yRadius;
+
+            int squareXYRadius = xRadiusSquare * yRadiusSquare;
+
+            List<Point> lps = new List<Point>();
+
+            for (int i = center.X - xRadius; i <= center.X + xRadius; i++)
+            {
+                for (int j = center.Y - yRadius; j <= center.Y + yRadius; j++)
+                {
+                    int squareDist = yRadiusSquare * (i - center.X) * (i - center.X) + xRadiusSquare * (j - center.Y) * (j - center.Y);
+                    if (squareDist < squareXYRadius)
+                        lps.Add(new Point(i, j));
+                }
+            }
+
+            return lps;
+        }
+
+        public override List<Point> InternalPoints()
+        {
+            Point center = GetMiddlePoint(keyPoints[0], keyPoints[1]);
+            if (keyPoints[2].X == keyPoints[1].X && keyPoints[2].Y == keyPoints[0].Y)
+            {
+                return CalculateNormalInternalPoints(center, keyPoints[1]);
+            }
+            else
+            {
+                Point upPoint = GetMiddlePoint(keyPoints[0], keyPoints[2]);
+                Point rightPoint = GetMiddlePoint(keyPoints[2], keyPoints[1]);
+
+                int yRadius = (int)GetDistance(upPoint, center);
+                int xRadius = (int)GetDistance(rightPoint, center);
+
+                Point fixedUpPoint = new Point(center.X, center.Y + yRadius);
+                Point fixedEdgePoint = new Point(center.X + xRadius, center.Y + yRadius);
+
+                List<Point> lps = CalculateNormalInternalPoints(center, fixedEdgePoint);
+
+                Theta theta = new Theta(center, fixedUpPoint, upPoint);
+
+                for (int i = lps.Count - 1; i >= 0; i--)
+                {
+                    lps[i] = theta.RotatePoint(lps[i], center);
+                }
+                return lps;
+            }
+        }
+
         public override void CalculatePointsSet()
         {
-            Point center = CalculateMiddlePoint(keyPoints[0], keyPoints[1]);
+            Point center = GetMiddlePoint(keyPoints[0], keyPoints[1]);
             if (keyPoints[2].X == keyPoints[1].X && keyPoints[2].Y == keyPoints[0].Y)
             {
                 CalculateNormalEllipse(center, keyPoints[1]);
             }
             else
             {
-                Point upPoint = CalculateMiddlePoint(keyPoints[0], keyPoints[2]);
-                Point rightPoint = CalculateMiddlePoint(keyPoints[2], keyPoints[1]);
+                Point upPoint = GetMiddlePoint(keyPoints[0], keyPoints[2]);
+                Point rightPoint = GetMiddlePoint(keyPoints[2], keyPoints[1]);
 
-                yRadius = (int)Distance.CalcDistance(upPoint, center);
-                xRadius = (int)Distance.CalcDistance(rightPoint, center);
+                int yRadius = (int)GetDistance(upPoint, center);
+                int xRadius = (int)GetDistance(rightPoint, center);
 
                 Point fixedUpPoint = new Point(center.X, center.Y + yRadius);
                 Point fixedEdgePoint = new Point(center.X + xRadius, center.Y + yRadius);
@@ -798,13 +843,16 @@ namespace ComputerGraphicsWork
                 }
             }
         }
+
+        // @param(1) : center
+        // @param(2) : edge
         public void CalculateNormalEllipse(Point center, Point edge)
         {
             int dx = edge.X - center.X;
             int dy = edge.Y - center.Y;
 
-            xRadius = Math.Abs(dx);
-            yRadius = Math.Abs(dy);
+            int xRadius = Math.Abs(dx);
+            int yRadius = Math.Abs(dy);
 
             int xRadiusSquare = xRadius * xRadius;
             int yRadiusSquare = yRadius * yRadius;
@@ -874,7 +922,7 @@ namespace ComputerGraphicsWork
         {
             foreach(Point p in pointsSet)
             {
-                if (Distance.CalcDistance(cursorPos, p) < 4.0)
+                if (GetDistance(cursorPos, p) < 4.0)
                     return true;
             }
             return false;
@@ -887,31 +935,15 @@ namespace ComputerGraphicsWork
             Point p3 = new Point(twicePx - keyPoints[2].X, twicePy - keyPoints[2].Y);
 
             return new List<Point>() {
-                CalculateMiddlePoint(keyPoints[0], keyPoints[2]),
-                CalculateMiddlePoint(keyPoints[2], keyPoints[1]),
-                CalculateMiddlePoint(keyPoints[1], p3),
-                CalculateMiddlePoint(p3, keyPoints[0]),
+                GetMiddlePoint(keyPoints[0], keyPoints[2]),
+                GetMiddlePoint(keyPoints[2], keyPoints[1]),
+                GetMiddlePoint(keyPoints[1], p3),
+                GetMiddlePoint(p3, keyPoints[0]),
             };
         }
 
         public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
-        {/*
-            if (Distance.CalcDistance(new Point(centerPoint.X, centerPoint.Y + yRadius), oldPos) < 8
-             || Distance.CalcDistance(new Point(centerPoint.X, centerPoint.Y - yRadius), oldPos) < 8)
-            {
-                CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(centerPoint, new Point(edgePoint.X, newPos.Y));
-                return newUserGraphics;
-            }
-            else if (Distance.CalcDistance(new Point(centerPoint.X + xRadius, centerPoint.Y), oldPos) < 8
-                  || Distance.CalcDistance(new Point(centerPoint.X - xRadius, centerPoint.Y), oldPos) < 8)
-            {
-                CGUserGraphicsEllipse newUserGraphics = new CGUserGraphicsEllipse(centerPoint, new Point(newPos.X, edgePoint.Y));
-                return newUserGraphics;
-            }
-            else
-            {
-                return this;
-            }*/
+        {
             return this;
         }
     }
@@ -919,6 +951,8 @@ namespace ComputerGraphicsWork
     public class CGUserGraphicsPolygon : CGUserGraphics
     {
         public List<CGUserGraphicsLine> edgeLines { get; } = new List<CGUserGraphicsLine>();
+
+        public CGUserGraphicsPolygon() { }
 
         public CGUserGraphicsPolygon(List<Point> inEndPoints)
         {
@@ -982,29 +1016,6 @@ namespace ComputerGraphicsWork
             return false;
         }
 
-        public override CGUserGraphics TransformAdjust(Point oldPos, Point newPos)
-        {
-            for (int i = keyPoints.Count - 1; i >= 0; i--)
-            {
-                if (Distance.CalcDistance(oldPos, keyPoints[i]) < 3)
-                {
-                    int dx = newPos.X - oldPos.X;
-                    int dy = newPos.Y - oldPos.Y;
-                    Point newPoint = new Point(keyPoints[i].X + dx, keyPoints[i].Y + dy);
-                    keyPoints[i] = newPoint;
-                    int nextI = (i + 1) % keyPoints.Count;
-                    int prevI = (i + keyPoints.Count - 1) % keyPoints.Count;
-                    edgeLines[i] = new CGUserGraphicsLine(keyPoints[i], keyPoints[nextI]);
-                    edgeLines[prevI] = new CGUserGraphicsLine(keyPoints[prevI], keyPoints[i]);
-                }
-            }
-
-            pointsSet.RemoveAll(p => true);
-            edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
-
-            return this;
-        }
-
         public bool Contains(Point p)
         {
             int i, j;
@@ -1016,16 +1027,6 @@ namespace ComputerGraphicsWork
                     c = !c;
             }
             return c || pointsSet.Contains(p);
-        }
-
-        public bool IsPointOnEdge(Point pos)
-        {
-            return pointsSet.Contains(pos);
-        }
-
-        public bool IsPointOnCorner(Point pos)
-        {
-            return keyPoints.Contains(pos);
         }
 
 
@@ -1044,6 +1045,11 @@ namespace ComputerGraphicsWork
             return s > 0;
         }
 
+        bool IsAnyTwoLineCross()
+        {
+            return false;
+        }
+
         List<Point> SortPointByAnticlockwise(List<Point> lps)
         {
             lps = new List<Point>(lps);
@@ -1051,6 +1057,8 @@ namespace ComputerGraphicsWork
                 lps.Reverse();
             return lps;
         }
+
+        // trim polygon
         public enum PointType
         {
             Normal,
@@ -1071,35 +1079,8 @@ namespace ComputerGraphicsWork
             public Node(Point inP, PointType inPt) { p = inP; pt = inPt; }
         }
 
-        public class LinkedList
-        {
-            public Node head, tail;
-            public LinkedList() { }
-            public void Add(Node node)
-            {
-                if (tail != null)
-                {
-                    tail.next = node;
-                    node.prev = tail;
-                    tail = node;
-                }
-                else
-                {
-                    head = tail = node;
-                }
 
-                tail.next = head;
-                head.prev = tail;
-            }
-
-            public void Remove(Node node)
-            {
-                Node prev = node.prev;
-                prev.next = node.next;
-            }
-        }
-
-        UserLog log = new UserLog("log2.txt");
+        static UserLog log = new UserLog("log2.txt");
 
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
         {
@@ -1280,7 +1261,7 @@ namespace ComputerGraphicsWork
                     }
                 }
 
-                log.write(String.Format("add polygon:{0}", Format(outPoints)));
+                log.write(String.Format("add polygon:{0}", FormatPointListToString(outPoints)));
                 graphics.Add(new CGUserGraphicsPolygon(outPoints));
                 log.write("===============next=================\n");
             } while (true);
@@ -1291,8 +1272,9 @@ namespace ComputerGraphicsWork
         }
     }
 
-    public class CGUserGraphicsRectangle : CGUserGraphics
+    public class CGUserGraphicsRectangle : CGUserGraphicsPolygon
     {
+        public CGUserGraphicsRectangle() { }
         public CGUserGraphicsRectangle(Point st, Point ed)
         {
             int minX = Math.Min(st.X, ed.X);
@@ -1302,58 +1284,17 @@ namespace ComputerGraphicsWork
 
             keyPoints.Add(new Point(minX, minY));
             keyPoints.Add(new Point(minX, maxY));
+            keyPoints.Add(new Point(maxX, maxY));
             keyPoints.Add(new Point(maxX, minY));
-
-            CalculatePointsSet();
+            
+            base.CalculatePointsSet();
         }
-
-        public CGUserGraphicsRectangle(List<Point> lps)
-        {
-            lps.ForEach((p)=> { keyPoints.Add(p); });
-
-            CalculatePointsSet();
-        }
-
-        public override void CalculatePointsSet()
-        {
-            CGUserGraphicsLine l;
-            l = new CGUserGraphicsLine(keyPoints[0], keyPoints[1]);
-            l.pointsSet.ForEach((p)=> { this.pointsSet.Add(p); });
-
-            l = new CGUserGraphicsLine(keyPoints[0], keyPoints[2]);
-            l.pointsSet.ForEach((p) => { this.pointsSet.Add(p); });
-
-            Point tp = new Point(keyPoints[1].X + keyPoints[2].X - keyPoints[0].X,
-                keyPoints[1].Y + keyPoints[2].Y - keyPoints[0].Y);
-
-            l = new CGUserGraphicsLine(keyPoints[1], tp);
-            l.pointsSet.ForEach((p) => { this.pointsSet.Add(p); });
-
-            l = new CGUserGraphicsLine(keyPoints[2], tp);
-            l.pointsSet.ForEach((p) => { this.pointsSet.Add(p); });
-        }
-
-        public override List<Point> CalculateTagPoints()
-        {
-            Point tp = new Point(keyPoints[1].X + keyPoints[2].X - keyPoints[0].X,
-                keyPoints[1].Y + keyPoints[2].Y - keyPoints[0].Y);
-            return new List<Point>(){
-                keyPoints[0],
-                keyPoints[1],
-                keyPoints[2],
-                tp
-            };
-        }
-
     }
 
     public class CGUserGraphicsBezier : CGUserGraphics
     {
         public Vector[,] pv;
-        public CGUserGraphicsBezier()
-        {
-
-        }
+        public CGUserGraphicsBezier() { }
 
         public CGUserGraphicsBezier(List<Point> inEndPoints)
         {
@@ -1361,7 +1302,7 @@ namespace ComputerGraphicsWork
             CalculatePointsSet();
         }
 
-        Vector CalculateBezierPointWithFactor(double factor)
+        private Vector CalculateBezierPointWithFactor(double factor)
         {
             for (int i = 1; i < keyPoints.Count; i++)
             {
@@ -1373,7 +1314,7 @@ namespace ComputerGraphicsWork
             return pv[keyPoints.Count - 1, 0];
         }
 
-        void CalculateBezierPoint(double stf, Vector st, double edf, Vector ed)
+        private void CalculateBezierPoint(double stf, Vector st, double edf, Vector ed)
         {
 
             double tf = (stf + edf) / 2;
@@ -1403,14 +1344,23 @@ namespace ComputerGraphicsWork
             pointsSet.Add(new Point((int)pv[0, keyPoints.Count - 1].X, (int)pv[0, keyPoints.Count - 1].Y));
             CalculateBezierPoint(0, pv[0, 0], 1, pv[0, keyPoints.Count - 1]);
         }
+
+
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            foreach(Point p in keyPoints)
+            {
+                if (GetDistance(p, cursorPos) < 4)
+                    return true;
+            }
+            return base.IsCursorNearby(cursorPos);
+        }
     }
 
     public class CGUserGraphicsBStyleCurve : CGUserGraphics
     {
         public const int K = 3;
-        public CGUserGraphicsBStyleCurve()
-        {
-        }
+        public CGUserGraphicsBStyleCurve() { }
 
         public CGUserGraphicsBStyleCurve(List<Point> inEndPoints)
         {
@@ -1418,7 +1368,7 @@ namespace ComputerGraphicsWork
             CalculatePointsSet();
         }
 
-        public Vector CalculateBStylePointWithFactor(double t, ref Vector[] pv)
+        private Vector CalculateBStylePointWithFactor(double t, ref Vector[] pv)
         {
             double it = 1 - t;
 
@@ -1433,7 +1383,7 @@ namespace ComputerGraphicsWork
             return b0 * pv[0] + b1 * pv[1] + b2 * pv[2] + b3 * pv[3];
         }
 
-        void CalculateBStylePoint(double stf, Vector st, double edf, Vector ed, ref Vector[] pv)
+        private void CalculateBStylePoint(double stf, Vector st, double edf, Vector ed, ref Vector[] pv)
         {
             double tf = (stf + edf) / 2;
             Vector v = CalculateBStylePointWithFactor(tf, ref pv);
@@ -1470,14 +1420,20 @@ namespace ComputerGraphicsWork
                 CalculateBStylePoint(0, st, 1, ed, ref pv);
             }
         }
+        public override bool IsCursorNearby(Point cursorPos)
+        {
+            foreach (Point p in keyPoints)
+            {
+                if (GetDistance(p, cursorPos) < 4)
+                    return true;
+            }
+            return base.IsCursorNearby(cursorPos);
+        }
     }
 
     public class CGUserGraphicsBlock : CGUserGraphics
     {
-        public CGUserGraphicsBlock()
-        {
-
-        }
+        public CGUserGraphicsBlock() { }
         public CGUserGraphicsBlock(List<Point> inPointSet)
         {
             inPointSet.ForEach((p) => { keyPoints.Add(p); });
@@ -1655,6 +1611,7 @@ namespace ComputerGraphicsWork
             userGraphicsSet.Add(block);
         }
 
+
         public void SetGraphicsSelected(CGUserGraphics userGraphics)
         {
             this.ClearStateOfSelectedGraphics();
@@ -1721,51 +1678,59 @@ namespace ComputerGraphicsWork
             selectedUserGraphics = newUserGraphics;
         }
 
-        public void MoveSelectedGraphics(Point newPos)
+        private delegate void TransformOperation(CGUserGraphics g);
+        private void TransformGraphicsFrame(TransformOperation btf)
         {
             if (!isUserGraphicsSelected || selectedUserGraphics == basePoint)
                 return;
 
             DeleteSelectedGraphics();
 
+            // why not remove rawSelectedGraphics firstly and transform and refill it?
+            //   reduce the loss between two adjacent graphics
             transfromSelectedGraphics = rawSelectedGraphics.Copy();
-            transfromSelectedGraphics.TransformMove(newPos.X - posOfGraphicsWhenSelected.X,
-                newPos.Y - posOfGraphicsWhenSelected.Y);
+            btf(transfromSelectedGraphics);
 
             UpdateSelectedGraphics(transfromSelectedGraphics);
+        }
+
+        public void InternalColoring()
+        {
+            TransformGraphicsFrame(g => {
+                g.InternalColoring();
+            });
+        }
+
+        public void MoveSelectedGraphics(Point newPos)
+        {
+            TransformGraphicsFrame(g => {
+                g.TransformMove(newPos.X - posOfGraphicsWhenSelected.X,
+                    newPos.Y - posOfGraphicsWhenSelected.Y);
+            });
         }
 
         public void ZoomSelectedGraphics(Point newPos)
         {
-            if (!isUserGraphicsSelected || selectedUserGraphics == basePoint)
+            if (basePoint == null)
                 return;
-
-            DeleteSelectedGraphics();
-
-            transfromSelectedGraphics = rawSelectedGraphics.Copy();
-            transfromSelectedGraphics.TransformZoom(
-                new Point(basePoint.X, basePoint.Y),
-                posOfGraphicsWhenSelected,
-                newPos);
-
-            UpdateSelectedGraphics(transfromSelectedGraphics);
+            TransformGraphicsFrame(g => {
+                g.TransformZoom(
+                    new Point(basePoint.X, basePoint.Y),
+                    posOfGraphicsWhenSelected,
+                    newPos);
+            });
         }
 
         public void RotateSelectedGraphics(Point newPos)
         {
-            if (!isUserGraphicsSelected || selectedUserGraphics == basePoint
-                || basePoint == null)
+            if (basePoint == null)
                 return;
-
-            DeleteSelectedGraphics();
-
-            transfromSelectedGraphics = rawSelectedGraphics.Copy();
-            transfromSelectedGraphics.TransformRotation(
-                new Point(basePoint.X, basePoint.Y),
-                posOfGraphicsWhenSelected,
-                newPos);
-
-            UpdateSelectedGraphics(transfromSelectedGraphics);
+            TransformGraphicsFrame(g => {
+                g.TransformRotation(
+                    new Point(basePoint.X, basePoint.Y),
+                    posOfGraphicsWhenSelected,
+                    newPos);
+            });
         }
 
 
@@ -1810,18 +1775,6 @@ namespace ComputerGraphicsWork
                     this.AddGraphics(lg[j]);
                 }
             }
-        }
-
-        public void redrawAllGraphics()
-        {
-            Rectangle oldRect = clientRect;
-            clientRect = new Rectangle(0, 0, clientRect.Width, clientRect.Height);
-
-            userGraphicsSet.ForEach((g) => { this.UndrawGraphics(g); });
-
-            clientRect = oldRect;
-            userGraphicsSet.ForEach((g) => { this.DrawGraphics(g); });
-
         }
 
         public void adjustTrimArea(Point downPos, Point curPos)
