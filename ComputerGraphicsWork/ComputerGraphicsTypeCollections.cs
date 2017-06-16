@@ -1399,7 +1399,35 @@ namespace ComputerGraphicsWork
 
     public class CGUserGraphicsBStyleCurve : CGUserGraphics
     {
+        public const int K = 3;
+        public CGUserGraphicsBStyleCurve()
+        {
+        }
 
+        public CGUserGraphicsBStyleCurve(List<Point> inEndPoints)
+        {
+            inEndPoints.ForEach((u) => { keyPoints.Add(u); });
+            CalculatePointsSet();
+        }
+
+        public double CalculateBaseFunction(int i, double u, ref double []au)
+        {
+            double[,] bv = new double[i, k];
+
+            for(int i = 0; i < )
+            if(i <= u && u < i + 1)
+            {
+
+            }
+            return 0.0;
+        }
+
+        public override void CalculatePointsSet()
+        {
+            if (keyPoints.Count <= 4)
+                return;
+
+        }
     }
 
     public class CGUserGraphicsBlock : CGUserGraphics
