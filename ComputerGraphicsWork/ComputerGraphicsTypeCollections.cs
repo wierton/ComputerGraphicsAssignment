@@ -22,6 +22,11 @@ namespace ComputerGraphicsWork
         public Vector(Point p) { X = p.X; Y = p.Y; }
         public Vector(double x, double y) { X = x; Y = y; }
 
+        public Point ToPoint()
+        {
+            return new Point((int)X, (int)Y);
+        }
+
         public static Vector operator +(Vector a, Vector b)
         {
             return new Vector(a.X + b.X, a.Y + b.Y);
@@ -304,6 +309,9 @@ namespace ComputerGraphicsWork
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsBezier":
                     graphics = new CGUserGraphicsBezier(this.keyPoints);
+                    break;
+                case "ComputerGraphicsWork.CGUserGraphicsBStyleCurve":
+                    graphics = new CGUserGraphicsBStyleCurve(this.keyPoints);
                     break;
                 case "ComputerGraphicsWork.CGUserGraphicsBlock":
                     graphics = new CGUserGraphicsBlock(this.keyPoints);
@@ -1410,23 +1418,57 @@ namespace ComputerGraphicsWork
             CalculatePointsSet();
         }
 
-        public double CalculateBaseFunction(int i, double u, ref double []au)
+        public Vector CalculateBStylePointWithFactor(double t, ref Vector[] pv)
         {
-            double[,] bv = new double[i, k];
+            double it = 1 - t;
 
-            for(int i = 0; i < )
-            if(i <= u && u < i + 1)
-            {
+            double b0 = it * it * it / 6.0f;
 
-            }
-            return 0.0;
+            double b1 = (3 * t * t * t - 6 * t * t + 4) / 6.0f;
+
+            double b2 = (-3 * t * t * t + 3 * t * t + 3 * t + 1) / 6.0f;
+
+            double b3 = t * t * t / 6.0f;
+
+            return b0 * pv[0] + b1 * pv[1] + b2 * pv[2] + b3 * pv[3];
         }
 
+        void CalculateBStylePoint(double stf, Vector st, double edf, Vector ed, ref Vector[] pv)
+        {
+            double tf = (stf + edf) / 2;
+            Vector v = CalculateBStylePointWithFactor(tf, ref pv);
+            pointsSet.Add(new Point((int)v.X, (int)v.Y));
+
+            if (Math.Abs((int)st.X - (int)v.X) <= 1
+                && Math.Abs((int)st.Y - (int)v.Y) <= 1
+                && Math.Abs((int)v.X - (int)ed.X) <= 1
+                && Math.Abs((int)v.Y - (int)ed.Y) <= 1)
+                return;
+
+            CalculateBStylePoint(stf, st, tf, v, ref pv);
+            CalculateBStylePoint(tf, v, edf, ed, ref pv);
+        }
         public override void CalculatePointsSet()
         {
             if (keyPoints.Count <= 4)
                 return;
 
+            for(int i = 0; i < keyPoints.Count - 3; i++)
+            {
+                Vector[] pv = new Vector[4]
+                {
+                    new Vector(keyPoints[i]),
+                    new Vector(keyPoints[i + 1]),
+                    new Vector(keyPoints[i + 2]),
+                    new Vector(keyPoints[i + 3]),
+                };
+
+                Vector st = CalculateBStylePointWithFactor(0, ref pv);
+                Vector ed = CalculateBStylePointWithFactor(1, ref pv);
+                pointsSet.Add(st.ToPoint());
+                pointsSet.Add(ed.ToPoint());
+                CalculateBStylePoint(0, st, 1, ed, ref pv);
+            }
         }
     }
 

@@ -103,7 +103,11 @@ namespace ComputerGraphicsWork
         {
             normalButtonClicked(this.buttonDrawBezier);
         }
+        private void buttonDrawBStyleCurve_Click(object sender, EventArgs e)
+        {
+            normalButtonClicked(this.buttonDrawBStyleCurve);
 
+        }
         private void buttonMoveGraphics_Click(object sender, EventArgs e)
         {
             normalButtonClicked(this.buttonMoveGraphics);
@@ -157,7 +161,8 @@ namespace ComputerGraphicsWork
         private void MainWindow_LeftMouseUp(object sender, MouseEventArgs e)
         {
             if (buttonClicked == this.buttonDrawPolygon
-                || buttonClicked == this.buttonDrawBezier)
+                || buttonClicked == this.buttonDrawBezier
+                || buttonClicked == this.buttonDrawBStyleCurve)
             {
                 // log.write("mouse set to up");
                 mouseState = CGMouseState.CGMouseStateUp;
@@ -211,7 +216,8 @@ namespace ComputerGraphicsWork
             mouseState = CGMouseState.CGMouseStateDown;
 
             if (buttonClicked != this.buttonDrawPolygon
-                && buttonClicked != this.buttonDrawBezier)
+                && buttonClicked != this.buttonDrawBezier
+                && buttonClicked != this.buttonDrawBStyleCurve)
             {
                 // log.write(String.Format("canUpdateGraphics:{0} --> true", canUpdateGraphics));
                 canUpdateGraphics = true;
@@ -322,6 +328,56 @@ namespace ComputerGraphicsWork
 
                 downPointSet.RemoveAll((l) => { return true; });
             }
+            else if (buttonClicked == this.buttonDrawBStyleCurve)
+            {
+                if (polygonEdgeSet.Count <= 1)
+                    return;
+
+                if (oldSelectedCurve != null)
+                {
+                    userCanvas.RemoveGraphics(oldSelectedCurve);
+                    oldSelectedCurve = null;
+                }
+
+                int dx = e.X - polygonEdgeSet[0].firstPoint.X;
+                int dy = e.Y - polygonEdgeSet[0].firstPoint.Y;
+
+                List<Point> downPointSet = new List<Point>();
+
+                foreach (CGUserGraphicsLine l in polygonEdgeSet)
+                {
+                    downPointSet.Add(l.firstPoint);
+                }
+
+                if (dx * dx + dy * dy < 3 * 3)
+                {
+                    downPointSet.Add(polygonEdgeSet[0].firstPoint);
+                }
+                else
+                {
+                    downPointSet.Add(polygonEdgeSet[polygonEdgeSet.Count - 1].nextPoint);
+                }
+
+                mouseState = CGMouseState.CGMouseStateUp;
+                // log.write("canUpdateGraphics --> false");
+                canUpdateGraphics = false;
+
+                isUpdatingGraphicsWhenMouseUp = false;
+
+                userCanvas.ClearStateOfSelectedGraphics();
+
+                polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
+                polygonEdgeSet.RemoveAll((l) => { return true; });
+
+                CGUserGraphicsBStyleCurve curve = new CGUserGraphicsBStyleCurve(downPointSet);
+
+                userCanvas.AddGraphics(curve);
+                userCanvas.SetGraphicsSelected(curve);
+
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+
+                downPointSet.RemoveAll((l) => { return true; });
+            }
             else if(buttonClicked == this.buttonRotation
                 || buttonClicked == this.buttonZoomGraphics)
             {
@@ -389,10 +445,7 @@ namespace ComputerGraphicsWork
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
         }
 
-        private void buttonDrawBStyleCurve_Click(object sender, EventArgs e)
-        {
 
-        }
 
         // return true if can clear old graphics
         private bool NormalPartOfUpdateTwoPointGraphics(CGUserGraphics graphics)
@@ -502,6 +555,23 @@ namespace ComputerGraphicsWork
                             userCanvas.RemoveGraphics(oldSelectedCurve);
                         }
                         oldSelectedCurve = new CGUserGraphicsBezier(tpl);
+                        userCanvas.AddGraphics(oldSelectedCurve);
+                    }
+                    break;
+                case "buttonDrawBStyleCurve":
+                    NormalPartOfUpdateMultPointGraphics();
+
+                    if (polygonEdgeSet.Count >= 2)
+                    {
+                        List<Point> tpl = new List<Point>();
+                        polygonEdgeSet.ForEach((l) => { tpl.Add(l.firstPoint); });
+                        tpl.Add(polygonEdgeSet[polygonEdgeSet.Count - 1].nextPoint);
+
+                        if (oldSelectedCurve != null)
+                        {
+                            userCanvas.RemoveGraphics(oldSelectedCurve);
+                        }
+                        oldSelectedCurve = new CGUserGraphicsBStyleCurve(tpl);
                         userCanvas.AddGraphics(oldSelectedCurve);
                     }
                     break;
