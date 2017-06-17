@@ -1,0 +1,395 @@
+	
+[1]:	minY:100, maxY:140
+[1]:	init left nodelist
+[1]:	add end point into lpa, (0, 130)
+[1]:	add end point into lpa, (40, 130)
+[1]:	add point pair into lpa, (10, 100) -> (40, 130)
+[1]:	add point pair into lpa, (10, 100) -> (20, 140)
+[1]:	add end point into lpa, (20, 140)
+[1]:	add point pair into lpa, (30, 100) -> (20, 140)
+[1]:	add point pair into lpa, (30, 100) -> (0, 130)
+[1]:	init cross points
+[1]:	add start point pair, (10, 100) -> 40, 130
+[1]:	add start point pair, (10, 100) -> 20, 140
+[1]:	add start point pair, (30, 100) -> 20, 140
+[1]:	add start point pair, (30, 100) -> 0, 130
+[1]:	calculate cross point at y=101
+[1]:	(11, 101)
+[1]:	(10, 101)
+[1]:	(30, 101)
+[1]:	(29, 101)
+[1]:	calculate cross point at y=102
+[1]:	(11, 102)
+[1]:	(12, 102)
+[1]:	(28, 102)
+[1]:	(29, 102)
+[1]:	calculate cross point at y=103
+[1]:	(11, 103)
+[1]:	(13, 103)
+[1]:	(27, 103)
+[1]:	(29, 103)
+[1]:	calculate cross point at y=104
+[1]:	(11, 104)
+[1]:	(14, 104)
+[1]:	(26, 104)
+[1]:	(29, 104)
+[1]:	calculate cross point at y=105
+[1]:	(11, 105)
+[1]:	(15, 105)
+[1]:	(25, 105)
+[1]:	(29, 105)
+[1]:	calculate cross point at y=106
+[1]:	(12, 106)
+[1]:	(16, 106)
+[1]:	(24, 106)
+[1]:	(28, 106)
+[1]:	calculate cross point at y=107
+[1]:	(12, 107)
+[1]:	(17, 107)
+[1]:	(23, 107)
+[1]:	(28, 107)
+[1]:	calculate cross point at y=108
+[1]:	(12, 108)
+[1]:	(18, 108)
+[1]:	(22, 108)
+[1]:	(28, 108)
+[1]:	calculate cross point at y=109
+[1]:	(12, 109)
+[1]:	(19, 109)
+[1]:	(21, 109)
+[1]:	(28, 109)
+[1]:	calculate cross point at y=110
+[1]:	(13, 110)
+[2]:	(20, 110)
+[1]:	(27, 110)
+[1]:	calculate cross point at y=111
+[1]:	(13, 111)
+[1]:	(21, 111)
+[1]:	(19, 111)
+[1]:	(27, 111)
+[1]:	calculate cross point at y=112
+[1]:	(13, 112)
+[1]:	(18, 112)
+[1]:	(22, 112)
+[1]:	(27, 112)
+[1]:	calculate cross point at y=113
+[1]:	(13, 113)
+[1]:	(17, 113)
+[1]:	(23, 113)
+[1]:	(27, 113)
+[1]:	calculate cross point at y=114
+[1]:	(14, 114)
+[1]:	(16, 114)
+[1]:	(24, 114)
+[1]:	(26, 114)
+[1]:	calculate cross point at y=115
+[1]:	(14, 115)
+[1]:	(15, 115)
+[1]:	(25, 115)
+[1]:	(26, 115)
+[1]:	calculate cross point at y=116
+[2]:	(14, 116)
+[2]:	(26, 116)
+[1]:	calculate cross point at y=117
+[1]:	(14, 117)
+[1]:	(13, 117)
+[1]:	(27, 117)
+[1]:	(26, 117)
+[1]:	calculate cross point at y=118
+[1]:	(12, 118)
+[1]:	(15, 118)
+[1]:	(25, 118)
+[1]:	(28, 118)
+[1]:	calculate cross point at y=119
+[1]:	(11, 119)
+[1]:	(15, 119)
+[1]:	(25, 119)
+[1]:	(29, 119)
+[1]:	calculate cross point at y=120
+[1]:	(10, 120)
+[1]:	(15, 120)
+[1]:	(25, 120)
+[1]:	(30, 120)
+[1]:	calculate cross point at y=121
+[1]:	(9, 121)
+[1]:	(15, 121)
+[1]:	(25, 121)
+[1]:	(31, 121)
+[1]:	calculate cross point at y=122
+[1]:	(8, 122)
+[1]:	(16, 122)
+[1]:	(24, 122)
+[1]:	(32, 122)
+[1]:	calculate cross point at y=123
+[1]:	(7, 123)
+[1]:	(16, 123)
+[1]:	(24, 123)
+[1]:	(33, 123)
+[1]:	calculate cross point at y=124
+[1]:	(6, 124)
+[1]:	(16, 124)
+[1]:	(24, 124)
+[1]:	(34, 124)
+[1]:	calculate cross point at y=125
+[1]:	(5, 125)
+[1]:	(16, 125)
+[1]:	(24, 125)
+[1]:	(35, 125)
+[1]:	calculate cross point at y=126
+[1]:	(4, 126)
+[1]:	(17, 126)
+[1]:	(23, 126)
+[1]:	(36, 126)
+[1]:	calculate cross point at y=127
+[1]:	(3, 127)
+[1]:	(17, 127)
+[1]:	(23, 127)
+[1]:	(37, 127)
+[1]:	calculate cross point at y=128
+[1]:	(2, 128)
+[1]:	(17, 128)
+[1]:	(23, 128)
+[1]:	(38, 128)
+[1]:	calculate cross point at y=129
+[1]:	(1, 129)
+[1]:	(17, 129)
+[1]:	(23, 129)
+[1]:	(39, 129)
+[1]:	calculate cross point at y=130
+[1]:	(0, 130)
+[1]:	(18, 130)
+[1]:	(22, 130)
+[1]:	(40, 130)
+[1]:	calculate cross point at y=131
+[1]:	(-1, 131)
+[1]:	(18, 131)
+[1]:	(22, 131)
+[1]:	(41, 131)
+[1]:	calculate cross point at y=132
+[1]:	(-2, 132)
+[1]:	(18, 132)
+[1]:	(22, 132)
+[1]:	(42, 132)
+[1]:	calculate cross point at y=133
+[1]:	(-3, 133)
+[1]:	(18, 133)
+[1]:	(22, 133)
+[1]:	(43, 133)
+[1]:	calculate cross point at y=134
+[1]:	(-4, 134)
+[1]:	(19, 134)
+[1]:	(21, 134)
+[1]:	(44, 134)
+[1]:	calculate cross point at y=135
+[1]:	(-5, 135)
+[1]:	(19, 135)
+[1]:	(21, 135)
+[1]:	(45, 135)
+[1]:	calculate cross point at y=136
+[1]:	(-6, 136)
+[1]:	(19, 136)
+[1]:	(21, 136)
+[1]:	(46, 136)
+[1]:	calculate cross point at y=137
+[1]:	(-7, 137)
+[1]:	(19, 137)
+[1]:	(21, 137)
+[1]:	(47, 137)
+[1]:	calculate cross point at y=138
+[1]:	(-8, 138)
+[2]:	(20, 138)
+[1]:	(48, 138)
+[1]:	calculate cross point at y=139
+[1]:	(-9, 139)
+[2]:	(20, 139)
+[1]:	(49, 139)
+[1]:	calculate cross point at y=140
+[1]:	(-10, 140)
+[2]:	(20, 140)
+[1]:	(50, 140)
+[1]:	
+[1]:	minY:100, maxY:140
+[1]:	init left nodelist
+[1]:	add end point into lpa, (0, 130)
+[1]:	add end point into lpa, (40, 130)
+[1]:	add point pair into lpa, (10, 100) -> (40, 130)
+[1]:	add point pair into lpa, (10, 100) -> (20, 140)
+[1]:	add end point into lpa, (20, 140)
+[1]:	add point pair into lpa, (30, 100) -> (20, 140)
+[1]:	add point pair into lpa, (30, 100) -> (0, 130)
+[1]:	init cross points
+[1]:	add start point pair, (10, 100) -> 40, 130
+[1]:	add start point pair, (10, 100) -> 20, 140
+[1]:	add start point pair, (30, 100) -> 20, 140
+[1]:	add start point pair, (30, 100) -> 0, 130
+[1]:	calculate cross point at y=101
+[1]:	(11, 101)
+[1]:	(10, 101)
+[1]:	(30, 101)
+[1]:	(29, 101)
+[1]:	calculate cross point at y=102
+[1]:	(11, 102)
+[1]:	(12, 102)
+[1]:	(28, 102)
+[1]:	(29, 102)
+[1]:	calculate cross point at y=103
+[1]:	(11, 103)
+[1]:	(13, 103)
+[1]:	(27, 103)
+[1]:	(29, 103)
+[1]:	calculate cross point at y=104
+[1]:	(11, 104)
+[1]:	(14, 104)
+[1]:	(26, 104)
+[1]:	(29, 104)
+[1]:	calculate cross point at y=105
+[1]:	(11, 105)
+[1]:	(15, 105)
+[1]:	(25, 105)
+[1]:	(29, 105)
+[1]:	calculate cross point at y=106
+[1]:	(12, 106)
+[1]:	(16, 106)
+[1]:	(24, 106)
+[1]:	(28, 106)
+[1]:	calculate cross point at y=107
+[1]:	(12, 107)
+[1]:	(17, 107)
+[1]:	(23, 107)
+[1]:	(28, 107)
+[1]:	calculate cross point at y=108
+[1]:	(12, 108)
+[1]:	(18, 108)
+[1]:	(22, 108)
+[1]:	(28, 108)
+[1]:	calculate cross point at y=109
+[1]:	(12, 109)
+[1]:	(19, 109)
+[1]:	(21, 109)
+[1]:	(28, 109)
+[1]:	calculate cross point at y=110
+[1]:	(13, 110)
+[2]:	(20, 110)
+[1]:	(27, 110)
+[1]:	calculate cross point at y=111
+[1]:	(13, 111)
+[1]:	(21, 111)
+[1]:	(19, 111)
+[1]:	(27, 111)
+[1]:	calculate cross point at y=112
+[1]:	(13, 112)
+[1]:	(18, 112)
+[1]:	(22, 112)
+[1]:	(27, 112)
+[1]:	calculate cross point at y=113
+[1]:	(13, 113)
+[1]:	(17, 113)
+[1]:	(23, 113)
+[1]:	(27, 113)
+[1]:	calculate cross point at y=114
+[1]:	(14, 114)
+[1]:	(16, 114)
+[1]:	(24, 114)
+[1]:	(26, 114)
+[1]:	calculate cross point at y=115
+[1]:	(14, 115)
+[1]:	(15, 115)
+[1]:	(25, 115)
+[1]:	(26, 115)
+[1]:	calculate cross point at y=116
+[2]:	(14, 116)
+[2]:	(26, 116)
+[1]:	calculate cross point at y=117
+[1]:	(14, 117)
+[1]:	(13, 117)
+[1]:	(27, 117)
+[1]:	(26, 117)
+[1]:	calculate cross point at y=118
+[1]:	(12, 118)
+[1]:	(15, 118)
+[1]:	(25, 118)
+[1]:	(28, 118)
+[1]:	calculate cross point at y=119
+[1]:	(11, 119)
+[1]:	(15, 119)
+[1]:	(25, 119)
+[1]:	(29, 119)
+[1]:	calculate cross point at y=120
+[1]:	(10, 120)
+[1]:	(15, 120)
+[1]:	(25, 120)
+[1]:	(30, 120)
+[1]:	calculate cross point at y=121
+[1]:	(9, 121)
+[1]:	(15, 121)
+[1]:	(25, 121)
+[1]:	(31, 121)
+[1]:	calculate cross point at y=122
+[1]:	(8, 122)
+[1]:	(16, 122)
+[1]:	(24, 122)
+[1]:	(32, 122)
+[1]:	calculate cross point at y=123
+[1]:	(7, 123)
+[1]:	(16, 123)
+[1]:	(24, 123)
+[1]:	(33, 123)
+[1]:	calculate cross point at y=124
+[1]:	(6, 124)
+[1]:	(16, 124)
+[1]:	(24, 124)
+[1]:	(34, 124)
+[1]:	calculate cross point at y=125
+[1]:	(5, 125)
+[1]:	(16, 125)
+[1]:	(24, 125)
+[1]:	(35, 125)
+[1]:	calculate cross point at y=126
+[1]:	(4, 126)
+[1]:	(17, 126)
+[1]:	(23, 126)
+[1]:	(36, 126)
+[1]:	calculate cross point at y=127
+[1]:	(3, 127)
+[1]:	(17, 127)
+[1]:	(23, 127)
+[1]:	(37, 127)
+[1]:	calculate cross point at y=128
+[1]:	(2, 128)
+[1]:	(17, 128)
+[1]:	(23, 128)
+[1]:	(38, 128)
+[1]:	calculate cross point at y=129
+[1]:	(1, 129)
+[1]:	(17, 129)
+[1]:	(23, 129)
+[1]:	(39, 129)
+[1]:	calculate cross point at y=130
+[1]:	(18, 130)
+[1]:	(22, 130)
+[1]:	calculate cross point at y=131
+[1]:	(18, 131)
+[1]:	(22, 131)
+[1]:	calculate cross point at y=132
+[1]:	(18, 132)
+[1]:	(22, 132)
+[1]:	calculate cross point at y=133
+[1]:	(18, 133)
+[1]:	(22, 133)
+[1]:	calculate cross point at y=134
+[1]:	(19, 134)
+[1]:	(21, 134)
+[1]:	calculate cross point at y=135
+[1]:	(19, 135)
+[1]:	(21, 135)
+[1]:	calculate cross point at y=136
+[1]:	(19, 136)
+[1]:	(21, 136)
+[1]:	calculate cross point at y=137
+[1]:	(19, 137)
+[1]:	(21, 137)
+[1]:	calculate cross point at y=138
+[2]:	(20, 138)
+[1]:	calculate cross point at y=139
+[2]:	(20, 139)
+[1]:	calculate cross point at y=140
