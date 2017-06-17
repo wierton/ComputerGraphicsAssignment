@@ -279,7 +279,7 @@ namespace ComputerGraphicsWork
                 userCanvas.SetGraphicsSelected(polygon);
 
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);              
-                polygonEdgeSet.RemoveAll((l) => { return true; });
+                polygonEdgeSet.Clear();
 
             }
             else if(buttonClicked == this.buttonDrawBezier)
@@ -321,7 +321,7 @@ namespace ComputerGraphicsWork
                 userCanvas.ClearStateOfSelectedGraphics();
 
                 polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
-                polygonEdgeSet.RemoveAll((l) => { return true; });
+                polygonEdgeSet.Clear();
 
                 CGUserGraphicsBezier curve = new CGUserGraphicsBezier(downPointSet);
 
@@ -330,7 +330,7 @@ namespace ComputerGraphicsWork
 
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
 
-                downPointSet.RemoveAll((l) => { return true; });
+                downPointSet.Clear();
             }
             else if (buttonClicked == this.buttonDrawBStyleCurve)
             {
@@ -371,7 +371,7 @@ namespace ComputerGraphicsWork
                 userCanvas.ClearStateOfSelectedGraphics();
 
                 polygonEdgeSet.ForEach((l) => { userCanvas.RemoveGraphics(l); });
-                polygonEdgeSet.RemoveAll((l) => { return true; });
+                polygonEdgeSet.Clear();
 
                 CGUserGraphicsBStyleCurve curve = new CGUserGraphicsBStyleCurve(downPointSet);
 
@@ -380,7 +380,7 @@ namespace ComputerGraphicsWork
 
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
 
-                downPointSet.RemoveAll((l) => { return true; });
+                downPointSet.Clear();
             }
             else if(buttonClicked == this.buttonRotation
                 || buttonClicked == this.buttonZoomGraphics)
@@ -431,39 +431,38 @@ namespace ComputerGraphicsWork
         }
 
         private void buttonTest_Click(object sender, EventArgs e)
-        {/*
-            CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(
-               new List<Point>() {
-                    new Point(0, 110),
-                    new Point(80, 110),
-                    new Point(40, 100),
-               }
+        {
+            /*
+            Point a = new Point(301, 178);
+            Point b = new Point(237, 196);
+            Point c = new Point(315, 280);
+            Point d = new Point(166, 253);
+
+            CGUserGraphics g = new CGUserGraphics();
+            MessageBox.Show(String.Format("{0}", g.IsSegmentsIntersect(a, b, c, d)));
+
+            a = new Point(0, 0);
+            b = new Point(2, 2);
+            c = new Point(1, 0);
+            d = new Point(3, 2);
+            MessageBox.Show(String.Format("{0}", g.IsSegmentsIntersect(a, b, c, d)));
+
+
+            
+            CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(new List<Point>()
+            {
+                new Point(100, 100),
+                new Point(140, 140),
+                new Point(100, 180),
+            }
             );
 
-            polygon.InternalColoring();
+            Rectangle rect = new Rectangle(120, 100, 60, 41);
 
+            polygon.TransformTrim(rect);
+            userCanvas.AddGraphics(polygon);
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
             */
-             CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(
-                 new List<Point>() {
-                     new Point(00, 30 + 100),
-                     new Point(40, 30 + 100),
-                     new Point(10, 00 + 100),
-                     new Point(20, 40 + 100),
-                     new Point(30, 00 + 100),
-                 }
-             );
-
-             CGUserGraphicsPolygon newP = (CGUserGraphicsPolygon)polygon.Copy();
-             newP = (CGUserGraphicsPolygon)newP.TransformMove(100, 0);
-
-             polygon.InternalColoring();
-
-             userCanvas.AddGraphics(polygon);
-             userCanvas.AddGraphics(newP);
-
-             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
-             
         }
 
         // return true if can clear old graphics

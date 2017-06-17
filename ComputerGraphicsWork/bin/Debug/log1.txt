@@ -1,0 +1,168 @@
+[1]:	
+[2]:	intersect point not at line
+[2]:	denominator is 0
+[2]:	intersect point not at line
+[1]:	
+[2]:	intersect point not at line
+[2]:	denominator is 0
+[2]:	intersect point not at line
+[1]:	
+[2]:	denominator is 0
+[2]:	intersect point not at line
+[2]:	intersect at (120, 120)
+[1]:	
+[2]:	intersect point not at line
+[2]:	intersect at (120, 120)
+[1]:	
+[1]:	intersect at (245, 154)
+[1]:	intersect point not at line
+[1]:	intersect at (203, 168)
+[1]:	intersect at (166, 168)
+[1]:	intersect at (393, 119)
+[1]:	intersect at (373, 119)
+[3]:	intersect point not at line
+[2]:	intersect at (332, 241)
+[2]:	intersect at (301, 241)
+[1]:	
+[2]:	intersect point not at line
+[2]:	intersect at (345, 210)
+[1]:	intersect at (335, 136)
+[1]:	intersect point not at line
+[1]:	intersect at (335, 163)
+[1]:	
+[1]:	intersect point not at line
+[1]:	intersect at (268, 148)
+[1]:	intersect at (268, 186)
+[1]:	intersect at (232, 164)
+[1]:	intersect at (232, 189)
+[1]:	intersect at (438, 127)
+[1]:	intersect at (438, 184)
+[1]:	intersect at (358, 141)
+[1]:	intersect at (358, 202)
+[1]:	intersect at (113, 136)
+[1]:	intersect at (147, 136)
+[1]:	intersect at (139, 210)
+[1]:	intersect point not at line
+[1]:	intersect at (124, 210)
+[1]:	intersect at (336, 277)
+[2]:	intersect point not at line
+[1]:	
+[1]:	intersect point not at line
+[1]:	intersect at (140, 140)
+[2]:	intersect at (120, 120)
+[1]:	
+[1]:	intersect at (100, 140)
+[1]:	intersect at (140, 140)
+[1]:	intersect at (120, 140)
+[1]:	denominator is 0
+[1]:	
+[1]:	intersect at (402, 158)
+[1]:	intersect at (231, 158)
+[1]:	intersect at (354, 158)
+[1]:	intersect point not at line
+[1]:	intersect at (354, 212)
+[1]:	intersect at (256, 137)
+[1]:	intersect at (232, 137)
+[1]:	intersect at (196, 137)
+[1]:	intersect at (175, 137)
+[1]:	intersect at (242, 173)
+[1]:	intersect at (242, 137)
+[1]:	intersect at (224, 220)
+[1]:	intersect at (145, 220)
+[1]:	intersect at (151, 220)
+[1]:	intersect at (190, 220)
+[1]:	intersect at (181, 185)
+[1]:	intersect point not at line
+[1]:	intersect at (181, 210)
+[1]:	intersect at (181, 137)
+[1]:	intersect at (181, 170)
+[1]:	intersect at (212, 141)
+[1]:	intersect point not at line
+[1]:	intersect at (301, 141)
+[1]:	intersect at (271, 215)
+[1]:	intersect at (271, 141)
+[1]:	intersect at (271, 172)
+[1]:	intersect at (271, 278)
+[1]:	intersect at (271, 244)
+[1]:	intersect at (201, 244)
+[1]:	intersect point not at line
+[1]:	intersect at (237, 244)
+[1]:	intersect at (237, 172)
+[1]:	intersect at (237, 141)
+[1]:	intersect at (237, 206)
+[1]:	intersect at (334, 270)
+[1]:	intersect at (334, 95)
+[1]:	intersect at (334, 153)
+[1]:	intersect at (334, 264)
+[1]:	intersect at (334, 217)
+[1]:	intersect at (334, 280)
+[1]:	intersect at (283, 166)
+[1]:	intersect at (283, 104)
+[1]:	intersect at (283, 209)
+[1]:	intersect at (283, 249)
+[1]:	intersect at (283, 177)
+[1]:	intersect at (283, 199)
+[1]:	intersect at (367, 283)
+[1]:	intersect at (416, 283)
+[2]:	intersect point not at line
+[1]:	intersect at (506, 97)
+[1]:	intersect at (506, 133)
+[1]:	intersect at (506, 156)
+[1]:	intersect at (506, 191)
+[1]:	intersect at (506, 244)
+[1]:	intersect at (506, 258)
+[1]:	
+[1]:	intersect point not at line
+[1]:	intersect at (241, 129)
+[1]:	intersect at (241, 146)
+[1]:	intersect at (241, 210)
+[1]:	intersect at (241, 252)
+[1]:	
+[1]:	intersect point not at line
+[1]:	intersect at (180, 109)
+[1]:	intersect at (180, 140)
+[1]:	intersect at (180, 164)
+[1]:	intersect at (180, 219)
+[1]:	
+[1]:	intersect point not at line
+[1]:	intersect at (405, 147)
+[1]:	intersect at (405, 180)
+[1]:	intersect at (405, 224)
+[1]:	intersect at (405, 243)
+[1]:	
+[1]:	intersect at (214, 86)
+[1]:	intersect at (253, 86)
+[2]:	intersect point not at line
+[1]:	intersect at (310, 115)
+[1]:	intersect at (310, 152)
+[1]:	intersect at (310, 201)
+[1]:	intersect at (310, 251)
+[1]:	
+[1]:	intersect point not at line
+[1]:	intersect at (279, 127)
+[1]:	intersect at (279, 160)
+[1]:	intersect at (279, 204)
+[1]:	intersect at (279, 249)
+[1]:	
+[1]:	intersect at (167, 131)
+[1]:	intersect at (185, 131)
+[2]:	intersect point not at line
+[1]:	intersect at (268, 164)
+[1]:	intersect at (268, 187)
+[1]:	intersect at (268, 229)
+[1]:	
+[1]:	intersect at (285, 153)
+[1]:	intersect at (259, 153)
+[1]:	intersect at (222, 153)
+[1]:	intersect at (188, 153)
+[1]:	intersect at (272, 192)
+[1]:	intersect at (272, 153)
+[1]:	intersect at (272, 215)
+[1]:	intersect at (272, 192)
+[1]:	intersect at (253, 249)
+[1]:	intersect at (227, 249)
+[1]:	denominator is 0
+[1]:	intersect at (206, 201)
+[1]:	intersect at (206, 225)
+[1]:	intersect at (206, 153)
+[1]:	intersect at (206, 197)

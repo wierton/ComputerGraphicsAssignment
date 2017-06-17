@@ -63,6 +63,56 @@ namespace ComputerGraphicsWork
         }
     }
 
+    public class FixedVector
+    {
+        public Point st { get; }
+        public Point ed { get; }
+        public FixedVector() { }
+        public FixedVector(Point inSt, Point inEd) { st = inSt; ed = inEd; }
+
+        public bool isInside(Point p)
+        {
+            int v1_dx = ed.X - st.X;
+            int v1_dy = ed.Y - st.Y;
+
+            int v2_dx = p.X - st.X;
+            int v2_dy = p.Y - st.Y;
+
+            return (v1_dx * v2_dy - v2_dx * v1_dy) >= 0;
+        }
+
+        static UserLog log = new UserLog("log1.txt");
+
+        public Point[] CalculateIntersectPoint(Point c, Point d)
+        {
+            int denominator = (ed.Y - st.Y) * (d.X - c.X) - (st.X - ed.X) * (c.Y - d.Y);
+            if (denominator == 0)
+            {
+                log.write("denominator is 0");
+                return new Point[0];
+            }
+
+            int X = ((ed.X - st.X) * (d.X - c.X) * (c.Y - st.Y)
+                        + (ed.Y - st.Y) * (d.X - c.X) * st.X
+                        - (d.Y - c.Y) * (ed.X - st.X) * c.X) / denominator;
+            int Y = -((ed.Y - st.Y) * (d.Y - c.Y) * (c.X - st.X)
+                        + (ed.X - st.X) * (d.Y - c.Y) * st.Y
+                        - (d.X - c.X) * (ed.Y - st.Y) * c.Y) / denominator;
+
+            if ( 
+                 (X - c.X) * (X - d.X) <= 0 && (Y - c.Y) * (Y - d.Y) <= 0
+               )
+            {
+                log.write(String.Format("intersect at ({0}, {1})", X, Y));
+                return new Point[] { new Point(X, Y) };
+            }
+
+            log.write("intersect point not at line");
+            return new Point[0];
+        }
+    }
+
+
     public class Theta
     {
         private bool isThetaValid;
@@ -188,7 +238,7 @@ namespace ComputerGraphicsWork
 
         public void UpdatePointsSet()
         {
-            pointsSet.RemoveAll(p => true);
+            pointsSet.Clear();
             CalculatePointsSet();
         }
 
@@ -391,30 +441,42 @@ namespace ComputerGraphicsWork
             return new Point[2] { st, ed };
         }
 
+        public Point[] CalculateCrossPointBetweenLineAndRectangle(Point st, Point ed, Rectangle rect)
+        {
+            Point[] ps = ClipLine(st, ed, rect);
 
-        private double determinant(double v1, double v2, double v3, double v4)
-        {
-            return v1 * v3 - v2 * v4;
+            List<Point> ret = new List<Point>();
+
+            if (ps.Count() >= 1 && ps[0] != st)
+            {
+                ret.Add(ps[0]);
+            }
+            if (ps.Count() >= 2 && ps[1] != ed)
+            {
+                ret.Add(ps[1]);
+            }
+
+            return ret.ToArray();
         }
-        public bool IsLineCross(Point st1, Point ed1, Point st2, Point ed2)
-        {
-            double delta = determinant(ed1.X - st1.X, st2.X - ed2.X, ed1.Y - st1.Y, st2.Y - ed2.Y);
-            if (delta <= 1e-6 && delta >= -1e-6)  
-            {
-                return false;
-            }
-            double lambda = determinant(st2.X - st1.X, st2.X - ed2.X, st2.Y - st1.Y, st2.Y - ed2.Y) / delta;
-            if (lambda > 1 || lambda < 0)
-            {
-                return false;
-            }
-            double mu = determinant(ed1.X - st1.X, st2.X - st1.X, ed1.Y - st1.Y, st2.Y - st1.Y) / delta;
-            if (mu > 1 || mu < 0)
-            {
-                return false;
-            }
-            return true;
+
+        int get_area(Point a0, Point a1, Point a2)
+        { 
+            //求有向面积  
+            return a0.X * a1.Y + a2.X * a0.Y + a1.X * a2.Y - a2.X * a1.Y - a0.X * a2.Y - a1.X * a0.Y;
         }
+
+        public bool IsSegmentsIntersect(Point st1, Point ed1, Point st2, Point ed2)
+        {
+            int s1 = get_area(st1, ed1, st2);
+            int s2 = get_area(st1, ed1, ed2);
+            int s3 = get_area(st2, ed2, st1);
+            int s4 = get_area(st2, ed2, ed1);
+            if (s1 * s2 <= 0 && s3 * s4 <= 0)
+                return true;
+            else
+                return false;
+        }
+
 
         public String FormatPointListToString(List<Point> lps)
         {
@@ -715,7 +777,7 @@ namespace ComputerGraphicsWork
                 int radius = (int)GetDistance(keyPoints[0], newPos);
                 keyPoints[1] = new Point(keyPoints[0].X + radius, keyPoints[0].Y);
 
-                pointsSet.RemoveAll(p => true);
+                pointsSet.Clear();
                 CalculatePointsSet();
             }
             return this;
@@ -975,7 +1037,11 @@ namespace ComputerGraphicsWork
 
         public override void CalculatePointsSet()
         {
-            edgeLines.RemoveAll(p => true);
+            edgeLines.Clear();
+
+            if (keyPoints.Count == 0)
+                return;
+
 
             for (int i = 0; i < keyPoints.Count - 1; i++)
             {
@@ -1012,16 +1078,6 @@ namespace ComputerGraphicsWork
             //edgeLines.ForEach((g) => { g.pointsSet.ForEach((p) => { pointsSet.Add(p); }); });
         }
 
-        public override bool IsCursorNearby(Point cursorPos)
-        {
-            foreach(CGUserGraphicsLine line in edgeLines)
-            {
-                if (line.IsCursorNearby(cursorPos))
-                    return true;
-            }
-            return false;
-        }
-
         public bool Contains(Point p)
         {
             int i, j;
@@ -1052,7 +1108,41 @@ namespace ComputerGraphicsWork
         }
 
         bool IsAnyTwoLineCross()
-        {            
+        {
+            for (int j = 2; j < edgeLines.Count - 1; j++)
+            {
+                if (IsSegmentsIntersect(edgeLines[0].firstPoint, edgeLines[0].nextPoint,
+                    edgeLines[j].firstPoint, edgeLines[j].nextPoint))
+                {
+                    log.write(String.Format("cross at {8}:{9} ({0}, {1})-({2}, {3})  ^  ({4}, {5})-({6}, {7})",
+                        edgeLines[0].firstPoint.X, edgeLines[0].firstPoint.Y,
+                        edgeLines[0].nextPoint.X, edgeLines[0].nextPoint.Y,
+                        edgeLines[j].firstPoint.X, edgeLines[j].firstPoint.Y,
+                        edgeLines[j].nextPoint.X, edgeLines[j].nextPoint.Y,
+                        0, j
+                    ));
+                    return true;
+                }
+            }
+
+            for (int i = 1; i < edgeLines.Count; i++)
+            {
+                for(int j = i + 2; j < edgeLines.Count; j++)
+                {
+                    if(IsSegmentsIntersect(edgeLines[i].firstPoint, edgeLines[i].nextPoint,
+                        edgeLines[j].firstPoint, edgeLines[j].nextPoint))
+                    {
+                        log.write(String.Format("cross at {8}:{9} ({0}, {1})-({2}, {3})  ^  ({4}, {5})-({6}, {7})",
+                            edgeLines[i].firstPoint.X, edgeLines[i].firstPoint.Y,
+                            edgeLines[i].nextPoint.X, edgeLines[i].nextPoint.Y,
+                            edgeLines[j].firstPoint.X, edgeLines[j].firstPoint.Y,
+                            edgeLines[j].nextPoint.X, edgeLines[j].nextPoint.Y,
+                            i, j
+                        ));
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
@@ -1090,6 +1180,7 @@ namespace ComputerGraphicsWork
 
         public override List<CGUserGraphics> TransformTrim(Rectangle rect)
         {
+            // corner cases
             if (keyPoints.Count == 0)
             {
                 return new List<CGUserGraphics>();
@@ -1107,6 +1198,97 @@ namespace ComputerGraphicsWork
                 return new List<CGUserGraphics>() { new CGUserGraphicsLine(ps[0], ps[1]) };
             }
 
+
+            if (IsAnyTwoLineCross())
+                return TransformTrimBySutherlandHodgman(rect);
+            else
+                return TransformTrimByWeilerrAtherton(rect);
+        }
+
+        public List<CGUserGraphics> TransformTrimBySutherlandHodgman(Rectangle rect)
+        {
+            Point[] edgeVertexs = new Point[]
+            {
+                new Point(rect.X, rect.Y),
+                new Point(rect.X + rect.Width - 1, rect.Y),
+                new Point(rect.X + rect.Width - 1, rect.Y + rect.Height - 1),
+                new Point(rect.X, rect.Y + rect.Height - 1),
+            };
+
+            FixedVector[] edges = new FixedVector[] {
+                new FixedVector(edgeVertexs[0], edgeVertexs[1]),
+                new FixedVector(edgeVertexs[1], edgeVertexs[2]),
+                new FixedVector(edgeVertexs[2], edgeVertexs[3]),
+                new FixedVector(edgeVertexs[3], edgeVertexs[0]),
+            };
+
+            List<Point> outPoints = new List<Point>(keyPoints);
+            log.write("SutherlandHodgman start");
+
+            foreach (var edge in edges)
+            {
+                log.write("\n=====new iteration=====");
+                log.write(String.Format("edge: ({0}, {1}) -> ({2}, {3})", edge.st.X, edge.st.Y, edge.ed.X, edge.ed.Y));
+                List<Point> lps = outPoints;
+                log.write(String.Format("lps:{0}: {1}", lps.Count, FormatPointListToString(lps)));
+                outPoints = new List<Point>();
+
+                bool isPrevVertexInRect = edge.isInside(lps.Last());
+
+                for(int j = 0, i = lps.Count - 1; j < lps.Count; i = j++)
+                {
+                    log.write(String.Format("---({0} -> {1})---", i, j));
+                    log.write(String.Format("i point: ({0}, {1})", lps[i].X, lps[i].Y));
+                    log.write(String.Format("j point: ({0}, {1})", lps[j].X, lps[j].Y));
+                    if (edge.isInside(lps[j]))
+                    {
+                        log.write("point j is inside");
+                        // j in
+                        if (!isPrevVertexInRect)
+                        {
+                            // i not in, j in
+                            Point[] ps = edge.CalculateIntersectPoint(lps[i], lps[j]);
+                            log.write(String.Format("i not in, j in, intersect points:{0}", ps.Count()));
+                            foreach (Point p in ps)
+                            {
+                                log.write(String.Format("add point: ({0}, {1})", p.X, p.Y));
+                                outPoints.Add(p);
+                            }
+                        }
+
+                        log.write(String.Format("add point: ({0}, {1})", lps[j].X, lps[j].Y));
+
+                        outPoints.Add(lps[j]);
+
+                        isPrevVertexInRect = true;
+                    }
+                    else
+                    {
+                        log.write("point j is not inside");
+
+                        // j not in
+                        // two cases are same
+                        Point[] ps = edge.CalculateIntersectPoint(lps[i], lps[j]);
+                        foreach (Point p in ps)
+                        {
+                            log.write(String.Format("add point: ({0}, {1})", p.X, p.Y));
+                            outPoints.Add(p);
+                        }
+
+                        isPrevVertexInRect = false;
+                    }
+
+                }
+
+                if (outPoints.Count == 0)
+                    break;
+            }
+
+            return new List<CGUserGraphics>() { new CGUserGraphicsPolygon(outPoints) };
+        }
+
+        public List<CGUserGraphics> TransformTrimByWeilerrAtherton(Rectangle rect)
+        {
             List<Point> plg = new List<Point>();
             List<PointType> plgt = new List<PointType>();
 

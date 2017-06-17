@@ -1,1 +1,381 @@
 
+[1]:	
+[1]:	cross at 1:3 (301, 178)-(237, 196)  ^  (315, 280)-(166, 253)
+[1]:	SutherlandHodgman start
+[1]:	
+=====new iteration=====
+[1]:	edge: (268, 131) -> (349, 131)
+[1]:	lps:5: {X=168,Y=124},{X=301,Y=178},{X=237,Y=196},{X=315,Y=280},{X=166,Y=253},
+[1]:	---(4 -> 0)---
+[1]:	i point: (166, 253)
+[1]:	j point: (168, 124)
+[1]:	point j is not inside
+[1]:	add point: (167, 131)
+[1]:	---(0 -> 1)---
+[1]:	i point: (168, 124)
+[1]:	j point: (301, 178)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (185, 131)
+[1]:	add point: (301, 178)
+[1]:	---(1 -> 2)---
+[1]:	i point: (301, 178)
+[1]:	j point: (237, 196)
+[1]:	point j is inside
+[1]:	add point: (237, 196)
+[1]:	---(2 -> 3)---
+[1]:	i point: (237, 196)
+[1]:	j point: (315, 280)
+[1]:	point j is inside
+[1]:	add point: (315, 280)
+[1]:	---(3 -> 4)---
+[1]:	i point: (315, 280)
+[1]:	j point: (166, 253)
+[1]:	point j is inside
+[1]:	add point: (166, 253)
+[1]:	
+=====new iteration=====
+[1]:	edge: (349, 131) -> (349, 313)
+[1]:	lps:6: {X=167,Y=131},{X=185,Y=131},{X=301,Y=178},{X=237,Y=196},{X=315,Y=280},{X=166,Y=253},
+[1]:	---(5 -> 0)---
+[1]:	i point: (166, 253)
+[1]:	j point: (167, 131)
+[1]:	point j is inside
+[1]:	add point: (167, 131)
+[1]:	---(0 -> 1)---
+[1]:	i point: (167, 131)
+[1]:	j point: (185, 131)
+[1]:	point j is inside
+[1]:	add point: (185, 131)
+[1]:	---(1 -> 2)---
+[1]:	i point: (185, 131)
+[1]:	j point: (301, 178)
+[1]:	point j is inside
+[1]:	add point: (301, 178)
+[1]:	---(2 -> 3)---
+[1]:	i point: (301, 178)
+[1]:	j point: (237, 196)
+[1]:	point j is inside
+[1]:	add point: (237, 196)
+[1]:	---(3 -> 4)---
+[1]:	i point: (237, 196)
+[1]:	j point: (315, 280)
+[1]:	point j is inside
+[1]:	add point: (315, 280)
+[1]:	---(4 -> 5)---
+[1]:	i point: (315, 280)
+[1]:	j point: (166, 253)
+[1]:	point j is inside
+[1]:	add point: (166, 253)
+[1]:	
+=====new iteration=====
+[1]:	edge: (349, 313) -> (268, 313)
+[1]:	lps:6: {X=167,Y=131},{X=185,Y=131},{X=301,Y=178},{X=237,Y=196},{X=315,Y=280},{X=166,Y=253},
+[1]:	---(5 -> 0)---
+[1]:	i point: (166, 253)
+[1]:	j point: (167, 131)
+[1]:	point j is inside
+[1]:	add point: (167, 131)
+[1]:	---(0 -> 1)---
+[1]:	i point: (167, 131)
+[1]:	j point: (185, 131)
+[1]:	point j is inside
+[1]:	add point: (185, 131)
+[1]:	---(1 -> 2)---
+[1]:	i point: (185, 131)
+[1]:	j point: (301, 178)
+[1]:	point j is inside
+[1]:	add point: (301, 178)
+[1]:	---(2 -> 3)---
+[1]:	i point: (301, 178)
+[1]:	j point: (237, 196)
+[1]:	point j is inside
+[1]:	add point: (237, 196)
+[1]:	---(3 -> 4)---
+[1]:	i point: (237, 196)
+[1]:	j point: (315, 280)
+[1]:	point j is inside
+[1]:	add point: (315, 280)
+[1]:	---(4 -> 5)---
+[1]:	i point: (315, 280)
+[1]:	j point: (166, 253)
+[1]:	point j is inside
+[1]:	add point: (166, 253)
+[1]:	
+=====new iteration=====
+[1]:	edge: (268, 313) -> (268, 131)
+[1]:	lps:6: {X=167,Y=131},{X=185,Y=131},{X=301,Y=178},{X=237,Y=196},{X=315,Y=280},{X=166,Y=253},
+[1]:	---(5 -> 0)---
+[1]:	i point: (166, 253)
+[1]:	j point: (167, 131)
+[1]:	point j is not inside
+[1]:	---(0 -> 1)---
+[1]:	i point: (167, 131)
+[1]:	j point: (185, 131)
+[1]:	point j is not inside
+[1]:	---(1 -> 2)---
+[1]:	i point: (185, 131)
+[1]:	j point: (301, 178)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (268, 164)
+[1]:	add point: (301, 178)
+[1]:	---(2 -> 3)---
+[1]:	i point: (301, 178)
+[1]:	j point: (237, 196)
+[1]:	point j is not inside
+[1]:	add point: (268, 187)
+[1]:	---(3 -> 4)---
+[1]:	i point: (237, 196)
+[1]:	j point: (315, 280)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (268, 229)
+[1]:	add point: (315, 280)
+[1]:	---(4 -> 5)---
+[1]:	i point: (315, 280)
+[1]:	j point: (166, 253)
+[1]:	point j is not inside
+[1]:	
+[1]:	===============start=================
+[1]:	(137, 245, Normal)
+[1]:	(155, 76, Normal)
+[1]:	(270, 108, Enter)
+[1]:	(341, 128, Normal)
+[1]:	(270, 142, Leave)
+[1]:	(221, 151, Normal)
+[1]:	(270, 197, Enter)
+[1]:	(343, 266, Normal)
+[1]:	(270, 259, Leave)
+[1]:	
+
+[1]:	(270, 321, Normal)
+[1]:	(270, 259, Leave)
+[1]:	(270, 197, Enter)
+[1]:	(270, 142, Leave)
+[1]:	(270, 108, Enter)
+[1]:	(270, 67, Normal)
+[1]:	(430, 67, Normal)
+[1]:	(430, 321, Normal)
+[1]:	===============mid=================
+
+[2]:	(270, 108)
+[1]:	keep at Normal:(341, 128)
+[1]:	(341, 128)
+[1]:	switch to clip edge at (270, 142)
+[1]:	(270, 142)
+[1]:	add polygon:{X=270,Y=108},{X=270,Y=108},{X=341,Y=128},{X=270,Y=142},
+[1]:	===============next=================
+
+[2]:	(270, 197)
+[1]:	keep at Normal:(343, 266)
+[1]:	(343, 266)
+[1]:	switch to clip edge at (270, 259)
+[1]:	(270, 259)
+[1]:	add polygon:{X=270,Y=197},{X=270,Y=197},{X=343,Y=266},{X=270,Y=259},
+[1]:	===============next=================
+
+[1]:	===============end=================
+
+[1]:	
+[1]:	cross at 0:2 (296, 120)-(174, 230)  ^  (296, 212)-(172, 113)
+[1]:	SutherlandHodgman start
+[1]:	
+=====new iteration=====
+[1]:	edge: (206, 153) -> (272, 153)
+[1]:	lps:6: {X=296,Y=120},{X=174,Y=230},{X=296,Y=212},{X=172,Y=113},{X=242,Y=284},{X=242,Y=284},
+[1]:	---(5 -> 0)---
+[1]:	i point: (242, 284)
+[1]:	j point: (296, 120)
+[1]:	point j is not inside
+[1]:	add point: (285, 153)
+[1]:	---(0 -> 1)---
+[1]:	i point: (296, 120)
+[1]:	j point: (174, 230)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (259, 153)
+[1]:	add point: (174, 230)
+[1]:	---(1 -> 2)---
+[1]:	i point: (174, 230)
+[1]:	j point: (296, 212)
+[1]:	point j is inside
+[1]:	add point: (296, 212)
+[1]:	---(2 -> 3)---
+[1]:	i point: (296, 212)
+[1]:	j point: (172, 113)
+[1]:	point j is not inside
+[1]:	add point: (222, 153)
+[1]:	---(3 -> 4)---
+[1]:	i point: (172, 113)
+[1]:	j point: (242, 284)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (188, 153)
+[1]:	add point: (242, 284)
+[1]:	---(4 -> 5)---
+[1]:	i point: (242, 284)
+[1]:	j point: (242, 284)
+[1]:	point j is inside
+[1]:	add point: (242, 284)
+[1]:	
+=====new iteration=====
+[1]:	edge: (272, 153) -> (272, 249)
+[1]:	lps:8: {X=285,Y=153},{X=259,Y=153},{X=174,Y=230},{X=296,Y=212},{X=222,Y=153},{X=188,Y=153},{X=242,Y=284},{X=242,Y=284},
+[1]:	---(7 -> 0)---
+[1]:	i point: (242, 284)
+[1]:	j point: (285, 153)
+[1]:	point j is not inside
+[1]:	add point: (272, 192)
+[1]:	---(0 -> 1)---
+[1]:	i point: (285, 153)
+[1]:	j point: (259, 153)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (272, 153)
+[1]:	add point: (259, 153)
+[1]:	---(1 -> 2)---
+[1]:	i point: (259, 153)
+[1]:	j point: (174, 230)
+[1]:	point j is inside
+[1]:	add point: (174, 230)
+[1]:	---(2 -> 3)---
+[1]:	i point: (174, 230)
+[1]:	j point: (296, 212)
+[1]:	point j is not inside
+[1]:	add point: (272, 215)
+[1]:	---(3 -> 4)---
+[1]:	i point: (296, 212)
+[1]:	j point: (222, 153)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (272, 192)
+[1]:	add point: (222, 153)
+[1]:	---(4 -> 5)---
+[1]:	i point: (222, 153)
+[1]:	j point: (188, 153)
+[1]:	point j is inside
+[1]:	add point: (188, 153)
+[1]:	---(5 -> 6)---
+[1]:	i point: (188, 153)
+[1]:	j point: (242, 284)
+[1]:	point j is inside
+[1]:	add point: (242, 284)
+[1]:	---(6 -> 7)---
+[1]:	i point: (242, 284)
+[1]:	j point: (242, 284)
+[1]:	point j is inside
+[1]:	add point: (242, 284)
+[1]:	
+=====new iteration=====
+[1]:	edge: (272, 249) -> (206, 249)
+[1]:	lps:10: {X=272,Y=192},{X=272,Y=153},{X=259,Y=153},{X=174,Y=230},{X=272,Y=215},{X=272,Y=192},{X=222,Y=153},{X=188,Y=153},{X=242,Y=284},{X=242,Y=284},
+[1]:	---(9 -> 0)---
+[1]:	i point: (242, 284)
+[1]:	j point: (272, 192)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (253, 249)
+[1]:	add point: (272, 192)
+[1]:	---(0 -> 1)---
+[1]:	i point: (272, 192)
+[1]:	j point: (272, 153)
+[1]:	point j is inside
+[1]:	add point: (272, 153)
+[1]:	---(1 -> 2)---
+[1]:	i point: (272, 153)
+[1]:	j point: (259, 153)
+[1]:	point j is inside
+[1]:	add point: (259, 153)
+[1]:	---(2 -> 3)---
+[1]:	i point: (259, 153)
+[1]:	j point: (174, 230)
+[1]:	point j is inside
+[1]:	add point: (174, 230)
+[1]:	---(3 -> 4)---
+[1]:	i point: (174, 230)
+[1]:	j point: (272, 215)
+[1]:	point j is inside
+[1]:	add point: (272, 215)
+[1]:	---(4 -> 5)---
+[1]:	i point: (272, 215)
+[1]:	j point: (272, 192)
+[1]:	point j is inside
+[1]:	add point: (272, 192)
+[1]:	---(5 -> 6)---
+[1]:	i point: (272, 192)
+[1]:	j point: (222, 153)
+[1]:	point j is inside
+[1]:	add point: (222, 153)
+[1]:	---(6 -> 7)---
+[1]:	i point: (222, 153)
+[1]:	j point: (188, 153)
+[1]:	point j is inside
+[1]:	add point: (188, 153)
+[1]:	---(7 -> 8)---
+[1]:	i point: (188, 153)
+[1]:	j point: (242, 284)
+[1]:	point j is not inside
+[1]:	add point: (227, 249)
+[1]:	---(8 -> 9)---
+[1]:	i point: (242, 284)
+[1]:	j point: (242, 284)
+[1]:	point j is not inside
+[1]:	
+=====new iteration=====
+[1]:	edge: (206, 249) -> (206, 153)
+[1]:	lps:10: {X=253,Y=249},{X=272,Y=192},{X=272,Y=153},{X=259,Y=153},{X=174,Y=230},{X=272,Y=215},{X=272,Y=192},{X=222,Y=153},{X=188,Y=153},{X=227,Y=249},
+[1]:	---(9 -> 0)---
+[1]:	i point: (227, 249)
+[1]:	j point: (253, 249)
+[1]:	point j is inside
+[1]:	add point: (253, 249)
+[1]:	---(0 -> 1)---
+[1]:	i point: (253, 249)
+[1]:	j point: (272, 192)
+[1]:	point j is inside
+[1]:	add point: (272, 192)
+[1]:	---(1 -> 2)---
+[1]:	i point: (272, 192)
+[1]:	j point: (272, 153)
+[1]:	point j is inside
+[1]:	add point: (272, 153)
+[1]:	---(2 -> 3)---
+[1]:	i point: (272, 153)
+[1]:	j point: (259, 153)
+[1]:	point j is inside
+[1]:	add point: (259, 153)
+[1]:	---(3 -> 4)---
+[1]:	i point: (259, 153)
+[1]:	j point: (174, 230)
+[1]:	point j is not inside
+[1]:	add point: (206, 201)
+[1]:	---(4 -> 5)---
+[1]:	i point: (174, 230)
+[1]:	j point: (272, 215)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (206, 225)
+[1]:	add point: (272, 215)
+[1]:	---(5 -> 6)---
+[1]:	i point: (272, 215)
+[1]:	j point: (272, 192)
+[1]:	point j is inside
+[1]:	add point: (272, 192)
+[1]:	---(6 -> 7)---
+[1]:	i point: (272, 192)
+[1]:	j point: (222, 153)
+[1]:	point j is inside
+[1]:	add point: (222, 153)
+[1]:	---(7 -> 8)---
+[1]:	i point: (222, 153)
+[1]:	j point: (188, 153)
+[1]:	point j is not inside
+[1]:	add point: (206, 153)
+[1]:	---(8 -> 9)---
+[1]:	i point: (188, 153)
+[1]:	j point: (227, 249)
+[1]:	point j is inside
+[1]:	i not in, j in, intersect points:1
+[1]:	add point: (206, 197)
+[1]:	add point: (227, 249)
