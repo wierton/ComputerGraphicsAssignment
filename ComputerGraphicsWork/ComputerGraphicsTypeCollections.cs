@@ -259,6 +259,12 @@ namespace ComputerGraphicsWork
 
             UpdatePointsSet();
 
+            if (isColored)
+            {
+                List<Point> lps = this.InternalPoints();
+                lps.ForEach(p => { pointsSet.Add(p); });
+            }
+
             return this;
         }
 
@@ -290,8 +296,8 @@ namespace ComputerGraphicsWork
             CGUserGraphics g = (CGUserGraphics)Activator.CreateInstance(t);
 
             this.keyPoints.ForEach(p => { g.keyPoints.Add(p); });
-            //this.pointsSet.ForEach(p => { g.pointsSet.Add(p); });
-            this.CalculatePointsSet();
+
+            g.CalculatePointsSet();
             g.isColored = this.isColored;
 
             return g;
@@ -1046,7 +1052,7 @@ namespace ComputerGraphicsWork
         }
 
         bool IsAnyTwoLineCross()
-        {
+        {            
             return false;
         }
 
@@ -1269,6 +1275,224 @@ namespace ComputerGraphicsWork
             log.write("===============end=================\n");
 
             return graphics;
+        }
+
+        public enum CrossPointType
+        {
+            Normal,
+            Vertex,
+        }
+
+        class CrossPoint
+        {
+            public Point p;
+            public int edy { get; }
+
+            int probe;
+            int dx;
+            int dy;
+            int inc;
+
+            public delegate void CalculateNextPointFunction();
+            public CalculateNextPointFunction CalculateNextPoint;
+
+            public CrossPoint(Point st, Point ed)
+            {
+                p = st;
+                probe = 0;
+                dx = ed.X - st.X;
+                dy = ed.Y - st.Y;
+
+                edy = ed.Y;
+
+                if(dx > 0)
+                {
+                    inc = 1;
+                }
+                else if(dx < 0)
+                {
+                    dx = -dx;
+                    inc = -1;
+                }
+                else
+                {
+                    inc = 0;
+                }
+
+                if (dy > dx)
+                    CalculateNextPoint = CalculateNextPointByX;
+                else
+                {
+                    probe = -2 * dx;
+                    CalculateNextPoint = CalculateNextPointByY;
+                }
+            }
+
+            public void CalculateNextPointByY()
+            {
+                while (true)
+                {
+                    probe += 2 * dy;
+                    p.X += inc;
+                    if (probe >= dx)
+                    {
+                        p.Y ++;
+                        probe -= 2 * dx;
+                        break;
+                    }
+                }
+            }
+
+
+            public void CalculateNextPointByX()
+            {
+                probe += 2 * dx;
+                if (probe >= dy)
+                {
+                    p.X += inc;
+                    probe -= 2 * dy;
+                }
+
+                p.Y++;
+            }
+        }
+
+        class PointPair
+        {
+            public bool isEnd = false;
+            public Point v;
+            public Point next;
+            public PointPair(Point inV, Point inNext) { v = inV; next = inNext; }
+            public PointPair(Point inV) { v = inV; isEnd = true; }
+        }
+        class NodeList
+        {
+            public List<PointPair> vertex = new List<PointPair>();
+        }
+
+        public override List<Point> InternalPoints()
+        {
+            if (keyPoints.Count < 3)
+                return new List<Point>() { };
+
+            int maxY = -2147483647;
+            int minY = 2147483647;
+
+            Point topVertex = new Point();
+            foreach(Point p in keyPoints)
+            {
+                if (p.Y < minY)
+                {
+                    topVertex = p;
+                    minY = p.Y;
+                }
+
+                if (p.Y > maxY)
+                {
+                    maxY = p.Y;
+                }
+            }
+
+            log.write(String.Format("minY:{0}, maxY:{1}", minY, maxY));
+
+            NodeList[] lpa = new NodeList[maxY - minY + 1];
+
+            for(int i = 0; i < lpa.Count(); i++)
+            {
+                lpa[i] = new NodeList();
+            }
+
+            log.write("init left nodelist");
+            for(int i = 0, prevI = keyPoints.Count - 1; i < keyPoints.Count; prevI = i++)
+            {
+                bool isEnd = true;
+                int curY = keyPoints[i].Y;
+                int nextI = (i + 1) % keyPoints.Count;
+
+                if(keyPoints[prevI].Y > curY)
+                {
+                    log.write(String.Format("add point pair into lpa, ({0}, {1}) -> ({2}, {3})", 
+                        keyPoints[i].X, keyPoints[i].Y, keyPoints[prevI].X, keyPoints[prevI].Y));
+                    lpa[curY - minY].vertex.Add(new PointPair(keyPoints[i], keyPoints[prevI]));
+                    isEnd = false;
+                }
+
+                if (keyPoints[nextI].Y > curY)
+                {
+                    log.write(String.Format("add point pair into lpa, ({0}, {1}) -> ({2}, {3})",
+                        keyPoints[i].X, keyPoints[i].Y, keyPoints[nextI].X, keyPoints[nextI].Y));
+                    lpa[curY - minY].vertex.Add(new PointPair(keyPoints[i], keyPoints[nextI]));
+                    isEnd = false;
+                }
+
+                if(isEnd)
+                {
+                    log.write(String.Format("add end point into lpa, ({0}, {1})",
+                        keyPoints[i].X, keyPoints[i].Y));
+                    lpa[curY - minY].vertex.Add(new PointPair(keyPoints[i]));
+                }
+            }
+
+            log.write("init cross points");
+            List<CrossPoint> lcp = new List<CrossPoint>();
+
+            foreach(PointPair pp in lpa[0].vertex)
+            {
+                if (!pp.isEnd)
+                {
+                    log.write(String.Format("add start point pair, ({0}, {1}) -> {2}, {3}",
+                        pp.v.X, pp.v.Y, pp.next.X, pp.next.Y));
+                    lcp.Add(new CrossPoint(pp.v, pp.next));
+                }
+            }
+
+
+            List<Point> lps = new List<Point>();
+            for (int y = minY + 1; y <= maxY; y++)
+            {
+                lcp.Sort((u, v)=> { return u.p.X - v.p.X; });
+
+                for (int j = 0; j < lcp.Count; j += 2)
+                {
+                    if (j + 1 >= lcp.Count)
+                        break;
+                    for (int x = lcp[j].p.X; x <= lcp[j + 1].p.X; x++)
+                    {
+                        lps.Add(new Point(x, y));
+                    }
+                }
+
+                // calculate next point in lcp
+                for(int j = 0; j < lcp.Count; j++)
+                {
+                    lcp[j].CalculateNextPoint();
+                }
+
+                // remove end point in cross points
+                for (int i = lcp.Count - 1; i >= 0; i--)
+                {
+                    if (lcp[i].p.Y >= lcp[i].edy)
+                    {
+                        lcp.RemoveAt(i);
+                    }
+                }
+
+                foreach(PointPair pp in lpa[y - minY].vertex)
+                {
+                    if (pp.isEnd)
+                        continue;
+
+                    lcp.Add(new CrossPoint(pp.v, pp.next));
+                }
+
+                log.write(String.Format("calculate cross point at y={0}", y));
+                for (int i = 0; i < lcp.Count; i++)
+                {
+                    log.write(String.Format("({0}, {1})", lcp[i].p.X, lcp[i].p.Y));
+                }
+            }
+
+            return lps;
         }
     }
 
@@ -1678,10 +1902,13 @@ namespace ComputerGraphicsWork
             selectedUserGraphics = newUserGraphics;
         }
 
-        private delegate void TransformOperation(CGUserGraphics g);
+        private delegate void TransformOperation(ref CGUserGraphics g);
         private void TransformGraphicsFrame(TransformOperation btf)
         {
             if (!isUserGraphicsSelected || selectedUserGraphics == basePoint)
+                return;
+
+            if (rawSelectedGraphics == null)
                 return;
 
             DeleteSelectedGraphics();
@@ -1689,21 +1916,22 @@ namespace ComputerGraphicsWork
             // why not remove rawSelectedGraphics firstly and transform and refill it?
             //   reduce the loss between two adjacent graphics
             transfromSelectedGraphics = rawSelectedGraphics.Copy();
-            btf(transfromSelectedGraphics);
+            btf(ref transfromSelectedGraphics);
 
             UpdateSelectedGraphics(transfromSelectedGraphics);
         }
 
         public void InternalColoring()
         {
-            TransformGraphicsFrame(g => {
+            rawSelectedGraphics = selectedUserGraphics;
+            TransformGraphicsFrame((ref CGUserGraphics g) => {
                 g.InternalColoring();
             });
         }
 
         public void MoveSelectedGraphics(Point newPos)
         {
-            TransformGraphicsFrame(g => {
+            TransformGraphicsFrame((ref CGUserGraphics g) => {
                 g.TransformMove(newPos.X - posOfGraphicsWhenSelected.X,
                     newPos.Y - posOfGraphicsWhenSelected.Y);
             });
@@ -1713,7 +1941,7 @@ namespace ComputerGraphicsWork
         {
             if (basePoint == null)
                 return;
-            TransformGraphicsFrame(g => {
+            TransformGraphicsFrame((ref CGUserGraphics g) => {
                 g.TransformZoom(
                     new Point(basePoint.X, basePoint.Y),
                     posOfGraphicsWhenSelected,
@@ -1725,7 +1953,7 @@ namespace ComputerGraphicsWork
         {
             if (basePoint == null)
                 return;
-            TransformGraphicsFrame(g => {
+            TransformGraphicsFrame((ref CGUserGraphics g) => {
                 g.TransformRotation(
                     new Point(basePoint.X, basePoint.Y),
                     posOfGraphicsWhenSelected,

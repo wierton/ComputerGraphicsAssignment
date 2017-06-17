@@ -44,6 +44,7 @@ namespace ComputerGraphicsWork
             this.buttonZoomGraphics = new System.Windows.Forms.ToolStripButton();
             this.buttonAdjustGraphics = new System.Windows.Forms.ToolStripButton();
             this.buttonColoring = new System.Windows.Forms.ToolStripButton();
+            this.buttonInternalColoring = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawPoint = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawLine = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawRectangle = new System.Windows.Forms.ToolStripButton();
@@ -53,7 +54,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawBStyleCurve = new System.Windows.Forms.ToolStripButton();
             this.buttonTrim = new System.Windows.Forms.ToolStripButton();
-            this.buttonInternalColoring = new System.Windows.Forms.ToolStripButton();
+            this.buttonTest = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,7 +76,8 @@ namespace ComputerGraphicsWork
             this.buttonDrawPolygon,
             this.buttonDrawBezier,
             this.buttonDrawBStyleCurve,
-            this.buttonTrim});
+            this.buttonTrim,
+            this.buttonTest});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
             this.commandHolder.Size = new System.Drawing.Size(635, 35);
@@ -153,6 +155,17 @@ namespace ComputerGraphicsWork
             this.buttonColoring.Size = new System.Drawing.Size(32, 32);
             this.buttonColoring.Text = "coloring";
             this.buttonColoring.Click += new System.EventHandler(this.buttonColoring_Click);
+            // 
+            // buttonInternalColoring
+            // 
+            this.buttonInternalColoring.AutoSize = false;
+            this.buttonInternalColoring.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonInternalColoring.Image = ((System.Drawing.Image)(resources.GetObject("buttonInternalColoring.Image")));
+            this.buttonInternalColoring.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonInternalColoring.Name = "buttonInternalColoring";
+            this.buttonInternalColoring.Size = new System.Drawing.Size(32, 32);
+            this.buttonInternalColoring.Text = "internal coloring";
+            this.buttonInternalColoring.Click += new System.EventHandler(this.buttonInternalColoring_Click);
             // 
             // buttonDrawPoint
             // 
@@ -259,16 +272,15 @@ namespace ComputerGraphicsWork
             this.buttonTrim.ToolTipText = "trim";
             this.buttonTrim.Click += new System.EventHandler(this.buttonTrim_Click);
             // 
-            // buttonInternalColoring
+            // buttonTest
             // 
-            this.buttonInternalColoring.AutoSize = false;
-            this.buttonInternalColoring.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonInternalColoring.Image = ((System.Drawing.Image)(resources.GetObject("buttonInternalColoring.Image")));
-            this.buttonInternalColoring.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonInternalColoring.Name = "buttonInternalColoring";
-            this.buttonInternalColoring.Size = new System.Drawing.Size(32, 32);
-            this.buttonInternalColoring.Text = "internal coloring";
-            this.buttonInternalColoring.Click += new System.EventHandler(this.buttonInternalColoring_Click);
+            this.buttonTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonTest.Image = ((System.Drawing.Image)(resources.GetObject("buttonTest.Image")));
+            this.buttonTest.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTest.Name = "buttonTest";
+            this.buttonTest.Size = new System.Drawing.Size(23, 32);
+            this.buttonTest.Text = "buttonTest";
+            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
             // 
             // MainWindow
             // 
@@ -314,5 +326,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawRectangle;
         private System.Windows.Forms.ToolStripButton buttonDrawBStyleCurve;
         private System.Windows.Forms.ToolStripButton buttonInternalColoring;
+        private System.Windows.Forms.ToolStripButton buttonTest;
     }
 }

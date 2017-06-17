@@ -431,22 +431,39 @@ namespace ComputerGraphicsWork
         }
 
         private void buttonTest_Click(object sender, EventArgs e)
-        {
+        {/*
             CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(
-                new List<Point>() {
-                    new Point(100, 100),
-                    new Point(200, 100),
-                    new Point(200, 400),
-                    new Point(100, 400),
-                }
+               new List<Point>() {
+                    new Point(0, 110),
+                    new Point(80, 110),
+                    new Point(40, 100),
+               }
             );
 
-            Rectangle rect = new Rectangle(0, 200, 300, 100);
-            userCanvas.AddGraphics(polygon);
-            userCanvas.SetGraphicsSelected(polygon);
-            userCanvas.trimSelectedGraphics(rect);
-            //userCanvas.AddGraphics(new CGUserGraphicsRectangle(new Point(105, 100),  new Point(130, 160)));
+            polygon.InternalColoring();
+
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+            */
+             CGUserGraphicsPolygon polygon = new CGUserGraphicsPolygon(
+                 new List<Point>() {
+                     new Point(00, 30 + 100),
+                     new Point(40, 30 + 100),
+                     new Point(10, 00 + 100),
+                     new Point(20, 40 + 100),
+                     new Point(30, 00 + 100),
+                 }
+             );
+
+             CGUserGraphicsPolygon newP = (CGUserGraphicsPolygon)polygon.Copy();
+             newP = (CGUserGraphicsPolygon)newP.TransformMove(100, 0);
+
+             polygon.InternalColoring();
+
+             userCanvas.AddGraphics(polygon);
+             userCanvas.AddGraphics(newP);
+
+             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+             
         }
 
         // return true if can clear old graphics
