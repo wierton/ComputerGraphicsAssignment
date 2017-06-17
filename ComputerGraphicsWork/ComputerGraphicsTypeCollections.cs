@@ -2204,5 +2204,149 @@ namespace ComputerGraphicsWork
             trimRectangle = new CGUserGraphicsRectangle(new Point(minX, minY), new Point(maxX, maxY));
             this.DrawGraphics(trimRectangle);
         }
+
+        public void SaveToCGFile(string fileName)
+        {
+            FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate);
+            StreamWriter sw = new StreamWriter(fs);
+
+
+            sw.Write(".cg\n");
+
+            foreach(var g in userGraphicsSet)
+            {
+                sw.Write(String.Format("{0}:", g.GetType().ToString()));
+
+                foreach(var p in g.keyPoints)
+                {
+                    sw.Write(String.Format(" {0} {1}", p.X, p.Y));
+                }
+
+                sw.Write("\n");
+            }
+
+
+            sw.Flush();
+            sw.Close();
+            fs.Close();
+        }
+
+        public void LoadFromCGFile(string fileName)
+        {
+            FileStream fs = null;
+
+            try
+            {
+                fs = new FileStream(fileName, FileMode.OpenOrCreate);
+            }
+            catch
+            {
+                MessageBox.Show(String.Format("fail to open file '{0}'", fileName));
+                return;
+            }
+            StreamReader sr = new StreamReader(fs);
+
+
+            String fileType = sr.ReadLine();
+
+            if(fileType != ".cg")
+            {
+                sr.Close();
+                fs.Close();
+                MessageBox.Show(String.Format("file '{0}' is not cg file", fileName));
+                return;
+            }
+
+            while (!sr.EndOfStream)
+            {
+                string lineText = sr.ReadLine();
+
+                // split by :
+                string[] columns = lineText.Split(':');
+
+                if (columns.Count() < 2)
+                    continue;
+
+                // delete spaces at the begin and end position
+                string allNumStrings = columns[1].Trim();
+
+                // split by ' ' ==> "12" "23" "78" "89" ...
+                string[] numStrings = allNumStrings.Split(' ');
+
+                int[] numInts = new int[numStrings.Count()];
+
+                // to int
+                for(int i = 0; i < numStrings.Count(); i++)
+                {
+                    numInts[i] = Convert.ToInt32(numStrings[i]);
+                }
+
+
+                if (numInts.Count() == 0 ||  numInts.Count() % 2 != 0)
+                    continue;
+
+                // convert to key points
+                List<Point> keyPoints = new List<Point>();
+
+                for(int i = 0; i < numInts.Count(); i += 2)
+                {
+                    keyPoints.Add(new Point(numInts[i], numInts[i + 1]));
+                }
+
+                CGUserGraphics graphics = null;
+                switch (columns[0])
+                {
+                    case "ComputerGraphicsWork.CGUserGraphicsPoint":
+                        if (keyPoints.Count < 1)
+                            break;
+                        graphics = new CGUserGraphicsPoint(keyPoints[0]);
+                        break;
+                    case "ComputerGraphicsWork.CGUserGraphicsLine":
+                        if (keyPoints.Count < 2)
+                            break;
+                        graphics = new CGUserGraphicsLine(keyPoints[0], keyPoints[1]);
+                        break;
+                    case "ComputerGraphicsWork.CGUserGraphicsCircle":
+                        if (keyPoints.Count < 2)
+                            break;
+                        graphics = new CGUserGraphicsCircle(keyPoints[0], keyPoints[1]);
+                        break;
+                    case "ComputerGraphicsWork.CGUserGraphicsEllipse":
+                        if (keyPoints.Count < 3)
+                            break;
+                        CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse();
+                        keyPoints.ForEach((p) => { ellipse.keyPoints.Add(p); });
+                        ellipse.CalculatePointsSet();
+                        graphics = ellipse;
+                        break;
+                    case "ComputerGraphicsWork.CGUserGraphicsRectangle":
+                    case "ComputerGraphicsWork.CGUserGraphicsPolygon":
+                        graphics = new CGUserGraphicsPolygon(keyPoints);
+                        break;
+                    case "ComputerGraphicsWork.CGUserGraphicsBStyleCurve":
+                        graphics = new CGUserGraphicsBStyleCurve(keyPoints);
+                        break;
+                    case "ComputerGraphicsWork.CGUserGraphicsBezier":
+                        graphics = new CGUserGraphicsBezier(keyPoints);
+                        break;
+                    case "ComputerGraphicsWork.CGUserGraphicsBlock":
+                        graphics = new CGUserGraphicsBlock(keyPoints);
+                        break;
+                    default:
+                        // MessageBox.Show(String.Format(""));
+                        break;
+                }
+
+                if(graphics != null)
+                {
+                    this.AddGraphics(graphics);
+                }
+            }
+
+
+            sr.Close();
+            fs.Close();
+
+        }
     }
 }

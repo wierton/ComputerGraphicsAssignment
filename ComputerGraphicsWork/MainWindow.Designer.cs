@@ -55,12 +55,14 @@ namespace ComputerGraphicsWork
             this.buttonDrawBStyleCurve = new System.Windows.Forms.ToolStripButton();
             this.buttonTrim = new System.Windows.Forms.ToolStripButton();
             this.buttonTest = new System.Windows.Forms.ToolStripButton();
+            this.buttonOpenFile = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
             // commandHolder
             // 
             this.commandHolder.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buttonOpenFile,
             this.buttonSaveBitmap,
             this.buttonMoveGraphics,
             this.buttonRotation,
@@ -282,6 +284,18 @@ namespace ComputerGraphicsWork
             this.buttonTest.Text = "buttonTest";
             this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
             // 
+            // buttonOpenFile
+            // 
+            this.buttonOpenFile.AutoSize = false;
+            this.buttonOpenFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonOpenFile.Image = ((System.Drawing.Image)(resources.GetObject("buttonOpenFile.Image")));
+            this.buttonOpenFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonOpenFile.Name = "buttonOpenFile";
+            this.buttonOpenFile.Size = new System.Drawing.Size(32, 32);
+            this.buttonOpenFile.Text = "buttonOpenFile";
+            this.buttonOpenFile.ToolTipText = "open cg file";
+            this.buttonOpenFile.Click += new System.EventHandler(this.buttonOpenFile_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -327,5 +341,6 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawBStyleCurve;
         private System.Windows.Forms.ToolStripButton buttonInternalColoring;
         private System.Windows.Forms.ToolStripButton buttonTest;
+        private System.Windows.Forms.ToolStripButton buttonOpenFile;
     }
 }

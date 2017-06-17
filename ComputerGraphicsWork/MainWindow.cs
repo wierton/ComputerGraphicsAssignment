@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 
 namespace ComputerGraphicsWork
 {
@@ -141,15 +134,38 @@ namespace ComputerGraphicsWork
             normalButtonClicked(this.buttonTrim);
         }
 
+        private void buttonOpenFile_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.InitialDirectory = ".";
+            ofd.Filter = "图元文件(*.cg)|*.cg";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                String strFileName = ofd.FileName;
+
+                userCanvas.LoadFromCGFile(strFileName);
+
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+            }
+        }
+
         private void buttonSaveBitmap_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = ".";
-            sfd.Filter = "图片文件(*.bmp;*.png;*.jpg)|*.bmp;*.png;*.jpg";
+            sfd.Filter = "图片文件(*.bmp;*.png;*.jpg)|*.bmp;*.png;*.jpg|图元文件(*.cg)|*.cg";
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 String strFileName = sfd.FileName;
-                userCanvas.bmp.Save(strFileName);
+
+                if (strFileName.EndsWith(".cg"))
+                {
+                    userCanvas.SaveToCGFile(strFileName);
+                }
+                else
+                {
+                    userCanvas.bmp.Save(strFileName);
+                }
             }
         }
 
@@ -464,6 +480,8 @@ namespace ComputerGraphicsWork
             ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
             */
         }
+
+
 
         // return true if can clear old graphics
         private bool NormalPartOfUpdateTwoPointGraphics(CGUserGraphics graphics)
