@@ -194,7 +194,8 @@ namespace ComputerGraphicsWork
 
     public class ZoomFactor
     {
-        double sx, sy;
+        public double sx { get; }
+        public double sy { get; }
         bool isFactorValid = true;
 
         public ZoomFactor(Point basePos, Point oldPos, Point newPos)
@@ -806,6 +807,34 @@ namespace ComputerGraphicsWork
             }
 
             return lps;
+        }
+
+        public override CGUserGraphics TransformZoom(Point basePos, Point oldPos, Point newPos)
+        {
+            ZoomFactor zf = new ZoomFactor(basePos, oldPos, newPos);
+
+
+
+            if(Math.Abs(zf.sx -  zf.sy) < 1e-6)
+            {
+                return base.TransformZoom(basePos, oldPos, newPos);
+            }
+            else
+            {
+                int dx = keyPoints[1].X - keyPoints[0].X;
+                int dy = keyPoints[1].Y - keyPoints[0].Y;
+
+                int d = (int)(Math.Sqrt(dx * dx + dy * dy) + 0.5);
+
+                CGUserGraphicsEllipse ellipse = new CGUserGraphicsEllipse();
+                ellipse.keyPoints.Add(new Point(keyPoints[0].X - d, keyPoints[0].Y - d));
+                ellipse.keyPoints.Add(new Point(keyPoints[0].X + d, keyPoints[0].Y + d));
+                ellipse.keyPoints.Add(new Point(keyPoints[0].X + d, keyPoints[0].Y - d));
+
+                ellipse.CalculatePointsSet();
+
+                return ellipse;
+            }
         }
     }
     public class CGUserGraphicsEllipse : CGUserGraphics
@@ -2114,7 +2143,7 @@ namespace ComputerGraphicsWork
         public void MoveSelectedGraphics(Point newPos)
         {
             TransformGraphicsFrame((ref CGUserGraphics g) => {
-                g.TransformMove(newPos.X - posOfGraphicsWhenSelected.X,
+                g = g.TransformMove(newPos.X - posOfGraphicsWhenSelected.X,
                     newPos.Y - posOfGraphicsWhenSelected.Y);
             });
         }
@@ -2123,11 +2152,20 @@ namespace ComputerGraphicsWork
         {
             if (basePoint == null)
                 return;
-            TransformGraphicsFrame((ref CGUserGraphics g) => {
-                g.TransformZoom(
+            TransformGraphicsFrame((ref CGUserGraphics g) =>
+            {
+                // except for ellipse
+                CGUserGraphics newG = g.TransformZoom(
                     new Point(basePoint.X, basePoint.Y),
                     posOfGraphicsWhenSelected,
                     newPos);
+
+                if (g.GetType().ToString() == "ComputerGraphicsWork.CGUserGraphicsCircle"
+                && newG.GetType().ToString() == "ComputerGraphicsWork.CGUserGraphicsEllipse")
+                {
+                    rawSelectedGraphics = newG;
+                }
+                g = newG;
             });
         }
 
@@ -2136,7 +2174,7 @@ namespace ComputerGraphicsWork
             if (basePoint == null)
                 return;
             TransformGraphicsFrame((ref CGUserGraphics g) => {
-                g.TransformRotation(
+                g = g.TransformRotation(
                     new Point(basePoint.X, basePoint.Y),
                     posOfGraphicsWhenSelected,
                     newPos);

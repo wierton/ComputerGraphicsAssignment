@@ -38,6 +38,7 @@ namespace ComputerGraphicsWork
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.commandHolder = new System.Windows.Forms.ToolStrip();
+            this.buttonOpenFile = new System.Windows.Forms.ToolStripButton();
             this.buttonSaveBitmap = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveGraphics = new System.Windows.Forms.ToolStripButton();
             this.buttonRotation = new System.Windows.Forms.ToolStripButton();
@@ -55,7 +56,6 @@ namespace ComputerGraphicsWork
             this.buttonDrawBStyleCurve = new System.Windows.Forms.ToolStripButton();
             this.buttonTrim = new System.Windows.Forms.ToolStripButton();
             this.buttonTest = new System.Windows.Forms.ToolStripButton();
-            this.buttonOpenFile = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -87,6 +87,18 @@ namespace ComputerGraphicsWork
             this.commandHolder.TabIndex = 0;
             this.commandHolder.Text = "commandHolder";
             this.commandHolder.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.commandHolder_ItemClicked);
+            // 
+            // buttonOpenFile
+            // 
+            this.buttonOpenFile.AutoSize = false;
+            this.buttonOpenFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonOpenFile.Image = ((System.Drawing.Image)(resources.GetObject("buttonOpenFile.Image")));
+            this.buttonOpenFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonOpenFile.Name = "buttonOpenFile";
+            this.buttonOpenFile.Size = new System.Drawing.Size(32, 32);
+            this.buttonOpenFile.Text = "buttonOpenFile";
+            this.buttonOpenFile.ToolTipText = "open cg file";
+            this.buttonOpenFile.Click += new System.EventHandler(this.buttonOpenFile_Click);
             // 
             // buttonSaveBitmap
             // 
@@ -259,7 +271,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawBStyleCurve.Name = "buttonDrawBStyleCurve";
             this.buttonDrawBStyleCurve.Size = new System.Drawing.Size(32, 32);
             this.buttonDrawBStyleCurve.Text = "buttonDrawBStyleCurve";
-            this.buttonDrawBStyleCurve.ToolTipText = "B style curve";
+            this.buttonDrawBStyleCurve.ToolTipText = "B spline curve";
             this.buttonDrawBStyleCurve.Click += new System.EventHandler(this.buttonDrawBStyleCurve_Click);
             // 
             // buttonTrim
@@ -283,18 +295,6 @@ namespace ComputerGraphicsWork
             this.buttonTest.Size = new System.Drawing.Size(23, 32);
             this.buttonTest.Text = "buttonTest";
             this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
-            // 
-            // buttonOpenFile
-            // 
-            this.buttonOpenFile.AutoSize = false;
-            this.buttonOpenFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonOpenFile.Image = ((System.Drawing.Image)(resources.GetObject("buttonOpenFile.Image")));
-            this.buttonOpenFile.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonOpenFile.Name = "buttonOpenFile";
-            this.buttonOpenFile.Size = new System.Drawing.Size(32, 32);
-            this.buttonOpenFile.Text = "buttonOpenFile";
-            this.buttonOpenFile.ToolTipText = "open cg file";
-            this.buttonOpenFile.Click += new System.EventHandler(this.buttonOpenFile_Click);
             // 
             // MainWindow
             // 
