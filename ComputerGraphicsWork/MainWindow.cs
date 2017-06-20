@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace ComputerGraphicsWork
@@ -153,7 +152,7 @@ namespace ComputerGraphicsWork
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = ".";
-            sfd.Filter = "图片文件(*.bmp;*.png;*.jpg)|*.bmp;*.png;*.jpg|图元文件(*.cg)|*.cg";
+            sfd.Filter = "图元文件(*.cg)|*.cg|图片文件(*.bmp;*.png;*.jpg)|*.bmp;*.png;*.jpg";
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 String strFileName = sfd.FileName;
@@ -448,8 +447,9 @@ namespace ComputerGraphicsWork
 
         private void buttonTest_Click(object sender, EventArgs e)
         {
+            Wpf3D.MainWindow wpfwindow = new Wpf3D.MainWindow();
+            wpfwindow.ShowDialog();
 
-            
             /*
             Point a = new Point(301, 178);
             Point b = new Point(237, 196);
@@ -495,6 +495,7 @@ namespace ComputerGraphicsWork
                 userCanvas.RemoveGraphics(curUserGraphics);
                 ret = true;
             }
+
 
             userCanvas.AddGraphics(graphics);
             userCanvas.SetGraphicsSelected(graphics);

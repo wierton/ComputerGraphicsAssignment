@@ -2286,7 +2286,7 @@ namespace ComputerGraphicsWork
 
         public void SaveToCGFile(string fileName)
         {
-            FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate);
+            FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs);
 
 
@@ -2304,6 +2304,7 @@ namespace ComputerGraphicsWork
                 sw.Write("\n");
             }
 
+            
 
             sw.Flush();
             sw.Close();

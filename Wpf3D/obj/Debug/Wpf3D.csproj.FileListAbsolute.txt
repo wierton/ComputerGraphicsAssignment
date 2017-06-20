@@ -1,0 +1,14 @@
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\bin\Debug\Wpf3D.exe.config
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\bin\Debug\Wpf3D.exe
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\bin\Debug\Wpf3D.pdb
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D.csprojResolveAssemblyReference.cache
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\MainWindow.g.cs
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\App.g.cs
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D_MarkupCompile.cache
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D_MarkupCompile.lref
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\MainWindow.baml
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D.g.resources
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D.Properties.Resources.resources
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D.csproj.GenerateResource.Cache
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D.exe
+C:\Users\欧先飞\Desktop\ComputerGraphicsWork\Wpf3D\obj\Debug\Wpf3D.pdb
