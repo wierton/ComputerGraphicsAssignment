@@ -209,7 +209,7 @@ namespace ComputerGraphicsWork
             if (canClearGraphics)
             {
                 // clear current graphics in userCanvas
-                userCanvas.ClearStateOfSelectedGraphics();
+                // userCanvas.ClearStateOfSelectedGraphics();
                 // flip userCanvas to ghs
                 ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
             }
@@ -448,6 +448,8 @@ namespace ComputerGraphicsWork
 
         private void buttonTest_Click(object sender, EventArgs e)
         {
+
+            
             /*
             Point a = new Point(301, 178);
             Point b = new Point(237, 196);
@@ -502,9 +504,8 @@ namespace ComputerGraphicsWork
             return ret;
         }
 
-        private void NormalPartOfUpdateMultPointGraphics()
+        private void NormalPartOfUpdateMultPointGraphics(CGUserGraphicsLine pline)
         {
-            CGUserGraphicsLine pline = new CGUserGraphicsLine(upPos, curPos);
             if (NormalPartOfUpdateTwoPointGraphics(pline))
             {
                 polygonEdgeSet.Remove(oldEdgeLineOfPolygon);
@@ -512,6 +513,25 @@ namespace ComputerGraphicsWork
 
             oldEdgeLineOfPolygon = pline;
             polygonEdgeSet.Add(pline);
+        }
+
+        private delegate CGUserGraphics UpdateCurveOperation(ref List<Point> lps);
+        private void NormalPartOfUpdateMultPointCurve(UpdateCurveOperation ucof)
+        {
+            if (polygonEdgeSet.Count >= 2)
+            {
+                List<Point> tpl = new List<Point>();
+                polygonEdgeSet.ForEach((l) => { tpl.Add(l.firstPoint); });
+                tpl.Add(curPos);
+
+                if (oldSelectedCurve != null)
+                {
+                    userCanvas.RemoveGraphics(oldSelectedCurve);
+                }
+                oldSelectedCurve = ucof(ref tpl);
+                userCanvas.AddGraphics(oldSelectedCurve);
+                ghs.DrawImage(userCanvas.bmp, this.ClientRectangle);
+            }
         }
 
         private void MainWindow_MouseMove(object sender, MouseEventArgs e)
@@ -578,41 +598,15 @@ namespace ComputerGraphicsWork
                     NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsPoint(curPos));
                     break;
                 case "buttonDrawBezier":
-                    NormalPartOfUpdateMultPointGraphics();
-
-                    if (polygonEdgeSet.Count >= 2)
-                    {
-                        List<Point> tpl = new List<Point>();
-                        polygonEdgeSet.ForEach((l)=> { tpl.Add(l.firstPoint); });
-                        tpl.Add(polygonEdgeSet.Last().nextPoint);
-
-                        if (oldSelectedCurve != null)
-                        {
-                            userCanvas.RemoveGraphics(oldSelectedCurve);
-                        }
-                        oldSelectedCurve = new CGUserGraphicsBezier(tpl);
-                        userCanvas.AddGraphics(oldSelectedCurve);
-                    }
+                    NormalPartOfUpdateMultPointGraphics(new CGUserGraphicsDottedLine(upPos, curPos));
+                    NormalPartOfUpdateMultPointCurve((ref List<Point> lps)=> new CGUserGraphicsBezier(lps));
                     break;
                 case "buttonDrawBStyleCurve":
-                    NormalPartOfUpdateMultPointGraphics();
-
-                    if (polygonEdgeSet.Count >= 2)
-                    {
-                        List<Point> tpl = new List<Point>();
-                        polygonEdgeSet.ForEach((l) => { tpl.Add(l.firstPoint); });
-                        tpl.Add(polygonEdgeSet.Last().nextPoint);
-
-                        if (oldSelectedCurve != null)
-                        {
-                            userCanvas.RemoveGraphics(oldSelectedCurve);
-                        }
-                        oldSelectedCurve = new CGUserGraphicsBStyleCurve(tpl);
-                        userCanvas.AddGraphics(oldSelectedCurve);
-                    }
+                    NormalPartOfUpdateMultPointGraphics(new CGUserGraphicsDottedLine(upPos, curPos));
+                    NormalPartOfUpdateMultPointCurve((ref List<Point> lps) => new CGUserGraphicsBStyleCurve(lps));
                     break;
                 case "buttonDrawPolygon":
-                    NormalPartOfUpdateMultPointGraphics();
+                    NormalPartOfUpdateMultPointGraphics(new CGUserGraphicsLine(upPos, curPos));
                     break;
                 case "buttonDrawLine":
                     NormalPartOfUpdateTwoPointGraphics(new CGUserGraphicsLine(downPos, curPos));

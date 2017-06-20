@@ -260,6 +260,7 @@ namespace ComputerGraphicsWork
         }
 
         public delegate Point TransformOperation(Point p);
+
         public CGUserGraphics BasicTransformFrame(TransformOperation btf)
         {
             for (int i = keyPoints.Count - 1; i >= 0; i--)
@@ -308,7 +309,8 @@ namespace ComputerGraphicsWork
                 }
             }
 
-            UpdatePointsSet();
+            pointsSet.Clear();
+            CalculatePointsSet();
 
             if (isColored)
             {
@@ -460,7 +462,7 @@ namespace ComputerGraphicsWork
             return ret.ToArray();
         }
 
-        int get_area(Point a0, Point a1, Point a2)
+        private int GetArea(Point a0, Point a1, Point a2)
         { 
             //求有向面积  
             return a0.X * a1.Y + a2.X * a0.Y + a1.X * a2.Y - a2.X * a1.Y - a0.X * a2.Y - a1.X * a0.Y;
@@ -468,10 +470,10 @@ namespace ComputerGraphicsWork
 
         public bool IsSegmentsIntersect(Point st1, Point ed1, Point st2, Point ed2)
         {
-            int s1 = get_area(st1, ed1, st2);
-            int s2 = get_area(st1, ed1, ed2);
-            int s3 = get_area(st2, ed2, st1);
-            int s4 = get_area(st2, ed2, ed1);
+            int s1 = GetArea(st1, ed1, st2);
+            int s2 = GetArea(st1, ed1, ed2);
+            int s3 = GetArea(st2, ed2, st1);
+            int s4 = GetArea(st2, ed2, ed1);
             if (s1 * s2 <= 0 && s3 * s4 <= 0)
                 return true;
             else
@@ -516,6 +518,34 @@ namespace ComputerGraphicsWork
             int dx = Math.Abs(point.X - cursorPos.X);
             int dy = Math.Abs(point.Y - cursorPos.Y);
             return (dx <= 4 && dy <= 4);
+        }
+    }
+
+    public class CGUserGraphicsDottedLine : CGUserGraphicsLine
+    {
+        public CGUserGraphicsDottedLine() { }
+
+        public CGUserGraphicsDottedLine(Point start, Point end)
+        {
+            keyPoints.Add(start);
+            keyPoints.Add(end);
+            CalculatePointsSet();
+        }
+
+        public override void CalculatePointsSet()
+        {
+            base.CalculatePointsSet();
+
+            List<Point> lps = new List<Point>(pointsSet);
+            pointsSet.Clear();
+
+            for (int i = 0; i < lps.Count; i++)
+            {
+                if(i % 6 < 4)
+                {
+                    pointsSet.Add(lps[i]);
+                }
+            }
         }
     }
 
@@ -1227,11 +1257,22 @@ namespace ComputerGraphicsWork
                 return new List<CGUserGraphics>() { new CGUserGraphicsLine(ps[0], ps[1]) };
             }
 
+            List<CGUserGraphics> lgs = new List<CGUserGraphics>();
 
             if (IsAnyTwoLineCross())
-                return TransformTrimBySutherlandHodgman(rect);
+                lgs = TransformTrimBySutherlandHodgman(rect);
             else
-                return TransformTrimByWeilerrAtherton(rect);
+                lgs = TransformTrimByWeilerrAtherton(rect);
+
+            if (isColored)
+            {
+                for(int i = 0; i < lgs.Count; i++)
+                {
+                    lgs[i].InternalColoring();
+                }
+            }
+
+            return lgs;
         }
 
         public List<CGUserGraphics> TransformTrimBySutherlandHodgman(Rectangle rect)
@@ -1835,7 +1876,7 @@ namespace ComputerGraphicsWork
         }
         public override void CalculatePointsSet()
         {
-            if (keyPoints.Count <= 4)
+            if (keyPoints.Count <= 3)
                 return;
 
             for(int i = 0; i < keyPoints.Count - 3; i++)
@@ -2253,7 +2294,7 @@ namespace ComputerGraphicsWork
 
             foreach(var g in userGraphicsSet)
             {
-                sw.Write(String.Format("{0}:", g.GetType().ToString()));
+                sw.Write(String.Format("{0}:{1}:", g.GetType().ToString(), g.isColored));
 
                 foreach(var p in g.keyPoints)
                 {
@@ -2302,11 +2343,13 @@ namespace ComputerGraphicsWork
                 // split by :
                 string[] columns = lineText.Split(':');
 
-                if (columns.Count() < 2)
+                if (columns.Count() < 3)
                     continue;
 
+                bool IsCurGraphicColored = Convert.ToBoolean(columns[1]);
+
                 // delete spaces at the begin and end position
-                string allNumStrings = columns[1].Trim();
+                string allNumStrings = columns[2].Trim();
 
                 // split by ' ' ==> "12" "23" "78" "89" ...
                 string[] numStrings = allNumStrings.Split(' ');
@@ -2377,6 +2420,10 @@ namespace ComputerGraphicsWork
 
                 if(graphics != null)
                 {
+                    if (IsCurGraphicColored)
+                    {
+                        graphics.InternalColoring();
+                    }
                     this.AddGraphics(graphics);
                 }
             }
