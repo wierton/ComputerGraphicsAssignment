@@ -4,78 +4,90 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf3D"
+        MouseMove="Viewport3D_MouseMove"
+        MouseLeftButtonDown="Viewport3D_MouseLeftButtonDown"
+        MouseWheel="Viewport3D_MouseWheel"
         mc:Ignorable="d"
+        Background="Black"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <Viewport3D>
-            <Viewport3D.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard>
-                        <Storyboard RepeatBehavior="Forever">
-                            <Point3DAnimationUsingKeyFrames Storyboard.TargetProperty="Position"
-                                                   Storyboard.TargetName="camera">
-                                <LinearPoint3DKeyFrame KeyTime="0:0:1" Value="5 0 0"/>
-                                <LinearPoint3DKeyFrame KeyTime="0:0:2" Value="0 0 -5"/>
-                                <LinearPoint3DKeyFrame KeyTime="0:0:3" Value="-5 0 0"/>
-                                <LinearPoint3DKeyFrame KeyTime="0:0:4" Value="0 0 5"/>
-                            </Point3DAnimationUsingKeyFrames>
-                            <Vector3DAnimationUsingKeyFrames Storyboard.TargetProperty="LookDirection"
-                                                    Storyboard.TargetName="camera">
-                                <LinearVector3DKeyFrame KeyTime="0:0:1" Value="-1 0 0"/>
-                                <LinearVector3DKeyFrame KeyTime="0:0:2" Value="0 0 1"/>
-                                <LinearVector3DKeyFrame KeyTime="0:0:3" Value="1 0 0"/>
-                                <LinearVector3DKeyFrame KeyTime="0:0:4" Value="0 0 -1"/>
-                            </Vector3DAnimationUsingKeyFrames>
-                            <Vector3DAnimationUsingKeyFrames Storyboard.TargetProperty="Direction"
-                                                    Storyboard.TargetName="light">
-                                <LinearVector3DKeyFrame KeyTime="0:0:1" Value="-1 0 0"/>
-                                <LinearVector3DKeyFrame KeyTime="0:0:2" Value="0 0 1"/>
-                                <LinearVector3DKeyFrame KeyTime="0:0:3" Value="1 0 0"/>
-                                <LinearVector3DKeyFrame KeyTime="0:0:4" Value="0 0 -1"/>
-                            </Vector3DAnimationUsingKeyFrames>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Viewport3D.Triggers>
-            <Viewport3D.Camera>
-                <PerspectiveCamera x:Name="camera" Position="0 0 5" LookDirection="0 0 -1" FieldOfView="60"/>
-            </Viewport3D.Camera>
-            <ModelVisual3D>
-                <ModelVisual3D.Content>
-                    <Model3DGroup>
-                        <DirectionalLight Direction="0 0 -1"
-                                 x:Name="light"
-                                 Color="White"/>
-                        <GeometryModel3D>
-                            <GeometryModel3D.Geometry>
-                                <MeshGeometry3D Positions="-1 1 1, 1 1 1, -1 -1 1, 1 -1 1, -1 1 -1, 1 1 -1, -1 -1 -1, 1 -1 -1
-                                                    1 1 1, 1 1 -1, 1 -1 1, 1 -1 -1, -1 1 1, -1 1 -1, -1 -1 1, -1 -1 -1
-                                                   -1 1 1, -1 1 -1, 1 1 1, 1 1 -1, -1 -1 1, -1 -1 -1, 1 -1 1, 1 -1 -1"
-                                       TriangleIndices="0 2 1, 1 2 3, 5 6 4, 5 7 6
-                                                        8 10 9, 9 10 11, 13 14 12, 13 15 14
-                                                        16 18 17, 17 18 19, 22 21 20, 22 23 21"
-                                       TextureCoordinates="0 0, 1 0, 0 1, 1 1,
-                                                           0 0, 1 0, 0 1, 1 1,
-                                                           0 0, 1 0, 0 1, 1 1,
-                                                           0 0, 1 0, 0 1, 1 1,
-                                                           0 0, 1 0, 0 1, 1 1,
-                                                           0 0, 1 0, 0 1, 1 1" />
-                            </GeometryModel3D.Geometry>
 
-                            <GeometryModel3D.Material>
-                                <DiffuseMaterial>
-                                    <DiffuseMaterial.Brush>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Color="YellowGreen" Offset="0"/>
-                                            <GradientStop Color="Green" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </DiffuseMaterial.Brush>
-                                </DiffuseMaterial>
-                            </GeometryModel3D.Material>
-                        </GeometryModel3D>
-                    </Model3DGroup>
-                </ModelVisual3D.Content>
-            </ModelVisual3D>
+            <Viewport3D.Camera>
+                <PerspectiveCamera Position="8,8,8" LookDirection="-1 -1 -1" FieldOfView="75" UpDirection="-1 1 -1" x:Name="camera"></PerspectiveCamera>
+            </Viewport3D.Camera>
+            <Viewport3D.Children>
+                <ModelVisual3D x:Name="light">
+                    <ModelVisual3D.Content>
+                        <AmbientLight />
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <ModelVisual3D x:Name="magicCube">
+                    <ModelVisual3D.Content>
+                        <!--    0: 0,0,0    1: 0,0,2    2: 2,0,2    3: 2,0,0    4: 2,2,0    5: 0,2,0    6: 0,2,2    7: 2,2,2    -->
+                        <Model3DGroup x:Name="cube">
+                            <Model3DGroup.Transform>
+                                <TranslateTransform3D OffsetX="-1" OffsetY="-1" OffsetZ="-1" />
+                            </Model3DGroup.Transform>
+                            <!--F1: 0,3,2,1-->
+                            <GeometryModel3D x:Name="F1">
+                                <GeometryModel3D.Material>
+                                    <DiffuseMaterial Brush="Blue"/>
+                                </GeometryModel3D.Material>
+                                <GeometryModel3D.Geometry>
+                                    <MeshGeometry3D Positions="0,0,0 2,0,0 2,0,2 0,0,2" TriangleIndices="0,1,2 0,2,3"></MeshGeometry3D>
+                                </GeometryModel3D.Geometry>
+                            </GeometryModel3D>
+                            <!--F2: 0,1,6,5-->
+                            <GeometryModel3D x:Name="F2">
+                                <GeometryModel3D.Material>
+                                    <DiffuseMaterial Brush="Green"/>
+                                </GeometryModel3D.Material>
+                                <GeometryModel3D.Geometry>
+                                    <MeshGeometry3D Positions="0,0,0 0,0,2 0,2,2 0,2,0" TriangleIndices="0 1 2 0 2 3"></MeshGeometry3D>
+                                </GeometryModel3D.Geometry>
+                            </GeometryModel3D>
+                            <!--F3: 4,5,6,7-->
+                            <GeometryModel3D x:Name="F3">
+                                <GeometryModel3D.Material>
+                                    <DiffuseMaterial Brush="Red"/>
+                                </GeometryModel3D.Material>
+                                <GeometryModel3D.Geometry>
+                                    <MeshGeometry3D Positions="2,2,0 0,2,0 0,2,2 2,2,2" TriangleIndices="0 1 2 0 2 3"></MeshGeometry3D>
+                                </GeometryModel3D.Geometry>
+                            </GeometryModel3D>
+                            <!--F4: 2,3,4,7-->
+                            <GeometryModel3D x:Name="F4">
+                                <GeometryModel3D.Material>
+                                    <DiffuseMaterial Brush="Yellow"/>
+                                </GeometryModel3D.Material>
+                                <GeometryModel3D.Geometry>
+                                    <MeshGeometry3D Positions="2,0,2 2,0,0 2,2,0 2,2,2" TriangleIndices="0 1 2 0 2 3" TextureCoordinates="0,0 0,1 1,1 1,0">
+                                    </MeshGeometry3D>
+                                </GeometryModel3D.Geometry>
+                            </GeometryModel3D>
+                            <!--F5: 1,2,7,6-->
+                            <GeometryModel3D x:Name="F5">
+                                <GeometryModel3D.Material>
+                                    <DiffuseMaterial Brush="White"/>
+                                </GeometryModel3D.Material>
+                                <GeometryModel3D.Geometry>
+                                    <MeshGeometry3D Positions=" 0,0,2 2,0,2 2,2,2 0,2,2" TriangleIndices="0 1 2 0 2 3"></MeshGeometry3D>
+                                </GeometryModel3D.Geometry>
+                            </GeometryModel3D>
+                            <!--F6: 0,5,4,3-->
+                            <GeometryModel3D x:Name="F6">
+                                <GeometryModel3D.Material>
+                                    <DiffuseMaterial Brush="Orange"/>
+                                </GeometryModel3D.Material>
+                                <GeometryModel3D.Geometry>
+                                    <MeshGeometry3D Positions=" 0,0,0 0,2,0 2,2,0 2,0,0" TriangleIndices="0 1 2 0 2 3"></MeshGeometry3D>
+                                </GeometryModel3D.Geometry>
+                            </GeometryModel3D>
+                        </Model3DGroup>
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+            </Viewport3D.Children>
         </Viewport3D>
-   </Grid>
+    </Grid>
 </Window>
