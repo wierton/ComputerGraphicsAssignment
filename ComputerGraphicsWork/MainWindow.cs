@@ -220,6 +220,7 @@ namespace ComputerGraphicsWork
         {
 
         }
+
         private void MainWindow_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
@@ -250,7 +251,8 @@ namespace ComputerGraphicsWork
             if (buttonClicked == this.buttonMoveGraphics
                 || buttonClicked == this.buttonAdjustGraphics
                 || buttonClicked == this.buttonRotation
-                || buttonClicked == this.buttonZoomGraphics)
+                || buttonClicked == this.buttonZoomGraphics
+                || buttonClicked == null)
             {
                 userCanvas.SelectGraphicsByCursor(new Point(e.X, e.Y));
             }
@@ -445,7 +447,7 @@ namespace ComputerGraphicsWork
             }
         }
 
-        private void buttonTest_Click(object sender, EventArgs e)
+        private void buttonDrawCube_Click(object sender, EventArgs e)
         {
             Wpf3D.MainWindow wpfwindow = new Wpf3D.MainWindow();
             wpfwindow.ShowDialog();

@@ -55,7 +55,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawBezier = new System.Windows.Forms.ToolStripButton();
             this.buttonDrawBStyleCurve = new System.Windows.Forms.ToolStripButton();
             this.buttonTrim = new System.Windows.Forms.ToolStripButton();
-            this.buttonTest = new System.Windows.Forms.ToolStripButton();
+            this.buttonDrawCube = new System.Windows.Forms.ToolStripButton();
             this.commandHolder.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -79,7 +79,7 @@ namespace ComputerGraphicsWork
             this.buttonDrawBezier,
             this.buttonDrawBStyleCurve,
             this.buttonTrim,
-            this.buttonTest});
+            this.buttonDrawCube});
             this.commandHolder.Location = new System.Drawing.Point(0, 0);
             this.commandHolder.Name = "commandHolder";
             this.commandHolder.Size = new System.Drawing.Size(635, 35);
@@ -286,15 +286,17 @@ namespace ComputerGraphicsWork
             this.buttonTrim.ToolTipText = "trim";
             this.buttonTrim.Click += new System.EventHandler(this.buttonTrim_Click);
             // 
-            // buttonTest
+            // buttonDrawCube
             // 
-            this.buttonTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonTest.Image = ((System.Drawing.Image)(resources.GetObject("buttonTest.Image")));
-            this.buttonTest.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonTest.Name = "buttonTest";
-            this.buttonTest.Size = new System.Drawing.Size(23, 32);
-            this.buttonTest.Text = "buttonTest";
-            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
+            this.buttonDrawCube.AutoSize = false;
+            this.buttonDrawCube.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDrawCube.Image = ((System.Drawing.Image)(resources.GetObject("buttonDrawCube.Image")));
+            this.buttonDrawCube.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDrawCube.Name = "buttonDrawCube";
+            this.buttonDrawCube.Size = new System.Drawing.Size(32, 32);
+            this.buttonDrawCube.Text = "buttonDrawCube";
+            this.buttonDrawCube.ToolTipText = "cube";
+            this.buttonDrawCube.Click += new System.EventHandler(this.buttonDrawCube_Click);
             // 
             // MainWindow
             // 
@@ -340,7 +342,7 @@ namespace ComputerGraphicsWork
         private System.Windows.Forms.ToolStripButton buttonDrawRectangle;
         private System.Windows.Forms.ToolStripButton buttonDrawBStyleCurve;
         private System.Windows.Forms.ToolStripButton buttonInternalColoring;
-        private System.Windows.Forms.ToolStripButton buttonTest;
         private System.Windows.Forms.ToolStripButton buttonOpenFile;
+        private System.Windows.Forms.ToolStripButton buttonDrawCube;
     }
 }
